@@ -18,7 +18,8 @@ use super::{calculate_t, calculate_var};
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the planet
 /// Mercury. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date. It
-/// returns, in order, a tuple with the values ```(a, l, k, h, q, p)``` of the VSOP87 solution.
+/// returns, in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p*) of the VSOP87
+/// solution.
 ///
 /// # Examples
 ///
