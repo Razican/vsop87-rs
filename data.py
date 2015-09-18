@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 
-for filename in os.listdir("/home/razican/Downloads/vsop/"):
+for filename in os.listdir("data"):
     if "mer" in filename:
         newfile = "mercury.rs"
     elif "ven" in filename:
@@ -22,7 +22,7 @@ for filename in os.listdir("/home/razican/Downloads/vsop/"):
     if (filename.startswith("VSOP87.")):
         print("Opening the file "+filename)
 
-        with open("/home/razican/Downloads/vsop/"+filename) as data:
+        with open("data"+filename) as data:
 
             outfile = open("src/vsop87/"+newfile, 'w')
             number = 0
