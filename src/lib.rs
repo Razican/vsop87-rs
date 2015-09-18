@@ -8,7 +8,8 @@
 //! ```
 //!
 //! There is still one module per VSOP87 implementation. Currently only basic VSOP87 algorithm and
-//! the VSOP87A versions are implemented. Nevertheless, in the future, VSOP87B, VSOP87C, VSOP87D //! and VSOP87E will be implemented.
+//! the VSOP87A versions are implemented. Nevertheless, in the future, VSOP87B, VSOP87C, VSOP87D
+//! and VSOP87E will be implemented.
 
 pub mod vsop87;
 pub mod vsop87a;
