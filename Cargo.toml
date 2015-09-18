@@ -8,3 +8,4 @@ repository = "https://github.com/Razican/vsop87-rs"
 description = """
 VSOP87 Rust implementation
 """
+keywords = ["vsop87", "simulation", "astrophysics", "planet positions", "astronomy"]
