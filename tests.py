@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
 
-with open("/home/razican/Downloads/vsop/vsop87.chk") as data:
+with open("data/vsop87.chk") as data:
     outfile = open("tests/vsop87_tests.rs", 'w')
     outfile.write("extern crate vsop87;\nuse vsop87::vsop87::*;\n");
 
