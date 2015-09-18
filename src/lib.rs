@@ -27,7 +27,7 @@ fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
 }
 
 /// Calculates the keplerian orbital elements from VSOP87
-/// TODO
+///
 /// This function calculates the keplerian orbital elements from the VSOP87 solution (the
 /// heliocentric orbital elements). The parameters needed are the 6 variables returned by the
 /// VSOP87 function for a given planet. It returns, in order, a tuple with the keplerian orbital
