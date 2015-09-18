@@ -18,7 +18,7 @@ use super::{calculate_t, calculate_var};
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the planet
 /// Mercury. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date. It
-/// returns, in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p*) of the VSOP87
+/// returns, in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p* of the VSOP87
 /// solution.
 ///
 /// # Examples
@@ -88,7 +88,7 @@ pub fn mercury(jde: f64) -> (f64, f64, f64, f64, f64, f64) {
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the planet
 /// Venus. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date. It returns,
-/// in order, a tuple with the values ```(a, l, k, h, q, p)``` of the VSOP87 solution.
+/// in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p* of the VSOP87 solution.
 ///
 /// # Examples
 ///
@@ -157,7 +157,8 @@ pub fn venus(jde: f64) -> (f64, f64, f64, f64, f64, f64) {
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the Earth
 /// - Moon barycenter. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date.
-/// It returns, in order, a tuple with the values ```(a, l, k, h, q, p)``` of the VSOP87 solution.
+/// It returns, in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p* of the VSOP87
+/// solution.
 ///
 /// # Examples
 ///
@@ -228,7 +229,7 @@ pub fn earth_moon(jde: f64) -> (f64, f64, f64, f64, f64, f64) {
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the planet
 /// Mars. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date. It returns,
-/// in order, a tuple with the values ```(a, l, k, h, q, p)``` of the VSOP87 solution.
+/// in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p* of the VSOP87 solution.
 ///
 /// # Examples
 ///
@@ -298,7 +299,7 @@ pub fn mars(jde: f64) -> (f64, f64, f64, f64, f64, f64) {
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the planet
 /// Jupiter. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date. It
-/// returns, in order, a tuple with the values ```(a, l, k, h, q, p)``` of the VSOP87 solution.
+/// returns, in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p* of the VSOP87 solution.
 ///
 /// # Examples
 ///
@@ -366,7 +367,7 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64, f64, f64, f64) {
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the planet
 /// Saturn. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date. It returns,
-/// in order, a tuple with the values ```(a, l, k, h, q, p)``` of the VSOP87 solution.
+/// in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p* of the VSOP87 solution.
 ///
 /// # Examples
 ///
@@ -438,7 +439,7 @@ pub fn saturn(jde: f64) -> (f64, f64, f64, f64, f64, f64) {
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the planet
 /// Uranus. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date. It returns,
-/// in order, a tuple with the values ```(a, l, k, h, q, p)``` of the VSOP87 solution.
+/// in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p* of the VSOP87 solution.
 ///
 /// # Examples
 ///
@@ -506,7 +507,7 @@ pub fn uranus(jde: f64) -> (f64, f64, f64, f64, f64, f64) {
 ///
 /// This function calculates the VSOP87 solution (the heliocentric orbital elements) for the planet
 /// Neptune. The parameter needed is the Julian Day Efemeris (*JDE*) for the given date. It
-/// returns, in order, a tuple with the values ```(a, l, k, h, q, p)``` of the VSOP87 solution.
+/// returns, in order, a tuple with the values *a*, *l*, *k*, *h*, *q*, *p* of the VSOP87 solution.
 ///
 /// # Examples
 ///

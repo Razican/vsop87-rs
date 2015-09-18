@@ -7,12 +7,11 @@
 //! extern crate vsop87;
 //! ```
 //!
-//! There is still only one module in the crate, that solves the basic VSOP87 algorithm.
-//! Nevertheless, in the future, VSOP87A, VSOP87B, VSOP87C, VSOP87D and VSOP87E will be
-//! implemented.
+//! There is still one module per VSOP87 implementation. Currently only basic VSOP87 algorithm and
+//! the VSOP87A versions are implemented. Nevertheless, in the future, VSOP87B, VSOP87C, VSOP87D //! and VSOP87E will be implemented.
 
 pub mod vsop87;
-// pub mod vsop87a;
+pub mod vsop87a;
 // pub mod vsop87b;
 // pub mod vsop87c;
 // pub mod vsop87d;
@@ -46,14 +45,14 @@ fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
 /// use vsop87::*;
 ///
 /// let (a, l, k, h, q, p) = vsop87::mercury(2451545.0);
-///
+/// #
 /// # assert!(a > 0.3870982121 && a < 0.3870982123);
 /// # assert!(l > 4.4026057778 && l < 4.4026057780);
 /// # assert!(k > 0.0446647517 && k < 0.0446647519);
 /// # assert!(h > 0.2007208957 && h < 0.2007208959);
 /// # assert!(q > 0.0406161540 && q < 0.0406161542);
 /// # assert!(p > 0.04563512 && p < 0.04563588);
-///
+/// #
 /// let (a, e, i, lan, lper, l) = keplerian_elements_from_vsop87(a, l, k, h, q, p);
 ///
 /// assert!(a > 0.387097 && a < 0.387099);
