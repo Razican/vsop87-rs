@@ -3,7 +3,7 @@ import os
 
 with open("data/vsop87.chk") as data:
     outfile = open("tests/vsop87_tests.rs", 'w')
-    outfile.write("extern crate vsop87_rs;\nuse vsop87_rs::*;\n");
+    outfile.write("extern crate vsop87;\n");
     current = "vsop87"
 
     current_planet = ""
@@ -58,7 +58,7 @@ with open("data/vsop87.chk") as data:
                 outfile.close()
                 print("Finished VSOP87")
                 outfile = open("tests/vsop87a_tests.rs", 'w')
-                outfile.write("extern crate vsop87_rs;\nuse vsop87_rs::*;\n");
+                outfile.write("extern crate vsop87;\nuse vsop87::*;\n");
 
             jde = line[2][2:]
             if line[1].lower().replace("-", "_") != current_planet:

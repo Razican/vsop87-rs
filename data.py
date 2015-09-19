@@ -23,7 +23,7 @@ for filename in os.listdir("data"):
 
     if (filename.startswith("VSOP87.")):
         with open("data/"+filename) as data:
-            outfile = open("src/vsop87/"+newfile, 'w')
+            outfile = open("src/"+newfile, 'w')
             number = 0
             letter = "A"
             size = 0

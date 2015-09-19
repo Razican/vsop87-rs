@@ -26,7 +26,7 @@ use super::{calculate_t, calculate_var};
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::mercury(2415020.0);
 ///
@@ -75,7 +75,7 @@ pub fn mercury(jde: f64) -> (f64, f64, f64) {
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::venus(2122820.0);
 ///
@@ -124,7 +124,7 @@ pub fn venus(jde: f64) -> (f64, f64, f64) {
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::earth(2341970.0);
 ///
@@ -173,7 +173,7 @@ pub fn earth(jde: f64) -> (f64, f64, f64) {
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::earth_moon(2159345.0);
 ///
@@ -222,7 +222,7 @@ pub fn earth_moon(jde: f64) -> (f64, f64, f64) {
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::mars(2232395.0);
 ///
@@ -271,7 +271,7 @@ pub fn mars(jde: f64) -> (f64, f64, f64) {
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::jupiter(2451545.0);
 ///
@@ -320,7 +320,7 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64) {
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::saturn(2122820.0);
 ///
@@ -369,7 +369,7 @@ pub fn saturn(jde: f64) -> (f64, f64, f64) {
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::uranus(2159345.0);
 ///
@@ -414,7 +414,7 @@ pub fn uranus(jde: f64) -> (f64, f64, f64) {
 /// # Examples
 ///
 /// ```
-/// use vsop87_rs::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::neptune(2195870.0);
 ///

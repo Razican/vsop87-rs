@@ -1,5 +1,4 @@
-extern crate vsop87_rs;
-use vsop87_rs::*;
+extern crate vsop87;
 
 #[test]
 fn it_mercury() {

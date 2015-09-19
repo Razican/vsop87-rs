@@ -1,4 +1,4 @@
-extern crate vsop87_rs;
+extern crate vsop87;
 
 mod vsop87_tests;
 mod vsop87a_tests;
@@ -7,7 +7,7 @@ mod vsop87a_tests;
 // mod vsop87d_tests;
 // mod vsop87e_tests;
 
-use vsop87_rs::*;
+use vsop87::*;
 
 #[test]
 fn it_kepler() {
