@@ -13,7 +13,7 @@
 //! VSOP87D and VSOP87E will be implemented.
 
 pub mod vsop87a;
-// pub mod vsop87b;
+pub mod vsop87b;
 // pub mod vsop87c;
 // pub mod vsop87d;
 // pub mod vsop87e;
