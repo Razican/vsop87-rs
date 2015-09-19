@@ -8,9 +8,9 @@
 //! ```
 //!
 //! The main module calculates heliocentric orbital elements for the planets in the solar system,
-//! the basic VSOP87 solution. There is still module per other VSOP87 implementation. Currently
-//! only VSOP87A and VSOP87B versions are implemented. Nevertheless, in the future, VSOP87C,
-//! VSOP87D and VSOP87E will be implemented.
+//! the basic VSOP87 solution. There is one module per other VSOP87 implementation. Currently
+//! only VSOP87A and VSOP87B versions are implemented. VSOP87C, VSOP87D and VSOP87E will be
+//! implemented in the future.
 
 pub mod vsop87a;
 pub mod vsop87b;
