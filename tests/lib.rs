@@ -1,15 +1,17 @@
 extern crate vsop87;
 
 mod vsop87_tests;
-// mod vsop87a_tests;
+mod vsop87a_tests;
 // mod vsop87b_tests;
 // mod vsop87c_tests;
 // mod vsop87d_tests;
 // mod vsop87e_tests;
 
+use vsop87::*;
+
 #[test]
 fn it_kepler() {
-    let (a, l, k, h, q, p) = vsop87::vsop87::mercury(2451545.0);
+    let (a, l, k, h, q, p) = vsop87::mercury(2451545.0);
 
     assert!(a > 0.3870982121 && a < 0.3870982123);
     assert!(l > 4.4026057778 && l < 4.4026057780);
@@ -18,7 +20,7 @@ fn it_kepler() {
     assert!(q > 0.0406161540 && q < 0.0406161542);
     assert!(p > 0.04563512 && p < 0.04563588);
 
-    let (a, e, i, lan, lper, l) = vsop87::keplerian_elements_from_vsop87(a, l, k, h, q, p);
+    let (a, e, i, lan, lper, l) = keplerian_elements_from_vsop87(a, l, k, h, q, p);
 
     assert!(a > 0.387097 && a < 0.387099);
     assert!(e > 0.205629 && e < 0.205631);

@@ -1,4 +1,4 @@
-//! VSOP87A module
+//! VSOP87A implementation
 //!
 //! This module calculates heliocentric ecliptic rectangular coordinates for the planets in the
 //! solar system.
@@ -17,16 +17,16 @@ use super::{calculate_t, calculate_var};
 
 /// Calculates VSOP87A solution for Mercury
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the planet Mercury. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
 /// date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A solution.
-/// Those values are the coordinates of the planet, in AU, with the Sun in the center and the
-/// ecliptic plane as reference ```z = 0```.
+/// Those values are the rectangular coordinates of the planet, in *AU*, with the Sun in the center
+/// and the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::mercury(2415020.0);
 ///
@@ -66,16 +66,16 @@ pub fn mercury(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87A solution for Venus
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the planet Venus. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
 /// date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A solution.
-/// Those values are the coordinates of the planet, in AU, with the Sun in the center and the
-/// ecliptic plane as reference ```z = 0```.
+/// Those values are the rectangular coordinates of the planet, in *AU*, with the Sun in the center
+/// and the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::venus(2122820.0);
 ///
@@ -115,16 +115,16 @@ pub fn venus(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87A solution for Earth
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the planet Earth. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
 /// date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A solution.
-/// Those values are the coordinates of the planet, in AU, with the Sun in the center and the
-/// ecliptic plane as reference ```z = 0```.
+/// Those values are the rectangular coordinates of the planet, in *AU*, with the Sun in the center
+/// and the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::earth(2341970.0);
 ///
@@ -164,16 +164,17 @@ pub fn earth(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87A solution for Earth - Moon barycenter
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the Earth - Moon barycenter. The parameter needed is the Julian Day Efemeris (*JDE*) for
 /// the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A
-/// solution. Those values are the coordinates of the barycenter, in AU, with the Sun in the center
-/// and the ecliptic plane as reference ```z = 0```.
+/// solution. Those values are the rectangular coordinates of the barycenter, in *AU*, with the Sun in the ce
+///nter
+/// the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::earth_moon(2159345.0);
 ///
@@ -213,16 +214,16 @@ pub fn earth_moon(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87A solution for Mars
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the planet Mars. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
 /// date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A solution.
-/// Those values are the coordinates of the planet, in AU, with the Sun in the center and the
-/// ecliptic plane as reference ```z = 0```.
+/// Those values are the rectangular coordinates of the planet, in *AU*, with the Sun in the center
+/// and the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::mars(2232395.0);
 ///
@@ -262,16 +263,16 @@ pub fn mars(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87A solution for Jupiter
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the planet Jupiter. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
 /// date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A solution.
-/// Those values are the coordinates of the planet, in AU, with the Sun in the center and the
-/// ecliptic plane as reference ```z = 0```.
+/// Those values are the rectangular coordinates of the planet, in *AU*, with the Sun in the center
+/// and the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::jupiter(2451545.0);
 ///
@@ -311,16 +312,16 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87A solution for Saturn
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the planet Saturn. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
 /// date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A solution.
-/// Those values are the coordinates of the planet, in AU, with the Sun in the center and the
-/// ecliptic plane as reference ```z = 0```.
+/// Those values are the rectangular coordinates of the planet, in *AU*, with the Sun in the center
+/// and the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::saturn(2122820.0);
 ///
@@ -360,16 +361,16 @@ pub fn saturn(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87A solution for Uranus
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the planet Uranus. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
 /// date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A solution.
-/// Those values are the coordinates of the planet, in AU, with the Sun in the center and the
-/// ecliptic plane as reference ```z = 0```.
+/// Those values are the rectangular coordinates of the planet, in *AU*, with the Sun in the center
+/// and the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::uranus(2159345.0);
 ///
@@ -405,16 +406,16 @@ pub fn uranus(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87A solution for Neptune
 ///
-/// This function calculates the VSOP87 solution (heliocentric ecliptic rectangular coordinates)
+/// This function calculates the VSOP87A solution (heliocentric ecliptic rectangular coordinates)
 /// for the planet Neptune. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
 /// date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87A solution.
-/// Those values are the coordinates of the planet, in AU, with the Sun in the center and the
-/// ecliptic plane as reference ```z = 0```.
+/// Those values are the rectangular coordinates of the planet, in *AU*, with the Sun in the center
+/// and the ecliptic plane as reference ```z = 0```.
 ///
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87::vsop87a;
 ///
 /// let (x, y, z) = vsop87a::neptune(2195870.0);
 ///

@@ -3,7 +3,7 @@ import os
 
 with open("data/vsop87.chk") as data:
     outfile = open("tests/vsop87_tests.rs", 'w')
-    outfile.write("extern crate vsop87;\nuse vsop87::vsop87::*;\n");
+    outfile.write("extern crate vsop87;\n");
     current = "vsop87"
 
     current_planet = ""
@@ -30,7 +30,7 @@ with open("data/vsop87.chk") as data:
             else:
                 new_planet = False
 
-            outfile.write("    let (a, l, k, h, q, p) = "+ current_planet +"("+ jde +");\n\n")
+            outfile.write("    let (a, l, k, h, q, p) = vsop87::"+ current_planet +"("+ jde +");\n\n")
 
             second_line = next(data).split()
 
@@ -58,10 +58,9 @@ with open("data/vsop87.chk") as data:
                 outfile.close()
                 print("Finished VSOP87")
                 outfile = open("tests/vsop87a_tests.rs", 'w')
-                outfile.write("extern crate vsop87;\nuse vsop87::vsop87a::*;\n");
+                outfile.write("extern crate vsop87;\nuse vsop87::*;\n");
 
             jde = line[2][2:]
-            print(jde)
             if line[1].lower().replace("-", "_") != current_planet:
                 if current_planet != "":
                     outfile.write("}\n")
@@ -75,7 +74,7 @@ with open("data/vsop87.chk") as data:
             else:
                 new_planet = False
 
-            outfile.write("    let (x, y, z) = "+ current_planet +"("+ jde +");\n\n")
+            outfile.write("    let (x, y, z) = vsop87a::"+ current_planet +"("+ jde +");\n\n")
 
             next(data)
             # try:
@@ -99,9 +98,59 @@ with open("data/vsop87.chk") as data:
             # outfile.write("    assert!(p > {0:.8f} && p < {1:.8f});\n"
             #     .format(float(second_line[7])-0.00000038, float(second_line[7])+0.00000038))
 
+        elif line[0] == "VSOP87B":
+            if current == "vsop87a":
+                current = "vsop87b"
+                current_planet = ""
+                print("Found VSOP87B")
+                outfile.write("}\n")
+                outfile.close()
+                print("Finished VSOP87A")
+                outfile = open("tests/vsop87b_tests.rs", 'w')
+                outfile.write("extern crate vsop87;\nuse vsop87::*;\n");
+
+            jde = line[2][2:]
+            if line[1].lower().replace("-", "_") != current_planet:
+                if current_planet != "":
+                    outfile.write("}\n")
+                current_planet = line[1].lower().replace("-", "_")
+                outfile.write("\n#[test]\nfn it_"+ current_planet +"() {\n")
+                new_planet = True
+
+        elif current == "vsop87b" and not line[0].startswith("VSOP87") and line[0] != "\x1a":
+            if not new_planet:
+                outfile.write("\n")
+            else:
+                new_planet = False
+
+            outfile.write("    let (l, b, r) = vsop87b::"+ current_planet +"("+ jde +");\n\n")
+
+            next(data)
+            # try:
+            #     second_line = next(data).split()
+            # except:
+            #     print("No more lines. Last line:")
+            #     print(line)
+
+            outfile.write("    assert!(l > {0:.10f} && l < {1:.10f});\n"
+                .format(float(line[1])-0.0000000001, float(line[1])+0.0000000001))
+            # outfile.write("    assert!(l > {0:.10f} && l < {1:.10f});\n"
+            #     .format(float(second_line[1])-0.0000000001, float(second_line[1])+0.0000000001))
+
+            outfile.write("    assert!(b > {0:.10f} && b < {1:.10f});\n"
+                .format(float(line[4])-0.0000000001, float(line[4])+0.0000000001))
+            # outfile.write("    assert!(h > {0:.10f} && h < {1:.10f});\n"
+            #     .format(float(second_line[4])-0.0000000001, float(second_line[4])+0.0000000001))
+
+            outfile.write("    assert!(r > {0:.7f} && r < {1:.7f});\n"
+                .format(float(line[7])-0.0000004, float(line[7])+0.0000004))
+            # outfile.write("    assert!(p > {0:.8f} && p < {1:.8f});\n"
+            #     .format(float(second_line[7])-0.00000038, float(second_line[7])+0.00000038))
+
+
         else:
-            print("Found VSOP87B")
+            print("Found VSOP87C")
             outfile.write("}\n")
             outfile.close()
-            print("Finished VSOP87A")
+            print("Finished VSOP87B")
             break
