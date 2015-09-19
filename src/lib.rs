@@ -1,15 +1,15 @@
 //! VSOP87 library
 //!
 //! This library implements the VSOP87 solutions to calculate the positions of the planets in the
-//! solar system. To use you must include the following in your crate:
+//! solar system. To use it you must include the following in your crate:
 //!
 //! ```
-//! extern crate vsop87;
+//! extern crate vsop87_rs;
 //! ```
 //!
-//! There is still one module per VSOP87 implementation. Currently only basic VSOP87 algorithm and
-//! the VSOP87A versions are implemented. Nevertheless, in the future, VSOP87B, VSOP87C, VSOP87D
-//! and VSOP87E will be implemented.
+//! There is still one module per VSOP87 implementation. Currently only VSOP87, VSOP87A and VSOP87B
+//! versions are implemented. Nevertheless, in the future, VSOP87C, VSOP87D and VSOP87E will be
+//! implemented.
 
 pub mod vsop87;
 pub mod vsop87a;
@@ -43,7 +43,7 @@ fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
 /// # Examples
 ///
 /// ```
-/// use vsop87::*;
+/// use vsop87_rs::*;
 ///
 /// let (a, l, k, h, q, p) = vsop87::mercury(2451545.0);
 /// #
