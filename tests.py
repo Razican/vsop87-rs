@@ -196,10 +196,58 @@ with open("data/vsop87.chk") as data:
             # outfile.write("    assert!(p > {0:.8f} && p < {1:.8f});\n"
             #     .format(float(second_line[7])-0.00000038, float(second_line[7])+0.00000038))
 
+        elif line[0] == "VSOP87D":
+            if current == "vsop87c":
+                current = "vsop87d"
+                current_planet = ""
+                print("Found VSOP87D")
+                outfile.write("}\n")
+                outfile.close()
+                print("Finished VSOP87C")
+                outfile = open("tests/vsop87d_tests.rs", 'w')
+                outfile.write("extern crate vsop87;\nuse vsop87::*;\n");
+
+            jde = line[2][2:]
+            if line[1].lower().replace("-", "_") != current_planet:
+                if current_planet != "":
+                    outfile.write("}\n")
+                current_planet = line[1].lower().replace("-", "_")
+                outfile.write("\n#[test]\nfn it_"+ current_planet +"() {\n")
+                new_planet = True
+
+        elif current == "vsop87d" and not line[0].startswith("VSOP87") and line[0] != "\x1a":
+            if not new_planet:
+                outfile.write("\n")
+            else:
+                new_planet = False
+
+            outfile.write("    let (l, b, r) = vsop87d::"+ current_planet +"("+ jde +");\n\n")
+
+            next(data)
+            # try:
+            #     second_line = next(data).split()
+            # except:
+            #     print("No more lines. Last line:")
+            #     print(line)
+
+            outfile.write("    assert!(l > {0:.10f} && l < {1:.10f});\n"
+                .format(float(line[1])-0.0000000001, float(line[1])+0.0000000001))
+            # outfile.write("    assert!(l > {0:.10f} && l < {1:.10f});\n"
+            #     .format(float(second_line[1])-0.0000000001, float(second_line[1])+0.0000000001))
+
+            outfile.write("    assert!(b > {0:.10f} && b < {1:.10f});\n"
+                .format(float(line[4])-0.0000000001, float(line[4])+0.0000000001))
+            # outfile.write("    assert!(h > {0:.10f} && h < {1:.10f});\n"
+            #     .format(float(second_line[4])-0.0000000001, float(second_line[4])+0.0000000001))
+
+            outfile.write("    assert!(r > {0:.8f} && r < {1:.8f});\n"
+                .format(float(line[7])-0.00000038, float(line[7])+0.00000038))
+            # outfile.write("    assert!(p > {0:.8f} && p < {1:.8f});\n"
+            #     .format(float(second_line[7])-0.00000038, float(second_line[7])+0.00000038))
 
         else:
-            print("Found VSOP87D")
+            print("Found VSOP87E")
             outfile.write("}\n")
             outfile.close()
-            print("Finished VSOP87C")
+            print("Finished VSOP87D")
             break
