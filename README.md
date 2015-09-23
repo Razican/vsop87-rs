@@ -6,11 +6,3 @@ This library implements the VSOP87 algorithm in Rust. The use can be seen in the
 [documentation](http://razican.github.io/vsop87-rs). The library is divided in one module per VSOP87
 version implementation. All versions are implemented: basic VSOP87 algorithm, VSOP87A, VSOP87B,
 VSOP87C, VSOP87D and VSOP87E.
-
-## What are the python files for? ##
-
-Well, currently there are two python files in the repository. One would be *tests.py* and the other
-one *data.py*. Those are for generating the data needed for the algorithm along with the tests. They
-take the original VSOP87 files from the *data* directory and create the needed constants and tests
-for the library. They will be removed once the library is stabilized. They try to create perfect
-Rust code.
