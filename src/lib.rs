@@ -9,8 +9,7 @@
 //!
 //! The main module calculates heliocentric ecliptic orbital elements for the equinox J2000.0 for
 //! the planets in the solar system, the basic VSOP87 solution. There is one module per other
-//! VSOP87 implementation. Currently only VSOP87A, VSOP87B, VSOP87C and VSOP87D versions are
-//! implemented. VSOP87E will be implemented in the future.
+//! VSOP87 implementation: VSOP87A, VSOP87B, VSOP87C, VSOP87D  and VSOP87E.
 
 pub mod vsop87a;
 pub mod vsop87b;
