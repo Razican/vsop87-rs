@@ -2,6 +2,8 @@
 import os
 
 for filename in os.listdir("data"):
+    if "sun" in filename:
+        newfile = "sun.rs"
     if "mer" in filename:
         newfile = "mercury.rs"
     elif "ven" in filename:
