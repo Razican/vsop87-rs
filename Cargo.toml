@@ -1,6 +1,6 @@
 [package]
 name = "vsop87"
-version = "0.5.0"
+version = "0.5.1"
 authors = ["Razican <admin@razican.com>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -10,5 +10,4 @@ description = """
 VSOP87 Rust implementation. Includes VSOP87, VSOP87A, VSOP87B, VSOP87C and VSOP87D versions. The
 VSOP87E version will be implemented in the future.
 """
-keywords = ["vsop87", "vsop87a", "vsop87b", "vsop87c", "vsop87d",
-    "simulation", "astrophysics", "astronomy"]
+keywords = ["vsop87", "simulation", "astrophysics", "astronomy"]
