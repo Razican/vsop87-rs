@@ -1,7 +1,7 @@
 //! VSOP87B implementation
 //!
-//! This module calculates heliocentric ecliptic spherical coordinates for the planets in the
-//! solar system.
+//! This module calculates heliocentric ecliptic spherical coordinates for the equinox J2000.0 for
+//! the planets in the solar system.
 
 mod mercury;
 mod venus;
@@ -17,11 +17,11 @@ use std::f64::consts::PI;
 
 /// Calculates VSOP87B solution for Mercury
 ///
-/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates)
-/// for the planet Mercury. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
-/// date. It returns, in order, a tuple with the values *l*, *b*, *r* of the VSOP87B solution.
-/// Those values are the spherical coordinates of the planet, with the Sun in the center and the
-/// ecliptic plane as reference ```b = 0```:
+/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
+/// the equinox J2000.0) for the planet Mercury. The parameter needed is the Julian Day Efemeris
+/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
+/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
+/// center and the ecliptic plane as reference ```b = 0```:
 ///
 /// - Ecliptic longitude (*L*), in radians
 /// - Ecliptic latitude (*B*), in radians
@@ -70,11 +70,11 @@ pub fn mercury(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87B solution for Venus
 ///
-/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates)
-/// for the planet Venus. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
-/// date. It returns, in order, a tuple with the values *l*, *b*, *r* of the VSOP87B solution.
-/// Those values are the spherical coordinates of the planet, with the Sun in the center and the
-/// ecliptic plane as reference ```b = 0```:
+/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
+/// the equinox J2000.0) for the planet Venus. The parameter needed is the Julian Day Efemeris
+/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
+/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
+/// center and the ecliptic plane as reference ```b = 0```:
 ///
 /// - Ecliptic longitude (*L*), in radians
 /// - Ecliptic latitude (*B*), in radians
@@ -123,11 +123,11 @@ pub fn venus(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87B solution for Earth
 ///
-/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates)
-/// for the planet Earth. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
-/// date. It returns, in order, a tuple with the values *l*, *b*, *r* of the VSOP87B solution.
-/// Those values are the spherical coordinates of the planet, with the Sun in the center and the
-/// ecliptic plane as reference ```b = 0```:
+/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
+/// the equinox J2000.0) for the planet Earth. The parameter needed is the Julian Day Efemeris
+/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
+/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
+/// center and the ecliptic plane as reference ```b = 0```:
 ///
 /// - Ecliptic longitude (*L*), in radians
 /// - Ecliptic latitude (*B*), in radians
@@ -176,11 +176,11 @@ pub fn earth(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87B solution for Mars
 ///
-/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates)
-/// for the planet Mars. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
-/// date. It returns, in order, a tuple with the values *l*, *b*, *r* of the VSOP87B solution.
-/// Those values are the spherical coordinates of the planet, with the Sun in the center and the
-/// ecliptic plane as reference ```b = 0```:
+/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
+/// the equinox J2000.0) for the planet Mars. The parameter needed is the Julian Day Efemeris
+/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
+/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
+/// center and the ecliptic plane as reference ```b = 0```:
 ///
 /// - Ecliptic longitude (*L*), in radians
 /// - Ecliptic latitude (*B*), in radians
@@ -229,11 +229,11 @@ pub fn mars(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87B solution for Jupiter
 ///
-/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates)
-/// for the planet Jupiter. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
-/// date. It returns, in order, a tuple with the values *l*, *b*, *r* of the VSOP87B solution.
-/// Those values are the spherical coordinates of the planet, with the Sun in the center and the
-/// ecliptic plane as reference ```b = 0```:
+/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
+/// the equinox J2000.0) for the planet Jupiter. The parameter needed is the Julian Day Efemeris
+/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
+/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
+/// center and the ecliptic plane as reference ```b = 0```:
 ///
 /// - Ecliptic longitude (*L*), in radians
 /// - Ecliptic latitude (*B*), in radians
@@ -282,11 +282,11 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87B solution for Saturn
 ///
-/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates)
-/// for the planet Saturn. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
-/// date. It returns, in order, a tuple with the values *l*, *b*, *r* of the VSOP87B solution.
-/// Those values are the spherical coordinates of the planet, with the Sun in the center and the
-/// ecliptic plane as reference ```b = 0```:
+/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
+/// the equinox J2000.0) for the planet Saturn. The parameter needed is the Julian Day Efemeris
+/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
+/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
+/// center and the ecliptic plane as reference ```b = 0```:
 ///
 /// - Ecliptic longitude (*L*), in radians
 /// - Ecliptic latitude (*B*), in radians
@@ -335,11 +335,11 @@ pub fn saturn(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87B solution for Uranus
 ///
-/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates)
-/// for the planet Uranus. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
-/// date. It returns, in order, a tuple with the values *l*, *b*, *r* of the VSOP87B solution.
-/// Those values are the spherical coordinates of the planet, with the Sun in the center and the
-/// ecliptic plane as reference ```b = 0```:
+/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
+/// the equinox J2000.0) for the planet Uranus. The parameter needed is the Julian Day Efemeris
+/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
+/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
+/// center and the ecliptic plane as reference ```b = 0```:
 ///
 /// - Ecliptic longitude (*L*), in radians
 /// - Ecliptic latitude (*B*), in radians
@@ -384,11 +384,11 @@ pub fn uranus(jde: f64) -> (f64, f64, f64) {
 
 /// Calculates VSOP87B solution for Neptune
 ///
-/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates)
-/// for the planet Neptune. The parameter needed is the Julian Day Efemeris (*JDE*) for the given
-/// date. It returns, in order, a tuple with the values *l*, *b*, *r* of the VSOP87B solution.
-/// Those values are the spherical coordinates of the planet, with the Sun in the center and the
-/// ecliptic plane as reference ```b = 0```:
+/// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
+/// the equinox J2000.0) for the planet Neptune. The parameter needed is the Julian Day Efemeris
+/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
+/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
+/// center and the ecliptic plane as reference ```b = 0```:
 ///
 /// - Ecliptic longitude (*L*), in radians
 /// - Ecliptic latitude (*B*), in radians

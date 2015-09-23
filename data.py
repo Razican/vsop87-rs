@@ -2,6 +2,8 @@
 import os
 
 for filename in os.listdir("data"):
+    if "sun" in filename:
+        newfile = "sun.rs"
     if "mer" in filename:
         newfile = "mercury.rs"
     elif "ven" in filename:
@@ -67,7 +69,6 @@ for filename in os.listdir("data"):
                         if (letter != "P"):
                             letter = "P"
                             number = 0
-
             outfile.close()
 
     elif (filename.startswith("VSOP87A.")):
@@ -104,7 +105,6 @@ for filename in os.listdir("data"):
                         if (letter != "Z"):
                             letter = "Z"
                             number = 0
-
             outfile.close()
 
     elif (filename.startswith("VSOP87B.")):
@@ -141,3 +141,41 @@ for filename in os.listdir("data"):
                         if (letter != "R"):
                             letter = "R"
                             number = 0
+            outfile.close()
+
+    elif (filename.startswith("VSOP87C.")):
+        with open("data/"+filename) as data:
+            outfile = open("src/vsop87c/"+newfile, 'w')
+            number = 0
+            letter = "X"
+            size = 0
+            current_var = ""
+            next(data);
+            for line in data:
+                line = line.replace("-", " -")
+                numbers = line.split()
+
+                if numbers[0] != "VSOP87":
+                    current_var += "    ("+ numbers[16] +", "+ numbers[17] +", "+ numbers[18] +"),\n"
+                    size += 1
+                else:
+                    if letter != "X" or number is not 0:
+                        outfile.write("\n")
+                    outfile.write("pub const "+ letter + str(number) +": [(f64, f64, f64); "+ str(size) +"] = [\n")
+                    outfile.write(current_var)
+                    outfile.write("];\n")
+
+                    number += 1
+                    size = 0
+                    current_var = ""
+
+                    if "VARIABLE 2" in line:
+                        if (letter != "Y"):
+                            letter = "Y"
+                            number = 0
+                    elif "VARIABLE 3" in line:
+                        if (letter != "Z"):
+                            letter = "Z"
+                            number = 0
+
+            outfile.close()
