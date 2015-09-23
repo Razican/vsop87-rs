@@ -30,6 +30,10 @@ use super::{calculate_t, calculate_var};
 /// use vsop87::vsop87e;
 ///
 /// let (x, y, z) = vsop87e::sun(2451545.0);
+///
+/// assert!(x > -0.0071415280 && x < -0.0071415278);
+/// assert!(y > -0.0027881716 && y < -0.0027881714);
+/// assert!(z > 0.0002041 && z < 0.0002081);
 /// ```
 pub fn sun(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);
@@ -75,7 +79,11 @@ pub fn sun(jde: f64) -> (f64, f64, f64) {
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::mercury(2451545.0);
+/// let (x, y, z) = vsop87e::mercury(2415020.0);
+///
+/// assert!(x > -0.3865370328 && x < -0.3865370326);
+/// assert!(y > -0.1438666202 && y < -0.1438666200);
+/// assert!(z > 0.0235142 && z < 0.0235182);
 /// ```
 pub fn mercury(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);
@@ -120,7 +128,11 @@ pub fn mercury(jde: f64) -> (f64, f64, f64) {
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::venus(2451545.0);
+/// let (x, y, z) = vsop87e::venus(2378495.0);
+///
+/// assert!(x > -0.5948645228 && x < -0.5948645226);
+/// assert!(y > 0.3900421674 && y < 0.3900421676);
+/// assert!(z > 0.0397542 && z < 0.0397582);
 /// ```
 pub fn venus(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);
@@ -165,7 +177,11 @@ pub fn venus(jde: f64) -> (f64, f64, f64) {
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::earth(2451545.0);
+/// let (x, y, z) = vsop87e::earth(2341970.0);
+///
+/// assert!(x > -0.2155959338 && x < -0.2155959336);
+/// assert!(y > 0.9651943804 && y < 0.9651943806);
+/// assert!(z > 0.0007705 && z < 0.0007745);
 /// ```
 pub fn earth(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);
@@ -210,7 +226,11 @@ pub fn earth(jde: f64) -> (f64, f64, f64) {
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::mars(2451545.0);
+/// let (x, y, z) = vsop87e::mars(2305445.0);
+///
+/// assert!(x > -0.8237565239 && x < -0.8237565237);
+/// assert!(y > 1.4065798250 && y < 1.4065798252);
+/// assert!(z > 0.0502476 && z < 0.0502516);
 /// ```
 pub fn mars(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);
@@ -255,7 +275,11 @@ pub fn mars(jde: f64) -> (f64, f64, f64) {
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::jupiter(2451545.0);
+/// let (x, y, z) = vsop87e::jupiter(2268920.0);
+///
+/// assert!(x > 4.5819830418 && x < 4.5819830420);
+/// assert!(y > -1.9854861384 && y < -1.9854861382);
+/// assert!(z > -0.0959289 && z < -0.0959249);
 /// ```
 pub fn jupiter(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);
@@ -300,7 +324,11 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64) {
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::saturn(2451545.0);
+/// let (x, y, z) = vsop87e::saturn(2232395.0);
+///
+/// assert!(x > 1.2645936161 && x < 1.2645936163);
+/// assert!(y > -10.0240954526 && y < -10.0240954524);
+/// assert!(z > 0.1345888 && z < 0.1345928);
 /// ```
 pub fn saturn(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);
@@ -345,7 +373,11 @@ pub fn saturn(jde: f64) -> (f64, f64, f64) {
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::uranus(2451545.0);
+/// let (x, y, z) = vsop87e::uranus(2195870.0);
+///
+/// assert!(x > -17.6538791198 && x < -17.6538791196);
+/// assert!(y > -5.1666300881 && y < -5.1666300879);
+/// assert!(z > 0.2124594 && z < 0.2124634);
 /// ```
 pub fn uranus(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);
@@ -386,7 +418,11 @@ pub fn uranus(jde: f64) -> (f64, f64, f64) {
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::neptune(2451545.0);
+/// let (x, y, z) = vsop87e::neptune(2159345.0);
+///
+/// assert!(x > 29.8297729718 && x < 29.8297729720);
+/// assert!(y > -2.0298541973 && y < -2.0298541971);
+/// assert!(z > -0.6440972 && z < -0.6440932);
 /// ```
 pub fn neptune(jde: f64) -> (f64, f64, f64) {
     let t = calculate_t(jde);

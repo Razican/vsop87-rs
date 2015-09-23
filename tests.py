@@ -93,8 +93,8 @@ with open("data/vsop87.chk") as data:
             # outfile.write("    assert!(h > {0:.10f} && h < {1:.10f});\n"
             #     .format(float(second_line[4])-0.0000000001, float(second_line[4])+0.0000000001))
 
-            outfile.write("    assert!(z > {0:.6f} && z < {1:.6f});\n"
-                .format(float(line[7])-0.000002, float(line[7])+0.000002))
+            outfile.write("    assert!(z > {0:.7f} && z < {1:.7f});\n"
+                .format(float(line[7])-0.0000025, float(line[7])+0.0000025))
             # outfile.write("    assert!(p > {0:.8f} && p < {1:.8f});\n"
             #     .format(float(second_line[7])-0.00000038, float(second_line[7])+0.00000038))
 
@@ -245,9 +245,55 @@ with open("data/vsop87.chk") as data:
             # outfile.write("    assert!(p > {0:.8f} && p < {1:.8f});\n"
             #     .format(float(second_line[7])-0.00000038, float(second_line[7])+0.00000038))
 
-        else:
-            print("Found VSOP87E")
-            outfile.write("}\n")
-            outfile.close()
-            print("Finished VSOP87D")
-            break
+        elif line[0] == "VSOP87E":
+            if current == "vsop87d":
+                current = "vsop87e"
+                current_planet = ""
+                print("Found VSOP87E")
+                outfile.write("}\n")
+                outfile.close()
+                print("Finished VSOP87D")
+                outfile = open("tests/vsop87e_tests.rs", 'w')
+                outfile.write("extern crate vsop87;\nuse vsop87::*;\n");
+
+            jde = line[2][2:]
+            if line[1].lower().replace("-", "_") != current_planet:
+                if current_planet != "":
+                    outfile.write("}\n")
+                current_planet = line[1].lower().replace("-", "_")
+                outfile.write("\n#[test]\nfn it_"+ current_planet +"() {\n")
+                new_planet = True
+
+        elif current == "vsop87e" and not line[0].startswith("VSOP87") and line[0] != "\x1a":
+            if not new_planet:
+                outfile.write("\n")
+            else:
+                new_planet = False
+
+            outfile.write("    let (x, y, z) = vsop87e::"+ current_planet +"("+ jde +");\n\n")
+
+            next(data)
+            # try:
+            #     second_line = next(data).split()
+            # except:
+            #     print("No more lines. Last line:")
+            #     print(line)
+
+            outfile.write("    assert!(x > {0:.10f} && x < {1:.10f});\n"
+                .format(float(line[1])-0.0000000001, float(line[1])+0.0000000001))
+            # outfile.write("    assert!(l > {0:.10f} && l < {1:.10f});\n"
+            #     .format(float(second_line[1])-0.0000000001, float(second_line[1])+0.0000000001))
+
+            outfile.write("    assert!(y > {0:.10f} && y < {1:.10f});\n"
+                .format(float(line[4])-0.0000000001, float(line[4])+0.0000000001))
+            # outfile.write("    assert!(h > {0:.10f} && h < {1:.10f});\n"
+            #     .format(float(second_line[4])-0.0000000001, float(second_line[4])+0.0000000001))
+
+            outfile.write("    assert!(z > {0:.7f} && z < {1:.7f});\n"
+                .format(float(line[7])-0.000002, float(line[7])+0.000002))
+            # outfile.write("    assert!(p > {0:.8f} && p < {1:.8f});\n"
+            #     .format(float(second_line[7])-0.00000038, float(second_line[7])+0.00000038))
+
+    outfile.write("}\n")
+    outfile.close()
+    print("Finished VSOP87E")
