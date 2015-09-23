@@ -49,7 +49,7 @@ fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
 /// - Inclination (*i*), in radians
 /// - Longitude of the ascending node (*Ω*), in radians
 /// - Longitude of the periapsis (*ϖ*), in radians
-/// - Mean longitude (L₀), in radians
+/// - Mean longitude (*L₀*), in radians
 ///
 /// # Examples
 ///
