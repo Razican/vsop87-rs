@@ -28,10 +28,12 @@ mod neptune;
 
 use std::f64::consts::PI;
 
+#[inline]
 fn calculate_t(jde: f64) -> f64{
     return (jde - 2451545_f64)/365250_f64
 }
 
+#[inline]
 fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
     var.iter().fold(0_f64, |term, &(a, b, c)| term + a*(b + c*t).cos())
 }
