@@ -1,13 +1,13 @@
 [package]
 name = "vsop87"
-version = "1.0.2"
+version = "1.0.3-dev"
 authors = ["Razican <razican@protonmail.ch>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
 repository = "https://github.com/Razican/vsop87-rs"
 documentation = "http://razican.github.io/vsop87-rs"
 description = """
-VSOP87 Rust implementation. Includes all VSOP87 algorith versions: VSOP87, VSOP87A, VSOP87B,
-VSOP87C, VSOP87D and VSOP87E.
+VSOP87 Rust implementation. Includes all VSOP87 algorith versions: VSOP87,
+VSOP87A, VSOP87B, VSOP87C, VSOP87D and VSOP87E.
 """
 keywords = ["vsop87", "simulation", "astrophysics", "astronomy"]
