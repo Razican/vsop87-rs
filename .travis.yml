@@ -1,5 +1,8 @@
 language: rust
 sudo: false
+os:
+  - linux
+  - osx
 addons:
   apt:
     packages:
@@ -31,13 +34,27 @@ before_script:
 # the main build
 script:
   - |
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       travis-cargo build &&
       travis-cargo test &&
       travis-cargo bench &&
-      travis-cargo --only stable doc
+      travis-cargo --only stable doc;
+      fi
+  - |
+      if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
+      cargo build -v &&
+      cargo test &&
+      cargo bench;
+      fi
 after_success:
-  - travis-cargo --only stable doc-upload
-  - travis-cargo coveralls --no-sudo --verify
+  - |
+      if [["$TRAVIS_OS_NAME" == "linux"]]; then
+      travis-cargo --only stable doc-upload;
+      fi
+  - |
+      if [["$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_RUST_VERSION" == "stable"]]; then
+      travis-cargo coveralls --no-sudo --verify;
+      fi
 
 env:
   global:
