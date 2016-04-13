@@ -1,6 +1,8 @@
 # VSOP87 Rust implementation #
-[![Coverage Status](https://coveralls.io/repos/Razican/vsop87-rs/badge.svg?branch=develop&service=github)](https://coveralls.io/github/Razican/vsop87-rs?branch=develop)
 [![Build Status](https://travis-ci.org/Razican/vsop87-rs.svg?branch=develop)](https://travis-ci.org/Razican/vsop87-rs)
+[![Build status](https://ci.appveyor.com/api/projects/status/g028p4t0ekvcypu3?svg=true)](https://ci.appveyor.com/project/Razican/vsop87-rs)
+[![Coverage Status](https://coveralls.io/repos/Razican/vsop87-rs/badge.svg?branch=develop&service=github)](https://coveralls.io/github/Razican/vsop87-rs?branch=develop)
+[![Crates.io](https://meritbadge.herokuapp.com/ntrumls)](https://crates.io/crates/ntrumls)
 
 This library implements the
 [VSOP87](https://en.wikipedia.org/wiki/VSOP_%28planets%29) algorithm in Rust.
