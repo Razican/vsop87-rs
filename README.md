@@ -1,7 +1,7 @@
 # VSOP87 Rust implementation #
-[![Build Status](https://travis-ci.org/Razican/vsop87-rs.svg?branch=develop)](https://travis-ci.org/Razican/vsop87-rs)
+[![Build Status](https://travis-ci.org/Razican/vsop87-rs.svg?branch=master)](https://travis-ci.org/Razican/vsop87-rs)
 [![Build status](https://ci.appveyor.com/api/projects/status/g028p4t0ekvcypu3?svg=true)](https://ci.appveyor.com/project/Razican/vsop87-rs)
-[![Coverage Status](https://coveralls.io/repos/Razican/vsop87-rs/badge.svg?branch=develop&service=github)](https://coveralls.io/github/Razican/vsop87-rs?branch=develop)
+[![Coverage Status](https://coveralls.io/repos/Razican/vsop87-rs/badge.svg?branch=develop&service=github)](https://coveralls.io/github/Razican/vsop87-rs?branch=master)
 [![Crates.io](https://meritbadge.herokuapp.com/vsop87)](https://crates.io/crates/vsop87)
 
 This library implements the
