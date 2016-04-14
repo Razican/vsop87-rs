@@ -1,5 +1,3 @@
-//! VSOP87 library
-//!
 //! This library implements the VSOP87 solutions to calculate the positions of the planets in the
 //! solar system. To use it you must include the following in your crate:
 //!
