@@ -10,3 +10,8 @@ pure Rust. The use can be seen in the
 [documentation](http://razican.github.io/vsop87-rs). The library is divided in
 one module per VSOP87 version implementation. All versions are implemented:
 basic VSOP87 algorithm, VSOP87A, VSOP87B, VSOP87C, VSOP87D and VSOP87E.
+
+## License ##
+
+This library is distributed under the terms of both the MIT license and the
+Apache License (Version 2.0). See LICENSE-APACHE, and LICENSE-MIT for details.
