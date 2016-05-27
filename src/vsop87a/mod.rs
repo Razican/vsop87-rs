@@ -57,9 +57,9 @@ pub fn mercury(jde: f64) -> (f64, f64, f64) {
     let z3 = calculate_var(t, &mercury::Z3);
     let z4 = calculate_var(t, &mercury::Z4);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4) + x5*t.powi(5);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4) + y5*t.powi(5);
-    let z = z0 + z1*t + z2*t*t + z3*t.powi(3) + z4*t.powi(4);
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4) + x5 * t.powi(5);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
+    let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
     (x, y, z)
 }
@@ -106,9 +106,9 @@ pub fn venus(jde: f64) -> (f64, f64, f64) {
     let z3 = calculate_var(t, &venus::Z3);
     let z4 = calculate_var(t, &venus::Z4);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4) + x5*t.powi(5);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4) + y5*t.powi(5);
-    let z = z0 + z1*t + z2*t*t + z3*t.powi(3) + z4*t.powi(4);
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4) + x5 * t.powi(5);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
+    let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
     (x, y, z)
 }
@@ -155,9 +155,9 @@ pub fn earth(jde: f64) -> (f64, f64, f64) {
     let z3 = calculate_var(t, &earth::Z3);
     let z4 = calculate_var(t, &earth::Z4);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4) + x5*t.powi(5);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4) + y5*t.powi(5);
-    let z = z0 + z1*t + z2*t*t + z3*t.powi(3) + z4*t.powi(4);
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4) + x5 * t.powi(5);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
+    let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
     (x, y, z)
 }
@@ -204,9 +204,9 @@ pub fn earth_moon(jde: f64) -> (f64, f64, f64) {
     let z3 = calculate_var(t, &earth_moon::Z3);
     let z4 = calculate_var(t, &earth_moon::Z4);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4) + x5*t.powi(5);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4) + y5*t.powi(5);
-    let z = z0 + z1*t + z2*t*t + z3*t.powi(3) + z4*t.powi(4);
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4) + x5 * t.powi(5);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
+    let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
     (x, y, z)
 }
@@ -253,9 +253,9 @@ pub fn mars(jde: f64) -> (f64, f64, f64) {
     let z3 = calculate_var(t, &mars::Z3);
     let z4 = calculate_var(t, &mars::Z4);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4) + x5*t.powi(5);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4) + y5*t.powi(5);
-    let z = z0 + z1*t + z2*t*t + z3*t.powi(3) + z4*t.powi(4);
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4) + x5 * t.powi(5);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
+    let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
     (x, y, z)
 }
@@ -302,9 +302,9 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64) {
     let z3 = calculate_var(t, &jupiter::Z3);
     let z4 = calculate_var(t, &jupiter::Z4);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4) + x5*t.powi(5);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4) + y5*t.powi(5);
-    let z = z0 + z1*t + z2*t*t + z3*t.powi(3) + z4*t.powi(4);
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4) + x5 * t.powi(5);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
+    let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
     (x, y, z)
 }
@@ -351,9 +351,9 @@ pub fn saturn(jde: f64) -> (f64, f64, f64) {
     let z3 = calculate_var(t, &saturn::Z3);
     let z4 = calculate_var(t, &saturn::Z4);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4) + x5*t.powi(5);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4) + y5*t.powi(5);
-    let z = z0 + z1*t + z2*t*t + z3*t.powi(3) + z4*t.powi(4);
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4) + x5 * t.powi(5);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
+    let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
     (x, y, z)
 }
@@ -396,9 +396,9 @@ pub fn uranus(jde: f64) -> (f64, f64, f64) {
     let z1 = calculate_var(t, &uranus::Z1);
     let z2 = calculate_var(t, &uranus::Z2);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4);
-    let z = z0 + z1*t + z2*t*t;
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4);
+    let z = z0 + z1 * t + z2 * t * t;
 
     (x, y, z)
 }
@@ -441,9 +441,9 @@ pub fn neptune(jde: f64) -> (f64, f64, f64) {
     let z1 = calculate_var(t, &neptune::Z1);
     let z2 = calculate_var(t, &neptune::Z2);
 
-    let x = x0 + x1*t + x2*t*t + x3*t.powi(3) + x4*t.powi(4);
-    let y = y0 + y1*t + y2*t*t + y3*t.powi(3) + y4*t.powi(4);
-    let z = z0 + z1*t + z2*t*t;
+    let x = x0 + x1 * t + x2 * t * t + x3 * t.powi(3) + x4 * t.powi(4);
+    let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4);
+    let z = z0 + z1 * t + z2 * t * t;
 
     (x, y, z)
 }

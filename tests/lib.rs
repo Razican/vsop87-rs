@@ -26,6 +26,6 @@ fn it_kepler() {
     assert!(e > 0.205629 && e < 0.205631);
     assert!(i > 0.122260 && i < 0.122261);
     assert!(lan > 0.843525 && lan < 0.843527);
-    assert!(lper >  1.35183 && lper < 1.35185);
+    assert!(lper > 1.35183 && lper < 1.35185);
     assert!(l > 4.40259 && l < 4.40261);
 }

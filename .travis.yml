@@ -17,6 +17,7 @@ rust:
   - nightly
   - beta
   - stable
+  - 1.9.0
   - 1.8.0
   - 1.7.0
   - 1.6.0
@@ -53,13 +54,13 @@ script:
 # Send coverage reports and upload docs
 after_success:
   - |
-      if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then
-      travis-cargo doc &&
-      travis-cargo doc-upload;
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      travis-cargo --only stable doc &&
+      travis-cargo --only stable doc-upload;
       fi
   - |
-      if [[ "$TRAVIS_OS_NAME" == "linux" && "$TRAVIS_RUST_VERSION" == "stable" ]]; then
-      travis-cargo coveralls --no-sudo --verify;
+      if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
+      travis-cargo --only stable coveralls --no-sudo --verify;
       fi
 
 env:
