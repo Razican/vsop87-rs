@@ -24,7 +24,7 @@ rust:
 before_script:
   - |
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
-      pip install 'travis-cargo<0.2' --user &&
+      pip install git+https://github.com/btmorex/travis-cargo.git@fix-coveralls --user &&
       export PATH=$HOME/.local/bin:$PATH
       fi
 
@@ -53,7 +53,6 @@ after_success:
   - |
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       travis-cargo --only stable coveralls --no-sudo --verify;
-      ./kcov/build/src/kcov --verify --coveralls-id=$TRAVIS_JOB_ID --exclude-pattern=/.cargo target/kcov target/debug/vsop87-*;
       fi
 
 env:
