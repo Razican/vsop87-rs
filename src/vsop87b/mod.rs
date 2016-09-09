@@ -66,13 +66,7 @@ pub fn mercury(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 {
-        l
-    } else {
-        2_f64 * PI + l
-    },
-     b,
-     r)
+    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
 }
 
 /// Calculates VSOP87B solution for Venus
@@ -126,13 +120,7 @@ pub fn venus(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 {
-        l
-    } else {
-        2_f64 * PI + l
-    },
-     b,
-     r)
+    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
 }
 
 /// Calculates VSOP87B solution for Earth
@@ -186,13 +174,7 @@ pub fn earth(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 {
-        l
-    } else {
-        2_f64 * PI + l
-    },
-     b,
-     r)
+    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
 }
 
 /// Calculates VSOP87B solution for Mars
@@ -246,13 +228,7 @@ pub fn mars(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 {
-        l
-    } else {
-        2_f64 * PI + l
-    },
-     b,
-     r)
+    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
 }
 
 /// Calculates VSOP87B solution for Jupiter
@@ -306,13 +282,7 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 {
-        l
-    } else {
-        2_f64 * PI + l
-    },
-     b,
-     r)
+    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
 }
 
 /// Calculates VSOP87B solution for Saturn
@@ -366,13 +336,7 @@ pub fn saturn(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 {
-        l
-    } else {
-        2_f64 * PI + l
-    },
-     b,
-     r)
+    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
 }
 
 /// Calculates VSOP87B solution for Uranus
@@ -421,13 +385,7 @@ pub fn uranus(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3);
 
-    (if l > 0_f64 {
-        l
-    } else {
-        2_f64 * PI + l
-    },
-     b,
-     r)
+    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
 }
 
 /// Calculates VSOP87B solution for Neptune
@@ -475,11 +433,5 @@ pub fn neptune(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3);
 
-    (if l > 0_f64 {
-        l
-    } else {
-        2_f64 * PI + l
-    },
-     b,
-     r)
+    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
 }
