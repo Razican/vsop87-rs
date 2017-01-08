@@ -1,8 +1,25 @@
-//! VSOP87E implementation
+//! VSOP87E algorithm: Barycentric ecliptic rectangular coordinates for the equinox J2000.0.
 //!
 //! This module calculates barycentric ecliptic rectangular coordinates for the equinox J2000.0
-//! for the planets in the solar system. These coordinates are centered in the barycenter of the
-//! solar system.
+//! for the planets in the solar system. These coordinates are centered in the
+//! [barycenter](https://en.wikipedia.org/wiki/Barycenter) or center of masses of the solar system.
+//! This means that the Sun is not at (0, 0, 0), and its position has to be calculated
+//! independently.
+//!
+//! # Example
+//!
+//! Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+//! position of the Sun in the solar system using rectangular coordinates. In this case, we
+//! calculate where the Sun was in January 1st, 2000.
+//!
+//! ```
+//! use vsop87::vsop87e;
+//!
+//! let coordinates = vsop87e::sun(2451545.0);
+//!
+//! assert!(coordinates.x > -0.0071415280 && coordinates.x < -0.0071415278);
+//! assert!(coordinates.y > -0.0027881716 && coordinates.y < -0.0027881714);
+//! assert!(coordinates.z > 0.0002041 && coordinates.z < 0.0002081);
 
 mod sun;
 mod mercury;
@@ -14,28 +31,32 @@ mod saturn;
 mod uranus;
 mod neptune;
 
-use super::{calculate_t, calculate_var};
+use super::{calculate_t, calculate_var, RectangularCoordinates};
 
-/// Calculates VSOP87E solution for the Sun
+/// Calculates VSOP87E solution for the Sun.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the Sun. The parameter needed is the Julian Day Efemeris (*JDE*) for
-/// the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the VSOP87E
-/// solution. Those values are the rectangular coordinates of the Sun, in *AU*, with the barycenter
-/// of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the Sun. The parameter needed is the Julian Day (*JD*) for the given
+/// date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those values are
+/// the rectangular coordinates of the Sun, in *AU*, with the barycenter of the solar system in the
+/// center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the Sun in the solar system using rectangular coordinates. In this case, we
+/// calculate where the Sun was in January 1st, 2000.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::sun(2451545.0);
+/// let coordinates = vsop87e::sun(2451545.0);
 ///
-/// assert!(x > -0.0071415280 && x < -0.0071415278);
-/// assert!(y > -0.0027881716 && y < -0.0027881714);
-/// assert!(z > 0.0002041 && z < 0.0002081);
+/// assert!(coordinates.x > -0.0071415280 && coordinates.x < -0.0071415278);
+/// assert!(coordinates.y > -0.0027881716 && coordinates.y < -0.0027881714);
+/// assert!(coordinates.z > 0.0002041 && coordinates.z < 0.0002081);
 /// ```
-pub fn sun(jde: f64) -> (f64, f64, f64) {
+pub fn sun(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &sun::X0);
@@ -62,30 +83,34 @@ pub fn sun(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
 
 
-/// Calculates VSOP87E solution for Mercury
+/// Calculates VSOP87E solution for Mercury.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the planet Mercury. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the
-/// VSOP87E solution. Those values are the rectangular coordinates of the planet, in *AU*, with the
-/// barycenter of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the planet Mercury. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those
+/// values are the rectangular coordinates of the planet, in *AU*, with the barycenter of the solar
+/// system in the center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Mercury in the solar system using rectangular coordinates. In this case,
+/// we calculate where Mercury was in December 31st, 1899.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::mercury(2415020.0);
+/// let coordinates = vsop87e::mercury(2415020.0);
 ///
-/// assert!(x > -0.3865370328 && x < -0.3865370326);
-/// assert!(y > -0.1438666202 && y < -0.1438666200);
-/// assert!(z > 0.0235142 && z < 0.0235182);
+/// assert!(coordinates.x > -0.3865370328 && coordinates.x < -0.3865370326);
+/// assert!(coordinates.y > -0.1438666202 && coordinates.y < -0.1438666200);
+/// assert!(coordinates.z > 0.0235142 && coordinates.z < 0.0235182);
 /// ```
-pub fn mercury(jde: f64) -> (f64, f64, f64) {
+pub fn mercury(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &mercury::X0);
@@ -112,29 +137,33 @@ pub fn mercury(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
 
-/// Calculates VSOP87E solution for Venus
+/// Calculates VSOP87E solution for Venus.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the planet Venus. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the
-/// VSOP87E solution. Those values are the rectangular coordinates of the planet, in *AU*, with the
-/// barycenter of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the planet Venus. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those
+/// values are the rectangular coordinates of the planet, in *AU*, with the barycenter of the solar
+/// system in the center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Venus in the solar system using rectangular coordinates. In this case,
+/// we calculate where Venus was in December 30th, 1799.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::venus(2378495.0);
+/// let coordinates = vsop87e::venus(2378495.0);
 ///
-/// assert!(x > -0.5948645228 && x < -0.5948645226);
-/// assert!(y > 0.3900421674 && y < 0.3900421676);
-/// assert!(z > 0.0397542 && z < 0.0397582);
+/// assert!(coordinates.x > -0.5948645228 && coordinates.x < -0.5948645226);
+/// assert!(coordinates.y > 0.3900421674 && coordinates.y < 0.3900421676);
+/// assert!(coordinates.z > 0.0397542 && coordinates.z < 0.0397582);
 /// ```
-pub fn venus(jde: f64) -> (f64, f64, f64) {
+pub fn venus(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &venus::X0);
@@ -161,29 +190,33 @@ pub fn venus(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
 
-/// Calculates VSOP87E solution for Earth
+/// Calculates VSOP87E solution for Earth.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the planet Earth. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the
-/// VSOP87E solution. Those values are the rectangular coordinates of the planet, in *AU*, with the
-/// barycenter of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the planet Earth. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those
+/// values are the rectangular coordinates of the planet, in *AU*, with the barycenter of the solar
+/// system in the center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Earth in the solar system using rectangular coordinates. In this case,
+/// we calculate where the Earth was in December 29th, 1699.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::earth(2341970.0);
+/// let coordinates = vsop87e::earth(2341970.0);
 ///
-/// assert!(x > -0.2155959338 && x < -0.2155959336);
-/// assert!(y > 0.9651943804 && y < 0.9651943806);
-/// assert!(z > 0.0007705 && z < 0.0007745);
+/// assert!(coordinates.x > -0.2155959338 && coordinates.x < -0.2155959336);
+/// assert!(coordinates.y > 0.9651943804 && coordinates.y < 0.9651943806);
+/// assert!(coordinates.z > 0.0007705 && coordinates.z < 0.0007745);
 /// ```
-pub fn earth(jde: f64) -> (f64, f64, f64) {
+pub fn earth(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &earth::X0);
@@ -210,29 +243,33 @@ pub fn earth(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
 
-/// Calculates VSOP87E solution for Mars
+/// Calculates VSOP87E solution for Mars.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the planet Mars. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the
-/// VSOP87E solution. Those values are the rectangular coordinates of the planet, in *AU*, with the
-/// barycenter of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the planet Mars. The parameter needed is the Julian Day (*JD*) for the
+/// given date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those
+/// values are the rectangular coordinates of the planet, in *AU*, with the barycenter of the solar
+/// system in the center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Mars in the solar system using rectangular coordinates. In this case, we
+/// calculate where Mercury was in December 29th, 1599.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::mars(2305445.0);
+/// let coordinates = vsop87e::mars(2305445.0);
 ///
-/// assert!(x > -0.8237565239 && x < -0.8237565237);
-/// assert!(y > 1.4065798250 && y < 1.4065798252);
-/// assert!(z > 0.0502476 && z < 0.0502516);
+/// assert!(coordinates.x > -0.8237565239 && coordinates.x < -0.8237565237);
+/// assert!(coordinates.y > 1.4065798250 && coordinates.y < 1.4065798252);
+/// assert!(coordinates.z > 0.0502476 && coordinates.z < 0.0502516);
 /// ```
-pub fn mars(jde: f64) -> (f64, f64, f64) {
+pub fn mars(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &mars::X0);
@@ -259,29 +296,33 @@ pub fn mars(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
 
-/// Calculates VSOP87E solution for Jupiter
+/// Calculates VSOP87E solution for Jupiter.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the planet Jupiter. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the
-/// VSOP87E solution. Those values are the rectangular coordinates of the planet, in *AU*, with the
-/// barycenter of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the planet Jupiter. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those
+/// values are the rectangular coordinates of the planet, in *AU*, with the barycenter of the solar
+/// system in the center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Jupiter in the solar system using rectangular coordinates. In this case,
+/// we calculate where Jupiter was in December 19th, 1499.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::jupiter(2268920.0);
+/// let coordinates = vsop87e::jupiter(2268920.0);
 ///
-/// assert!(x > 4.5819830418 && x < 4.5819830420);
-/// assert!(y > -1.9854861384 && y < -1.9854861382);
-/// assert!(z > -0.0959289 && z < -0.0959249);
+/// assert!(coordinates.x > 4.5819830418 && coordinates.x < 4.5819830420);
+/// assert!(coordinates.y > -1.9854861384 && coordinates.y < -1.9854861382);
+/// assert!(coordinates.z > -0.0959289 && coordinates.z < -0.0959249);
 /// ```
-pub fn jupiter(jde: f64) -> (f64, f64, f64) {
+pub fn jupiter(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &jupiter::X0);
@@ -308,29 +349,33 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
 
-/// Calculates VSOP87E solution for Saturn
+/// Calculates VSOP87E solution for Saturn.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the planet Saturn. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the
-/// VSOP87E solution. Those values are the rectangular coordinates of the planet, in *AU*, with the
-/// barycenter of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the planet Saturn. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those
+/// values are the rectangular coordinates of the planet, in *AU*, with the barycenter of the solar
+/// system in the center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Saturn in the solar system using rectangular coordinates. In this case,
+/// we calculate where Saturn was in December 19th, 1399.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::saturn(2232395.0);
+/// let coordinates = vsop87e::saturn(2232395.0);
 ///
-/// assert!(x > 1.2645936161 && x < 1.2645936163);
-/// assert!(y > -10.0240954526 && y < -10.0240954524);
-/// assert!(z > 0.1345888 && z < 0.1345928);
+/// assert!(coordinates.x > 1.2645936161 && coordinates.x < 1.2645936163);
+/// assert!(coordinates.y > -10.0240954526 && coordinates.y < -10.0240954524);
+/// assert!(coordinates.z > 0.1345888 && coordinates.z < 0.1345928);
 /// ```
-pub fn saturn(jde: f64) -> (f64, f64, f64) {
+pub fn saturn(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &saturn::X0);
@@ -357,29 +402,33 @@ pub fn saturn(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
 
-/// Calculates VSOP87E solution for Uranus
+/// Calculates VSOP87E solution for Uranus.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the planet Uranus. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the
-/// VSOP87E solution. Those values are the rectangular coordinates of the planet, in *AU*, with the
-/// barycenter of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the planet Uranus. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those
+/// values are the rectangular coordinates of the planet, in *AU*, with the barycenter of the solar
+/// system in the center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Uranus in the solar system using rectangular coordinates. In this case,
+/// we calculate where Neptune was in December 19th, 1299.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::uranus(2195870.0);
+/// let coordinates = vsop87e::uranus(2195870.0);
 ///
-/// assert!(x > -17.6538791198 && x < -17.6538791196);
-/// assert!(y > -5.1666300881 && y < -5.1666300879);
-/// assert!(z > 0.2124594 && z < 0.2124634);
+/// assert!(coordinates.x > -17.6538791198 && coordinates.x < -17.6538791196);
+/// assert!(coordinates.y > -5.1666300881 && coordinates.y < -5.1666300879);
+/// assert!(coordinates.z > 0.2124594 && coordinates.z < 0.2124634);
 /// ```
-pub fn uranus(jde: f64) -> (f64, f64, f64) {
+pub fn uranus(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &uranus::X0);
@@ -402,29 +451,33 @@ pub fn uranus(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4);
     let z = z0 + z1 * t + z2 * t * t;
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
 
-/// Calculates VSOP87E solution for Neptune
+/// Calculates VSOP87E solution for Neptune.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for
-/// the equinox J2000.0) for the planet Neptune. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *x*, *y*, *z* of the
-/// VSOP87E solution. Those values are the rectangular coordinates of the planet, in *AU*, with the
-/// barycenter of the solar system in the center and the ecliptic plane as reference ```z = 0```.
+/// the equinox J2000.0) for the planet Neptune. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87E solution in a `RectangularCoordinates` structure. Those
+/// values are the rectangular coordinates of the planet, in *AU*, with the barycenter of the solar
+/// system in the center and the ecliptic plane as reference `z = 0`.
 ///
-/// # Examples
+/// # Example
+///
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Neptune in the solar system using rectangular coordinates. In this case,
+/// we calculate where Neptune was in December 19th, 1199.
 ///
 /// ```
 /// use vsop87::vsop87e;
 ///
-/// let (x, y, z) = vsop87e::neptune(2159345.0);
+/// let coordinates = vsop87e::neptune(2159345.0);
 ///
-/// assert!(x > 29.8297729718 && x < 29.8297729720);
-/// assert!(y > -2.0298541973 && y < -2.0298541971);
-/// assert!(z > -0.6440972 && z < -0.6440932);
+/// assert!(coordinates.x > 29.8297729718 && coordinates.x < 29.8297729720);
+/// assert!(coordinates.y > -2.0298541973 && coordinates.y < -2.0298541971);
+/// assert!(coordinates.z > -0.6440972 && coordinates.z < -0.6440932);
 /// ```
-pub fn neptune(jde: f64) -> (f64, f64, f64) {
+pub fn neptune(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
     let x0 = calculate_var(t, &neptune::X0);
@@ -447,5 +500,5 @@ pub fn neptune(jde: f64) -> (f64, f64, f64) {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4);
     let z = z0 + z1 * t + z2 * t * t;
 
-    (x, y, z)
+    RectangularCoordinates { x: x, y: y, z: z }
 }
