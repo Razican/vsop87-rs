@@ -3,504 +3,504 @@ use vsop87::*;
 
 #[test]
 fn it_mercury() {
-    let (l, b, r) = vsop87d::mercury(2451545.0);
+    let coordinates = vsop87d::mercury(2451545.0);
 
-    assert!(l > 4.4293481035 && l < 4.4293481037);
-    assert!(b > -0.0527573410 && b < -0.0527573408);
-    assert!(r > 0.46647110 && r < 0.46647186);
+    assert!(coordinates.longitude() > 4.4293481035 && coordinates.longitude() < 4.4293481037);
+    assert!(coordinates.latitude() > -0.0527573410 && coordinates.latitude() < -0.0527573408);
+    assert!(coordinates.distance() > 0.46647110 && coordinates.distance() < 0.46647186);
 
-    let (l, b, r) = vsop87d::mercury(2415020.0);
+    let coordinates = vsop87d::mercury(2415020.0);
 
-    assert!(l > 3.4851161910 && l < 3.4851161912);
-    assert!(b > 0.0565906172 && b < 0.0565906174);
-    assert!(r > 0.41834225 && r < 0.41834301);
+    assert!(coordinates.longitude() > 3.4851161910 && coordinates.longitude() < 3.4851161912);
+    assert!(coordinates.latitude() > 0.0565906172 && coordinates.latitude() < 0.0565906174);
+    assert!(coordinates.distance() > 0.41834225 && coordinates.distance() < 0.41834301);
 
-    let (l, b, r) = vsop87d::mercury(2378495.0);
+    let coordinates = vsop87d::mercury(2378495.0);
 
-    assert!(l > 2.0737894887 && l < 2.0737894889);
-    assert!(b > 0.1168184803 && b < 0.1168184805);
-    assert!(r > 0.32339057 && r < 0.32339133);
+    assert!(coordinates.longitude() > 2.0737894887 && coordinates.longitude() < 2.0737894889);
+    assert!(coordinates.latitude() > 0.1168184803 && coordinates.latitude() < 0.1168184805);
+    assert!(coordinates.distance() > 0.32339057 && coordinates.distance() < 0.32339133);
 
-    let (l, b, r) = vsop87d::mercury(2341970.0);
+    let coordinates = vsop87d::mercury(2341970.0);
 
-    assert!(l > 0.1910149586 && l < 0.1910149588);
-    assert!(b > -0.0682441257 && b < -0.0682441255);
-    assert!(r > 0.33815593 && r < 0.33815669);
+    assert!(coordinates.longitude() > 0.1910149586 && coordinates.longitude() < 0.1910149588);
+    assert!(coordinates.latitude() > -0.0682441257 && coordinates.latitude() < -0.0682441255);
+    assert!(coordinates.distance() > 0.33815593 && coordinates.distance() < 0.33815669);
 
-    let (l, b, r) = vsop87d::mercury(2305445.0);
+    let coordinates = vsop87d::mercury(2305445.0);
 
-    assert!(l > 5.1836421819 && l < 5.1836421821);
-    assert!(b > -0.1170914849 && b < -0.1170914847);
-    assert!(r > 0.43265140 && r < 0.43265216);
+    assert!(coordinates.longitude() > 5.1836421819 && coordinates.longitude() < 5.1836421821);
+    assert!(coordinates.latitude() > -0.1170914849 && coordinates.latitude() < -0.1170914847);
+    assert!(coordinates.distance() > 0.43265140 && coordinates.distance() < 0.43265216);
 
-    let (l, b, r) = vsop87d::mercury(2268920.0);
+    let coordinates = vsop87d::mercury(2268920.0);
 
-    assert!(l > 4.2636517902 && l < 4.2636517904);
-    assert!(b > -0.0457048517 && b < -0.0457048515);
-    assert!(r > 0.46615201 && r < 0.46615277);
+    assert!(coordinates.longitude() > 4.2636517902 && coordinates.longitude() < 4.2636517904);
+    assert!(coordinates.latitude() > -0.0457048517 && coordinates.latitude() < -0.0457048515);
+    assert!(coordinates.distance() > 0.46615201 && coordinates.distance() < 0.46615277);
 
-    let (l, b, r) = vsop87d::mercury(2232395.0);
+    let coordinates = vsop87d::mercury(2232395.0);
 
-    assert!(l > 3.3115600861 && l < 3.3115600863);
-    assert!(b > 0.0639722346 && b < 0.0639722348);
-    assert!(r > 0.41523814 && r < 0.41523890);
+    assert!(coordinates.longitude() > 3.3115600861 && coordinates.longitude() < 3.3115600863);
+    assert!(coordinates.latitude() > 0.0639722346 && coordinates.latitude() < 0.0639722348);
+    assert!(coordinates.distance() > 0.41523814 && coordinates.distance() < 0.41523890);
 
-    let (l, b, r) = vsop87d::mercury(2195870.0);
+    let coordinates = vsop87d::mercury(2195870.0);
 
-    assert!(l > 1.8738888758 && l < 1.8738888760);
-    assert!(b > 0.1126774696 && b < 0.1126774698);
-    assert!(r > 0.32093624 && r < 0.32093700);
+    assert!(coordinates.longitude() > 1.8738888758 && coordinates.longitude() < 1.8738888760);
+    assert!(coordinates.latitude() > 0.1126774696 && coordinates.latitude() < 0.1126774698);
+    assert!(coordinates.distance() > 0.32093624 && coordinates.distance() < 0.32093700);
 
-    let (l, b, r) = vsop87d::mercury(2159345.0);
+    let coordinates = vsop87d::mercury(2159345.0);
 
-    assert!(l > 6.2819826059 && l < 6.2819826061);
-    assert!(b > -0.0768697085 && b < -0.0768697083);
-    assert!(r > 0.34143504 && r < 0.34143581);
+    assert!(coordinates.longitude() > 6.2819826059 && coordinates.longitude() < 6.2819826061);
+    assert!(coordinates.latitude() > -0.0768697085 && coordinates.latitude() < -0.0768697083);
+    assert!(coordinates.distance() > 0.34143504 && coordinates.distance() < 0.34143581);
 
-    let (l, b, r) = vsop87d::mercury(2122820.0);
+    let coordinates = vsop87d::mercury(2122820.0);
 
-    assert!(l > 5.0128397763 && l < 5.0128397765);
-    assert!(b > -0.1143275809 && b < -0.1143275807);
-    assert!(r > 0.43520594 && r < 0.43520670);
+    assert!(coordinates.longitude() > 5.0128397763 && coordinates.longitude() < 5.0128397765);
+    assert!(coordinates.latitude() > -0.1143275809 && coordinates.latitude() < -0.1143275807);
+    assert!(coordinates.distance() > 0.43520594 && coordinates.distance() < 0.43520670);
 }
 
 #[test]
 fn it_venus() {
-    let (l, b, r) = vsop87d::venus(2451545.0);
+    let coordinates = vsop87d::venus(2451545.0);
 
-    assert!(l > 3.1870221832 && l < 3.1870221834);
-    assert!(b > 0.0569782848 && b < 0.0569782850);
-    assert!(r > 0.72021255 && r < 0.72021331);
+    assert!(coordinates.longitude() > 3.1870221832 && coordinates.longitude() < 3.1870221834);
+    assert!(coordinates.latitude() > 0.0569782848 && coordinates.latitude() < 0.0569782850);
+    assert!(coordinates.distance() > 0.72021255 && coordinates.distance() < 0.72021331);
 
-    let (l, b, r) = vsop87d::venus(2415020.0);
+    let coordinates = vsop87d::venus(2415020.0);
 
-    assert!(l > 5.9749622237 && l < 5.9749622239);
-    assert!(b > -0.0591260015 && b < -0.0591260013);
-    assert!(r > 0.72747156 && r < 0.72747232);
+    assert!(coordinates.longitude() > 5.9749622237 && coordinates.longitude() < 5.9749622239);
+    assert!(coordinates.latitude() > -0.0591260015 && coordinates.latitude() < -0.0591260013);
+    assert!(coordinates.distance() > 0.72747156 && coordinates.distance() < 0.72747232);
 
-    let (l, b, r) = vsop87d::venus(2378495.0);
+    let coordinates = vsop87d::venus(2378495.0);
 
-    assert!(l > 2.5083656667 && l < 2.5083656669);
-    assert!(b > 0.0552309406 && b < 0.0552309408);
-    assert!(r > 0.71854695 && r < 0.71854771);
+    assert!(coordinates.longitude() > 2.5083656667 && coordinates.longitude() < 2.5083656669);
+    assert!(coordinates.latitude() > 0.0552309406 && coordinates.latitude() < 0.0552309408);
+    assert!(coordinates.distance() > 0.71854695 && coordinates.distance() < 0.71854771);
 
-    let (l, b, r) = vsop87d::venus(2341970.0);
+    let coordinates = vsop87d::venus(2341970.0);
 
-    assert!(l > 5.3115708035 && l < 5.3115708037);
-    assert!(b > -0.0455979905 && b < -0.0455979903);
-    assert!(r > 0.72834037 && r < 0.72834113);
+    assert!(coordinates.longitude() > 5.3115708035 && coordinates.longitude() < 5.3115708037);
+    assert!(coordinates.latitude() > -0.0455979905 && coordinates.latitude() < -0.0455979903);
+    assert!(coordinates.distance() > 0.72834037 && coordinates.distance() < 0.72834113);
 
-    let (l, b, r) = vsop87d::venus(2305445.0);
+    let coordinates = vsop87d::venus(2305445.0);
 
-    assert!(l > 1.8291359616 && l < 1.8291359618);
-    assert!(b > 0.0311394083 && b < 0.0311394085);
-    assert!(r > 0.71863712 && r < 0.71863788);
+    assert!(coordinates.longitude() > 1.8291359616 && coordinates.longitude() < 1.8291359618);
+    assert!(coordinates.latitude() > 0.0311394083 && coordinates.latitude() < 0.0311394085);
+    assert!(coordinates.distance() > 0.71863712 && coordinates.distance() < 0.71863788);
 
-    let (l, b, r) = vsop87d::venus(2268920.0);
+    let coordinates = vsop87d::venus(2268920.0);
 
-    assert!(l > 4.6495448743 && l < 4.6495448745);
-    assert!(b > -0.0145437543 && b < -0.0145437541);
-    assert!(r > 0.72733600 && r < 0.72733676);
+    assert!(coordinates.longitude() > 4.6495448743 && coordinates.longitude() < 4.6495448745);
+    assert!(coordinates.latitude() > -0.0145437543 && coordinates.latitude() < -0.0145437541);
+    assert!(coordinates.distance() > 0.72733600 && coordinates.distance() < 0.72733676);
 
-    let (l, b, r) = vsop87d::venus(2232395.0);
+    let coordinates = vsop87d::venus(2232395.0);
 
-    assert!(l > 1.1527504142 && l < 1.1527504144);
-    assert!(b > -0.0054100667 && b < -0.0054100665);
-    assert!(r > 0.72054247 && r < 0.72054323);
+    assert!(coordinates.longitude() > 1.1527504142 && coordinates.longitude() < 1.1527504144);
+    assert!(coordinates.latitude() > -0.0054100667 && coordinates.latitude() < -0.0054100665);
+    assert!(coordinates.distance() > 0.72054247 && coordinates.distance() < 0.72054323);
 
-    let (l, b, r) = vsop87d::venus(2195870.0);
+    let coordinates = vsop87d::venus(2195870.0);
 
-    assert!(l > 3.9850309908 && l < 3.9850309910);
-    assert!(b > 0.0222342484 && b < 0.0222342486);
-    assert!(r > 0.72474374 && r < 0.72474450);
+    assert!(coordinates.longitude() > 3.9850309908 && coordinates.longitude() < 3.9850309910);
+    assert!(coordinates.latitude() > 0.0222342484 && coordinates.latitude() < 0.0222342486);
+    assert!(coordinates.distance() > 0.72474374 && coordinates.distance() < 0.72474450);
 
-    let (l, b, r) = vsop87d::venus(2159345.0);
+    let coordinates = vsop87d::venus(2159345.0);
 
-    assert!(l > 0.4804699930 && l < 0.4804699932);
-    assert!(b > -0.0395505251 && b < -0.0395505249);
-    assert!(r > 0.72354267 && r < 0.72354343);
+    assert!(coordinates.longitude() > 0.4804699930 && coordinates.longitude() < 0.4804699932);
+    assert!(coordinates.latitude() > -0.0395505251 && coordinates.latitude() < -0.0395505249);
+    assert!(coordinates.distance() > 0.72354267 && coordinates.distance() < 0.72354343);
 
-    let (l, b, r) = vsop87d::venus(2122820.0);
+    let coordinates = vsop87d::venus(2122820.0);
 
-    assert!(l > 3.3145399294 && l < 3.3145399296);
-    assert!(b > 0.0505016052 && b < 0.0505016054);
-    assert!(r > 0.72158160 && r < 0.72158236);
+    assert!(coordinates.longitude() > 3.3145399294 && coordinates.longitude() < 3.3145399296);
+    assert!(coordinates.latitude() > 0.0505016052 && coordinates.latitude() < 0.0505016054);
+    assert!(coordinates.distance() > 0.72158160 && coordinates.distance() < 0.72158236);
 }
 
 #[test]
 fn it_earth() {
-    let (l, b, r) = vsop87d::earth(2451545.0);
+    let coordinates = vsop87d::earth(2451545.0);
 
-    assert!(l > 1.7519238680 && l < 1.7519238682);
-    assert!(b > -0.0000039657 && b < -0.0000039655);
-    assert!(r > 0.98332730 && r < 0.98332806);
+    assert!(coordinates.longitude() > 1.7519238680 && coordinates.longitude() < 1.7519238682);
+    assert!(coordinates.latitude() > -0.0000039657 && coordinates.latitude() < -0.0000039655);
+    assert!(coordinates.distance() > 0.98332730 && coordinates.distance() < 0.98332806);
 
-    let (l, b, r) = vsop87d::earth(2415020.0);
+    let coordinates = vsop87d::earth(2415020.0);
 
-    assert!(l > 1.7391225562 && l < 1.7391225564);
-    assert!(b > -0.0000005680 && b < -0.0000005678);
-    assert!(r > 0.98326860 && r < 0.98326936);
+    assert!(coordinates.longitude() > 1.7391225562 && coordinates.longitude() < 1.7391225564);
+    assert!(coordinates.latitude() > -0.0000005680 && coordinates.latitude() < -0.0000005678);
+    assert!(coordinates.distance() > 0.98326860 && coordinates.distance() < 0.98326936);
 
-    let (l, b, r) = vsop87d::earth(2378495.0);
+    let coordinates = vsop87d::earth(2378495.0);
 
-    assert!(l > 1.7262638915 && l < 1.7262638917);
-    assert!(b > 0.0000002082 && b < 0.0000002084);
-    assert!(r > 0.98322705 && r < 0.98322781);
+    assert!(coordinates.longitude() > 1.7262638915 && coordinates.longitude() < 1.7262638917);
+    assert!(coordinates.latitude() > 0.0000002082 && coordinates.latitude() < 0.0000002084);
+    assert!(coordinates.distance() > 0.98322705 && coordinates.distance() < 0.98322781);
 
-    let (l, b, r) = vsop87d::earth(2341970.0);
+    let coordinates = vsop87d::earth(2341970.0);
 
-    assert!(l > 1.7134419104 && l < 1.7134419106);
-    assert!(b > 0.0000025050 && b < 0.0000025052);
-    assert!(r > 0.98314946 && r < 0.98315022);
+    assert!(coordinates.longitude() > 1.7134419104 && coordinates.longitude() < 1.7134419106);
+    assert!(coordinates.latitude() > 0.0000025050 && coordinates.latitude() < 0.0000025052);
+    assert!(coordinates.distance() > 0.98314946 && coordinates.distance() < 0.98315022);
 
-    let (l, b, r) = vsop87d::earth(2305445.0);
+    let coordinates = vsop87d::earth(2305445.0);
 
-    assert!(l > 1.7006065937 && l < 1.7006065939);
-    assert!(b > -0.0000016360 && b < -0.0000016358);
-    assert!(r > 0.98312506 && r < 0.98312582);
+    assert!(coordinates.longitude() > 1.7006065937 && coordinates.longitude() < 1.7006065939);
+    assert!(coordinates.latitude() > -0.0000016360 && coordinates.latitude() < -0.0000016358);
+    assert!(coordinates.distance() > 0.98312506 && coordinates.distance() < 0.98312582);
 
-    let (l, b, r) = vsop87d::earth(2268920.0);
+    let coordinates = vsop87d::earth(2268920.0);
 
-    assert!(l > 1.6877624959 && l < 1.6877624961);
-    assert!(b > -0.0000020341 && b < -0.0000020339);
-    assert!(r > 0.98308130 && r < 0.98308206);
+    assert!(coordinates.longitude() > 1.6877624959 && coordinates.longitude() < 1.6877624961);
+    assert!(coordinates.latitude() > -0.0000020341 && coordinates.latitude() < -0.0000020339);
+    assert!(coordinates.distance() > 0.98308130 && coordinates.distance() < 0.98308206);
 
-    let (l, b, r) = vsop87d::earth(2232395.0);
+    let coordinates = vsop87d::earth(2232395.0);
 
-    assert!(l > 1.6750110960 && l < 1.6750110962);
-    assert!(b > 0.0000037878 && b < 0.0000037880);
-    assert!(r > 0.98307506 && r < 0.98307582);
+    assert!(coordinates.longitude() > 1.6750110960 && coordinates.longitude() < 1.6750110962);
+    assert!(coordinates.latitude() > 0.0000037878 && coordinates.latitude() < 0.0000037880);
+    assert!(coordinates.distance() > 0.98307506 && coordinates.distance() < 0.98307582);
 
-    let (l, b, r) = vsop87d::earth(2195870.0);
+    let coordinates = vsop87d::earth(2195870.0);
 
-    assert!(l > 1.6622048656 && l < 1.6622048658);
-    assert!(b > 0.0000015132 && b < 0.0000015134);
-    assert!(r > 0.98309386 && r < 0.98309462);
+    assert!(coordinates.longitude() > 1.6622048656 && coordinates.longitude() < 1.6622048658);
+    assert!(coordinates.latitude() > 0.0000015132 && coordinates.latitude() < 0.0000015134);
+    assert!(coordinates.distance() > 0.98309386 && coordinates.distance() < 0.98309462);
 
-    let (l, b, r) = vsop87d::earth(2159345.0);
+    let coordinates = vsop87d::earth(2159345.0);
 
-    assert!(l > 1.6495143196 && l < 1.6495143198);
-    assert!(b > -0.0000013004 && b < -0.0000013002);
-    assert!(r > 0.98304366 && r < 0.98304442);
+    assert!(coordinates.longitude() > 1.6495143196 && coordinates.longitude() < 1.6495143198);
+    assert!(coordinates.latitude() > -0.0000013004 && coordinates.latitude() < -0.0000013002);
+    assert!(coordinates.distance() > 0.98304366 && coordinates.distance() < 0.98304442);
 
-    let (l, b, r) = vsop87d::earth(2122820.0);
+    let coordinates = vsop87d::earth(2122820.0);
 
-    assert!(l > 1.6367193622 && l < 1.6367193624);
-    assert!(b > -0.0000031293 && b < -0.0000031291);
-    assert!(r > 0.98303280 && r < 0.98303356);
+    assert!(coordinates.longitude() > 1.6367193622 && coordinates.longitude() < 1.6367193624);
+    assert!(coordinates.latitude() > -0.0000031293 && coordinates.latitude() < -0.0000031291);
+    assert!(coordinates.distance() > 0.98303280 && coordinates.distance() < 0.98303356);
 }
 
 #[test]
 fn it_mars() {
-    let (l, b, r) = vsop87d::mars(2451545.0);
+    let coordinates = vsop87d::mars(2451545.0);
 
-    assert!(l > 6.2735389982 && l < 6.2735389984);
-    assert!(b > -0.0247779825 && b < -0.0247779823);
-    assert!(r > 1.39120731 && r < 1.39120807);
+    assert!(coordinates.longitude() > 6.2735389982 && coordinates.longitude() < 6.2735389984);
+    assert!(coordinates.latitude() > -0.0247779825 && coordinates.latitude() < -0.0247779823);
+    assert!(coordinates.distance() > 1.39120731 && coordinates.distance() < 1.39120807);
 
-    let (l, b, r) = vsop87d::mars(2415020.0);
+    let coordinates = vsop87d::mars(2415020.0);
 
-    assert!(l > 4.9942005210 && l < 4.9942005212);
-    assert!(b > -0.0271965870 && b < -0.0271965868);
-    assert!(r > 1.42187739 && r < 1.42187815);
+    assert!(coordinates.longitude() > 4.9942005210 && coordinates.longitude() < 4.9942005212);
+    assert!(coordinates.latitude() > -0.0271965870 && coordinates.latitude() < -0.0271965868);
+    assert!(coordinates.distance() > 1.42187739 && coordinates.distance() < 1.42187815);
 
-    let (l, b, r) = vsop87d::mars(2378495.0);
+    let coordinates = vsop87d::mars(2378495.0);
 
-    assert!(l > 3.8711855477 && l < 3.8711855479);
-    assert!(b > 0.0034969938 && b < 0.0034969940);
-    assert!(r > 1.56151362 && r < 1.56151438);
+    assert!(coordinates.longitude() > 3.8711855477 && coordinates.longitude() < 3.8711855479);
+    assert!(coordinates.latitude() > 0.0034969938 && coordinates.latitude() < 0.0034969940);
+    assert!(coordinates.distance() > 1.56151362 && coordinates.distance() < 1.56151438);
 
-    let (l, b, r) = vsop87d::mars(2341970.0);
+    let coordinates = vsop87d::mars(2341970.0);
 
-    assert!(l > 2.9166648689 && l < 2.9166648691);
-    assert!(b > 0.0280268148 && b < 0.0280268150);
-    assert!(r > 1.65846933 && r < 1.65847009);
+    assert!(coordinates.longitude() > 2.9166648689 && coordinates.longitude() < 2.9166648691);
+    assert!(coordinates.latitude() > 0.0280268148 && coordinates.latitude() < 0.0280268150);
+    assert!(coordinates.distance() > 1.65846933 && coordinates.distance() < 1.65847009);
 
-    let (l, b, r) = vsop87d::mars(2305445.0);
+    let coordinates = vsop87d::mars(2305445.0);
 
-    assert!(l > 2.0058210393 && l < 2.0058210395);
-    assert!(b > 0.0300702180 && b < 0.0300702182);
-    assert!(r > 1.63719934 && r < 1.63720010);
+    assert!(coordinates.longitude() > 2.0058210393 && coordinates.longitude() < 2.0058210395);
+    assert!(coordinates.latitude() > 0.0300702180 && coordinates.latitude() < 0.0300702182);
+    assert!(coordinates.distance() > 1.63719934 && coordinates.distance() < 1.63720010);
 
-    let (l, b, r) = vsop87d::mars(2268920.0);
+    let coordinates = vsop87d::mars(2268920.0);
 
-    assert!(l > 1.0050966938 && l < 1.0050966940);
-    assert!(b > 0.0066676097 && b < 0.0066676099);
-    assert!(r > 1.51236189 && r < 1.51236265);
+    assert!(coordinates.longitude() > 1.0050966938 && coordinates.longitude() < 1.0050966940);
+    assert!(coordinates.latitude() > 0.0066676097 && coordinates.latitude() < 0.0066676099);
+    assert!(coordinates.distance() > 1.51236189 && coordinates.distance() < 1.51236265);
 
-    let (l, b, r) = vsop87d::mars(2232395.0);
+    let coordinates = vsop87d::mars(2232395.0);
 
-    assert!(l > 6.0979760761 && l < 6.0979760763);
-    assert!(b > -0.0266794244 && b < -0.0266794242);
-    assert!(r > 1.39259607 && r < 1.39259683);
+    assert!(coordinates.longitude() > 6.0979760761 && coordinates.longitude() < 6.0979760763);
+    assert!(coordinates.latitude() > -0.0266794244 && coordinates.latitude() < -0.0266794242);
+    assert!(coordinates.distance() > 1.39259607 && coordinates.distance() < 1.39259683);
 
-    let (l, b, r) = vsop87d::mars(2195870.0);
+    let coordinates = vsop87d::mars(2195870.0);
 
-    assert!(l > 4.8193924947 && l < 4.8193924949);
-    assert!(b > -0.0255031924 && b < -0.0255031922);
-    assert!(r > 1.42087034 && r < 1.42087110);
+    assert!(coordinates.longitude() > 4.8193924947 && coordinates.longitude() < 4.8193924949);
+    assert!(coordinates.latitude() > -0.0255031924 && coordinates.latitude() < -0.0255031922);
+    assert!(coordinates.distance() > 1.42087034 && coordinates.distance() < 1.42087110);
 
-    let (l, b, r) = vsop87d::mars(2159345.0);
+    let coordinates = vsop87d::mars(2159345.0);
 
-    assert!(l > 3.6939294874 && l < 3.6939294876);
-    assert!(b > 0.0065885508 && b < 0.0065885510);
-    assert!(r > 1.55937982 && r < 1.55938058);
+    assert!(coordinates.longitude() > 3.6939294874 && coordinates.longitude() < 3.6939294876);
+    assert!(coordinates.latitude() > 0.0065885508 && coordinates.latitude() < 0.0065885510);
+    assert!(coordinates.distance() > 1.55937982 && coordinates.distance() < 1.55938058);
 
-    let (l, b, r) = vsop87d::mars(2122820.0);
+    let coordinates = vsop87d::mars(2122820.0);
 
-    assert!(l > 2.7367104343 && l < 2.7367104345);
-    assert!(b > 0.0295522718 && b < 0.0295522720);
-    assert!(r > 1.65709985 && r < 1.65710061);
+    assert!(coordinates.longitude() > 2.7367104343 && coordinates.longitude() < 2.7367104345);
+    assert!(coordinates.latitude() > 0.0295522718 && coordinates.latitude() < 0.0295522720);
+    assert!(coordinates.distance() > 1.65709985 && coordinates.distance() < 1.65710061);
 }
 
 #[test]
 fn it_jupiter() {
-    let (l, b, r) = vsop87d::jupiter(2451545.0);
+    let coordinates = vsop87d::jupiter(2451545.0);
 
-    assert!(l > 0.6334614185 && l < 0.6334614187);
-    assert!(b > -0.0205001040 && b < -0.0205001038);
-    assert!(r > 4.96538094 && r < 4.96538170);
+    assert!(coordinates.longitude() > 0.6334614185 && coordinates.longitude() < 0.6334614187);
+    assert!(coordinates.latitude() > -0.0205001040 && coordinates.latitude() < -0.0205001038);
+    assert!(coordinates.distance() > 4.96538094 && coordinates.distance() < 4.96538170);
 
-    let (l, b, r) = vsop87d::jupiter(2415020.0);
+    let coordinates = vsop87d::jupiter(2415020.0);
 
-    assert!(l > 4.0927527023 && l < 4.0927527025);
-    assert!(b > 0.0161446617 && b < 0.0161446619);
-    assert!(r > 5.38502729 && r < 5.38502805);
+    assert!(coordinates.longitude() > 4.0927527023 && coordinates.longitude() < 4.0927527025);
+    assert!(coordinates.latitude() > 0.0161446617 && coordinates.latitude() < 0.0161446619);
+    assert!(coordinates.distance() > 5.38502729 && coordinates.distance() < 5.38502805);
 
-    let (l, b, r) = vsop87d::jupiter(2378495.0);
+    let coordinates = vsop87d::jupiter(2378495.0);
 
-    assert!(l > 1.5255696770 && l < 1.5255696772);
-    assert!(b > -0.0043606937 && b < -0.0043606935);
-    assert!(r > 5.13184538 && r < 5.13184614);
+    assert!(coordinates.longitude() > 1.5255696770 && coordinates.longitude() < 1.5255696772);
+    assert!(coordinates.latitude() > -0.0043606937 && coordinates.latitude() < -0.0043606935);
+    assert!(coordinates.distance() > 5.13184538 && coordinates.distance() < 5.13184614);
 
-    let (l, b, r) = vsop87d::jupiter(2341970.0);
+    let coordinates = vsop87d::jupiter(2341970.0);
 
-    assert!(l > 4.8888943124 && l < 4.8888943126);
-    assert!(b > -0.0011098086 && b < -0.0011098084);
-    assert!(r > 5.18881299 && r < 5.18881375);
+    assert!(coordinates.longitude() > 4.8888943124 && coordinates.longitude() < 4.8888943126);
+    assert!(coordinates.latitude() > -0.0011098086 && coordinates.latitude() < -0.0011098084);
+    assert!(coordinates.distance() > 5.18881299 && coordinates.distance() < 5.18881375);
 
-    let (l, b, r) = vsop87d::jupiter(2305445.0);
+    let coordinates = vsop87d::jupiter(2305445.0);
 
-    assert!(l > 2.3348832683 && l < 2.3348832685);
-    assert!(b > 0.0140523906 && b < 0.0140523908);
-    assert!(r > 5.34394512 && r < 5.34394588);
+    assert!(coordinates.longitude() > 2.3348832683 && coordinates.longitude() < 2.3348832685);
+    assert!(coordinates.latitude() > 0.0140523906 && coordinates.latitude() < 0.0140523908);
+    assert!(coordinates.distance() > 5.34394512 && coordinates.distance() < 5.34394588);
 
-    let (l, b, r) = vsop87d::jupiter(2268920.0);
+    let coordinates = vsop87d::jupiter(2268920.0);
 
-    assert!(l > 5.7527666851 && l < 5.7527666853);
-    assert!(b > -0.0188346312 && b < -0.0188346310);
-    assert!(r > 5.00180036 && r < 5.00180112);
+    assert!(coordinates.longitude() > 5.7527666851 && coordinates.longitude() < 5.7527666853);
+    assert!(coordinates.latitude() > -0.0188346312 && coordinates.latitude() < -0.0188346310);
+    assert!(coordinates.distance() > 5.00180036 && coordinates.distance() < 5.00180112);
 
-    let (l, b, r) = vsop87d::jupiter(2232395.0);
+    let coordinates = vsop87d::jupiter(2232395.0);
 
-    assert!(l > 3.0889515349 && l < 3.0889515351);
-    assert!(b > 0.0231157946 && b < 0.0231157948);
-    assert!(r > 5.44915664 && r < 5.44915740);
+    assert!(coordinates.longitude() > 3.0889515349 && coordinates.longitude() < 3.0889515351);
+    assert!(coordinates.latitude() > 0.0231157946 && coordinates.latitude() < 0.0231157948);
+    assert!(coordinates.distance() > 5.44915664 && coordinates.distance() < 5.44915740);
 
-    let (l, b, r) = vsop87d::jupiter(2195870.0);
+    let coordinates = vsop87d::jupiter(2195870.0);
 
-    assert!(l > 0.3776503429 && l < 0.3776503431);
-    assert!(b > -0.0222448937 && b < -0.0222448935);
-    assert!(r > 4.97150672 && r < 4.97150748);
+    assert!(coordinates.longitude() > 0.3776503429 && coordinates.longitude() < 0.3776503431);
+    assert!(coordinates.latitude() > -0.0222448937 && coordinates.latitude() < -0.0222448935);
+    assert!(coordinates.distance() > 4.97150672 && coordinates.distance() < 4.97150748);
 
-    let (l, b, r) = vsop87d::jupiter(2159345.0);
+    let coordinates = vsop87d::jupiter(2159345.0);
 
-    assert!(l > 3.8455069136 && l < 3.8455069138);
-    assert!(b > 0.0185554472 && b < 0.0185554474);
-    assert!(r > 5.38962031 && r < 5.38962107);
+    assert!(coordinates.longitude() > 3.8455069136 && coordinates.longitude() < 3.8455069138);
+    assert!(coordinates.latitude() > 0.0185554472 && coordinates.latitude() < 0.0185554474);
+    assert!(coordinates.distance() > 5.38962031 && coordinates.distance() < 5.38962107);
 
-    let (l, b, r) = vsop87d::jupiter(2122820.0);
+    let coordinates = vsop87d::jupiter(2122820.0);
 
-    assert!(l > 1.2695066545 && l < 1.2695066547);
-    assert!(b > -0.0075335741 && b < -0.0075335739);
-    assert!(r > 5.11935836 && r < 5.11935912);
+    assert!(coordinates.longitude() > 1.2695066545 && coordinates.longitude() < 1.2695066547);
+    assert!(coordinates.latitude() > -0.0075335741 && coordinates.latitude() < -0.0075335739);
+    assert!(coordinates.distance() > 5.11935836 && coordinates.distance() < 5.11935912);
 }
 
 #[test]
 fn it_saturn() {
-    let (l, b, r) = vsop87d::saturn(2451545.0);
+    let coordinates = vsop87d::saturn(2451545.0);
 
-    assert!(l > 0.7980038760 && l < 0.7980038762);
-    assert!(b > -0.0401984150 && b < -0.0401984148);
-    assert!(r > 9.18384799 && r < 9.18384875);
+    assert!(coordinates.longitude() > 0.7980038760 && coordinates.longitude() < 0.7980038762);
+    assert!(coordinates.latitude() > -0.0401984150 && coordinates.latitude() < -0.0401984148);
+    assert!(coordinates.distance() > 9.18384799 && coordinates.distance() < 9.18384875);
 
-    let (l, b, r) = vsop87d::saturn(2415020.0);
+    let coordinates = vsop87d::saturn(2415020.0);
 
-    assert!(l > 4.6512836346 && l < 4.6512836348);
-    assert!(b > 0.0192701408 && b < 0.0192701410);
-    assert!(r > 10.06685282 && r < 10.06685358);
+    assert!(coordinates.longitude() > 4.6512836346 && coordinates.longitude() < 4.6512836348);
+    assert!(coordinates.latitude() > 0.0192701408 && coordinates.latitude() < 0.0192701410);
+    assert!(coordinates.distance() > 10.06685282 && coordinates.distance() < 10.06685358);
 
-    let (l, b, r) = vsop87d::saturn(2378495.0);
+    let coordinates = vsop87d::saturn(2378495.0);
 
-    assert!(l > 2.1956677358 && l < 2.1956677360);
-    assert!(b > 0.0104156565 && b < 0.0104156567);
-    assert!(r > 9.10430648 && r < 9.10430724);
+    assert!(coordinates.longitude() > 2.1956677358 && coordinates.longitude() < 2.1956677360);
+    assert!(coordinates.latitude() > 0.0104156565 && coordinates.latitude() < 0.0104156567);
+    assert!(coordinates.distance() > 9.10430648 && coordinates.distance() < 9.10430724);
 
-    let (l, b, r) = vsop87d::saturn(2341970.0);
+    let coordinates = vsop87d::saturn(2341970.0);
 
-    assert!(l > 5.8113963636 && l < 5.8113963638);
-    assert!(b > -0.0291472788 && b < -0.0291472786);
-    assert!(r > 9.76299911 && r < 9.76299987);
+    assert!(coordinates.longitude() > 5.8113963636 && coordinates.longitude() < 5.8113963638);
+    assert!(coordinates.latitude() > -0.0291472788 && coordinates.latitude() < -0.0291472786);
+    assert!(coordinates.distance() > 9.76299911 && coordinates.distance() < 9.76299987);
 
-    let (l, b, r) = vsop87d::saturn(2305445.0);
+    let coordinates = vsop87d::saturn(2305445.0);
 
-    assert!(l > 3.5217555198 && l < 3.5217555200);
-    assert!(b > 0.0437035057 && b < 0.0437035059);
-    assert!(r > 9.75710318 && r < 9.75710394);
+    assert!(coordinates.longitude() > 3.5217555198 && coordinates.longitude() < 3.5217555200);
+    assert!(coordinates.latitude() > 0.0437035057 && coordinates.latitude() < 0.0437035059);
+    assert!(coordinates.distance() > 9.75710318 && coordinates.distance() < 9.75710394);
 
-    let (l, b, r) = vsop87d::saturn(2268920.0);
+    let coordinates = vsop87d::saturn(2268920.0);
 
-    assert!(l > 0.8594235307 && l < 0.8594235309);
-    assert!(b > -0.0379350089 && b < -0.0379350087);
-    assert!(r > 9.06692090 && r < 9.06692166);
+    assert!(coordinates.longitude() > 0.8594235307 && coordinates.longitude() < 0.8594235309);
+    assert!(coordinates.latitude() > -0.0379350089 && coordinates.latitude() < -0.0379350087);
+    assert!(coordinates.distance() > 9.06692090 && coordinates.distance() < 9.06692166);
 
-    let (l, b, r) = vsop87d::saturn(2232395.0);
+    let coordinates = vsop87d::saturn(2232395.0);
 
-    assert!(l > 4.6913199263 && l < 4.6913199265);
-    assert!(b > 0.0146771897 && b < 0.0146771899);
-    assert!(r > 10.10656892 && r < 10.10656968);
+    assert!(coordinates.longitude() > 4.6913199263 && coordinates.longitude() < 4.6913199265);
+    assert!(coordinates.latitude() > 0.0146771897 && coordinates.latitude() < 0.0146771899);
+    assert!(coordinates.distance() > 10.10656892 && coordinates.distance() < 10.10656968);
 
-    let (l, b, r) = vsop87d::saturn(2195870.0);
+    let coordinates = vsop87d::saturn(2195870.0);
 
-    assert!(l > 2.2948875822 && l < 2.2948875824);
-    assert!(b > 0.0178533696 && b < 0.0178533698);
-    assert!(r > 9.18575957 && r < 9.18576033);
+    assert!(coordinates.longitude() > 2.2948875822 && coordinates.longitude() < 2.2948875824);
+    assert!(coordinates.latitude() > 0.0178533696 && coordinates.latitude() < 0.0178533698);
+    assert!(coordinates.distance() > 9.18575957 && coordinates.distance() < 9.18576033);
 
-    let (l, b, r) = vsop87d::saturn(2159345.0);
+    let coordinates = vsop87d::saturn(2159345.0);
 
-    assert!(l > 5.8660241563 && l < 5.8660241565);
-    assert!(b > -0.0333866504 && b < -0.0333866502);
-    assert!(r > 9.59271701 && r < 9.59271777);
+    assert!(coordinates.longitude() > 5.8660241563 && coordinates.longitude() < 5.8660241565);
+    assert!(coordinates.latitude() > -0.0333866504 && coordinates.latitude() < -0.0333866502);
+    assert!(coordinates.distance() > 9.59271701 && coordinates.distance() < 9.59271777);
 
-    let (l, b, r) = vsop87d::saturn(2122820.0);
+    let coordinates = vsop87d::saturn(2122820.0);
 
-    assert!(l > 3.5570108068 && l < 3.5570108070);
-    assert!(b > 0.0435371138 && b < 0.0435371140);
-    assert!(r > 9.86699357 && r < 9.86699433);
+    assert!(coordinates.longitude() > 3.5570108068 && coordinates.longitude() < 3.5570108070);
+    assert!(coordinates.latitude() > 0.0435371138 && coordinates.latitude() < 0.0435371140);
+    assert!(coordinates.distance() > 9.86699357 && coordinates.distance() < 9.86699433);
 }
 
 #[test]
 fn it_uranus() {
-    let (l, b, r) = vsop87d::uranus(2451545.0);
+    let coordinates = vsop87d::uranus(2451545.0);
 
-    assert!(l > 5.5225485802 && l < 5.5225485804);
-    assert!(b > -0.0119527839 && b < -0.0119527837);
-    assert!(r > 19.92404789 && r < 19.92404865);
+    assert!(coordinates.longitude() > 5.5225485802 && coordinates.longitude() < 5.5225485804);
+    assert!(coordinates.latitude() > -0.0119527839 && coordinates.latitude() < -0.0119527837);
+    assert!(coordinates.distance() > 19.92404789 && coordinates.distance() < 19.92404865);
 
-    let (l, b, r) = vsop87d::uranus(2415020.0);
+    let coordinates = vsop87d::uranus(2415020.0);
 
-    assert!(l > 4.3397761172 && l < 4.3397761174);
-    assert!(b > 0.0011570306 && b < 0.0011570308);
-    assert!(r > 18.99271598 && r < 18.99271674);
+    assert!(coordinates.longitude() > 4.3397761172 && coordinates.longitude() < 4.3397761174);
+    assert!(coordinates.latitude() > 0.0011570306 && coordinates.latitude() < 0.0011570308);
+    assert!(coordinates.distance() > 18.99271598 && coordinates.distance() < 18.99271674);
 
-    let (l, b, r) = vsop87d::uranus(2378495.0);
+    let coordinates = vsop87d::uranus(2378495.0);
 
-    assert!(l > 3.0388348557 && l < 3.0388348559);
-    assert!(b > 0.0132392954 && b < 0.0132392956);
-    assert!(r > 18.29911506 && r < 18.29911582);
+    assert!(coordinates.longitude() > 3.0388348557 && coordinates.longitude() < 3.0388348559);
+    assert!(coordinates.latitude() > 0.0132392954 && coordinates.latitude() < 0.0132392956);
+    assert!(coordinates.distance() > 18.29911506 && coordinates.distance() < 18.29911582);
 
-    let (l, b, r) = vsop87d::uranus(2341970.0);
+    let coordinates = vsop87d::uranus(2341970.0);
 
-    assert!(l > 1.7242204719 && l < 1.7242204721);
-    assert!(b > 0.0059836564 && b < 0.0059836566);
-    assert!(r > 18.79662051 && r < 18.79662127);
+    assert!(coordinates.longitude() > 1.7242204719 && coordinates.longitude() < 1.7242204721);
+    assert!(coordinates.latitude() > 0.0059836564 && coordinates.latitude() < 0.0059836566);
+    assert!(coordinates.distance() > 18.79662051 && coordinates.distance() < 18.79662127);
 
-    let (l, b, r) = vsop87d::uranus(2305445.0);
+    let coordinates = vsop87d::uranus(2305445.0);
 
-    assert!(l > 0.5223325213 && l < 0.5223325215);
-    assert!(b > -0.0089983886 && b < -0.0089983884);
-    assert!(r > 19.78198789 && r < 19.78198865);
+    assert!(coordinates.longitude() > 0.5223325213 && coordinates.longitude() < 0.5223325215);
+    assert!(coordinates.latitude() > -0.0089983886 && coordinates.latitude() < -0.0089983884);
+    assert!(coordinates.distance() > 19.78198789 && coordinates.distance() < 19.78198865);
 
-    let (l, b, r) = vsop87d::uranus(2268920.0);
+    let coordinates = vsop87d::uranus(2268920.0);
 
-    assert!(l > 5.6817615581 && l < 5.6817615583);
-    assert!(b > -0.0129257255 && b < -0.0129257253);
-    assert!(r > 20.03004592 && r < 20.03004668);
+    assert!(coordinates.longitude() > 5.6817615581 && coordinates.longitude() < 5.6817615583);
+    assert!(coordinates.latitude() > -0.0129257255 && coordinates.latitude() < -0.0129257253);
+    assert!(coordinates.distance() > 20.03004592 && coordinates.distance() < 20.03004668);
 
-    let (l, b, r) = vsop87d::uranus(2232395.0);
+    let coordinates = vsop87d::uranus(2232395.0);
 
-    assert!(l > 4.5254482962 && l < 4.5254482964);
-    assert!(b > -0.0019303341 && b < -0.0019303339);
-    assert!(r > 19.26943073 && r < 19.26943149);
+    assert!(coordinates.longitude() > 4.5254482962 && coordinates.longitude() < 4.5254482964);
+    assert!(coordinates.latitude() > -0.0019303341 && coordinates.latitude() < -0.0019303339);
+    assert!(coordinates.distance() > 19.26943073 && coordinates.distance() < 19.26943149);
 
-    let (l, b, r) = vsop87d::uranus(2195870.0);
+    let coordinates = vsop87d::uranus(2195870.0);
 
-    assert!(l > 3.2557221719 && l < 3.2557221721);
-    assert!(b > 0.0120919638 && b < 0.0120919640);
-    assert!(r > 18.39482248 && r < 18.39482324);
+    assert!(coordinates.longitude() > 3.2557221719 && coordinates.longitude() < 3.2557221721);
+    assert!(coordinates.latitude() > 0.0120919638 && coordinates.latitude() < 0.0120919640);
+    assert!(coordinates.distance() > 18.39482248 && coordinates.distance() < 18.39482324);
 
-    let (l, b, r) = vsop87d::uranus(2159345.0);
+    let coordinates = vsop87d::uranus(2159345.0);
 
-    assert!(l > 1.9333853934 && l < 1.9333853936);
-    assert!(b > 0.0088045917 && b < 0.0088045919);
-    assert!(r > 18.58414975 && r < 18.58415051);
+    assert!(coordinates.longitude() > 1.9333853934 && coordinates.longitude() < 1.9333853936);
+    assert!(coordinates.latitude() > 0.0088045917 && coordinates.latitude() < 0.0088045919);
+    assert!(coordinates.distance() > 18.58414975 && coordinates.distance() < 18.58415051);
 
-    let (l, b, r) = vsop87d::uranus(2122820.0);
+    let coordinates = vsop87d::uranus(2122820.0);
 
-    assert!(l > 0.7007226223 && l < 0.7007226225);
-    assert!(b > -0.0065610612 && b < -0.0065610610);
-    assert!(r > 19.56120745 && r < 19.56120821);
+    assert!(coordinates.longitude() > 0.7007226223 && coordinates.longitude() < 0.7007226225);
+    assert!(coordinates.latitude() > -0.0065610612 && coordinates.latitude() < -0.0065610610);
+    assert!(coordinates.distance() > 19.56120745 && coordinates.distance() < 19.56120821);
 }
 
 #[test]
 fn it_neptune() {
-    let (l, b, r) = vsop87d::neptune(2451545.0);
+    let coordinates = vsop87d::neptune(2451545.0);
 
-    assert!(l > 5.3045629251 && l < 5.3045629253);
-    assert!(b > 0.0042236788 && b < 0.0042236790);
-    assert!(r > 30.12053246 && r < 30.12053322);
+    assert!(coordinates.longitude() > 5.3045629251 && coordinates.longitude() < 5.3045629253);
+    assert!(coordinates.latitude() > 0.0042236788 && coordinates.latitude() < 0.0042236790);
+    assert!(coordinates.distance() > 30.12053246 && coordinates.distance() < 30.12053322);
 
-    let (l, b, r) = vsop87d::neptune(2415020.0);
+    let coordinates = vsop87d::neptune(2415020.0);
 
-    assert!(l > 1.4956195224 && l < 1.4956195226);
-    assert!(b > -0.0219610031 && b < -0.0219610029);
-    assert!(r > 29.87103413 && r < 29.87103489);
+    assert!(coordinates.longitude() > 1.4956195224 && coordinates.longitude() < 1.4956195226);
+    assert!(coordinates.latitude() > -0.0219610031 && coordinates.latitude() < -0.0219610029);
+    assert!(coordinates.distance() > 29.87103413 && coordinates.distance() < 29.87103489);
 
-    let (l, b, r) = vsop87d::neptune(2378495.0);
+    let coordinates = vsop87d::neptune(2378495.0);
 
-    assert!(l > 3.9290537976 && l < 3.9290537978);
-    assert!(b > 0.0310692111 && b < 0.0310692113);
-    assert!(r > 30.32091885 && r < 30.32091961);
+    assert!(coordinates.longitude() > 3.9290537976 && coordinates.longitude() < 3.9290537978);
+    assert!(coordinates.latitude() > 0.0310692111 && coordinates.latitude() < 0.0310692113);
+    assert!(coordinates.distance() > 30.32091885 && coordinates.distance() < 30.32091961);
 
-    let (l, b, r) = vsop87d::neptune(2341970.0);
+    let coordinates = vsop87d::neptune(2341970.0);
 
-    assert!(l > 0.0815199678 && l < 0.0815199680);
-    assert!(b > -0.0260752534 && b < -0.0260752532);
-    assert!(r > 29.86858567 && r < 29.86858643);
+    assert!(coordinates.longitude() > 0.0815199678 && coordinates.longitude() < 0.0815199680);
+    assert!(coordinates.latitude() > -0.0260752534 && coordinates.latitude() < -0.0260752532);
+    assert!(coordinates.distance() > 29.86858567 && coordinates.distance() < 29.86858643);
 
-    let (l, b, r) = vsop87d::neptune(2305445.0);
+    let coordinates = vsop87d::neptune(2305445.0);
 
-    assert!(l > 2.5537079777 && l < 2.5537079779);
-    assert!(b > 0.0102374009 && b < 0.0102374011);
-    assert!(r > 30.13601549 && r < 30.13601625);
+    assert!(coordinates.longitude() > 2.5537079777 && coordinates.longitude() < 2.5537079779);
+    assert!(coordinates.latitude() > 0.0102374009 && coordinates.latitude() < 0.0102374011);
+    assert!(coordinates.distance() > 30.13601549 && coordinates.distance() < 30.13601625);
 
-    let (l, b, r) = vsop87d::neptune(2268920.0);
+    let coordinates = vsop87d::neptune(2268920.0);
 
-    assert!(l > 4.9678695784 && l < 4.9678695786);
-    assert!(b > 0.0116907776 && b < 0.0116907778);
-    assert!(r > 30.17853464 && r < 30.17853540);
+    assert!(coordinates.longitude() > 4.9678695784 && coordinates.longitude() < 4.9678695786);
+    assert!(coordinates.latitude() > 0.0116907776 && coordinates.latitude() < 0.0116907778);
+    assert!(coordinates.distance() > 30.17853464 && coordinates.distance() < 30.17853540);
 
-    let (l, b, r) = vsop87d::neptune(2232395.0);
+    let coordinates = vsop87d::neptune(2232395.0);
 
-    assert!(l > 1.1523661583 && l < 1.1523661585);
-    assert!(b > -0.0273547726 && b < -0.0273547724);
-    assert!(r > 29.83260514 && r < 29.83260590);
+    assert!(coordinates.longitude() > 1.1523661583 && coordinates.longitude() < 1.1523661585);
+    assert!(coordinates.latitude() > -0.0273547726 && coordinates.latitude() < -0.0273547724);
+    assert!(coordinates.distance() > 29.83260514 && coordinates.distance() < 29.83260590);
 
-    let (l, b, r) = vsop87d::neptune(2195870.0);
+    let coordinates = vsop87d::neptune(2195870.0);
 
-    assert!(l > 3.5930943432 && l < 3.5930943434);
-    assert!(b > 0.0316878974 && b < 0.0316878976);
-    assert!(r > 30.31091112 && r < 30.31091188);
+    assert!(coordinates.longitude() > 3.5930943432 && coordinates.longitude() < 3.5930943434);
+    assert!(coordinates.latitude() > 0.0316878974 && coordinates.latitude() < 0.0316878976);
+    assert!(coordinates.distance() > 30.31091112 && coordinates.distance() < 30.31091188);
 
-    let (l, b, r) = vsop87d::neptune(2159345.0);
+    let coordinates = vsop87d::neptune(2159345.0);
 
-    assert!(l > 6.0203596579 && l < 6.0203596581);
-    assert!(b > -0.0215169843 && b < -0.0215169841);
-    assert!(r > 29.90655030 && r < 29.90655106);
+    assert!(coordinates.longitude() > 6.0203596579 && coordinates.longitude() < 6.0203596581);
+    assert!(coordinates.latitude() > -0.0215169843 && coordinates.latitude() < -0.0215169841);
+    assert!(coordinates.distance() > 29.90655030 && coordinates.distance() < 29.90655106);
 
-    let (l, b, r) = vsop87d::neptune(2122820.0);
+    let coordinates = vsop87d::neptune(2122820.0);
 
-    assert!(l > 2.2124988266 && l < 2.2124988268);
-    assert!(b > 0.0027498092 && b < 0.0027498094);
-    assert!(r > 30.06536898 && r < 30.06536974);
+    assert!(coordinates.longitude() > 2.2124988266 && coordinates.longitude() < 2.2124988268);
+    assert!(coordinates.latitude() > 0.0027498092 && coordinates.latitude() < 0.0027498094);
+    assert!(coordinates.distance() > 30.06536898 && coordinates.distance() < 30.06536974);
 }

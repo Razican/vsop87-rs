@@ -1,7 +1,22 @@
-//! VSOP87B implementation
+//! VSOP87B algorithm: Heliocentric ecliptic spherical coordinates for the equinox J2000.0.
 //!
 //! This module calculates heliocentric ecliptic spherical coordinates for the equinox J2000.0 for
 //! the planets in the solar system.
+//!
+//! # Example
+//!
+//! Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+//! position of the planet Earth in the solar system using spherical coordinates. In this case, we
+//! calculate where the Earth was in December 30th, 1799.
+//!
+//! ```
+//! use vsop87::vsop87b;
+//!
+//! let coordinates = vsop87b::earth(2378495.0);
+//!
+//! assert!(coordinates.longitude() > 1.7750058557 && coordinates.longitude() < 1.7750058559);
+//! assert!(coordinates.latitude() > 0.0004381094 && coordinates.latitude() < 0.0004381096);
+//! assert!(coordinates.distance() > 0.9832270 && coordinates.distance() < 0.9832278);
 
 mod mercury;
 mod venus;
@@ -12,33 +27,33 @@ mod saturn;
 mod uranus;
 mod neptune;
 
-use super::{calculate_t, calculate_var};
+use super::{calculate_t, calculate_var, SphericalCoordinates};
 use std::f64::consts::PI;
 
-/// Calculates VSOP87B solution for Mercury
+/// Calculates VSOP87B solution for Mercury.
 ///
 /// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
-/// the equinox J2000.0) for the planet Mercury. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
-/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
-/// center and the ecliptic plane as reference ```b = 0```:
+/// the equinox J2000.0) for the planet Mercury. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87B solution ina `SphericalCoordinates` struct. Those values
+/// are the spherical coordinates of the planet, with the Sun in the center and the ecliptic plane
+/// as reference `latitude = 0`.
 ///
-/// - Ecliptic longitude (*L*), in radians
-/// - Ecliptic latitude (*B*), in radians
-/// - Radial distance (*R*), in *AU*
+/// # Example
 ///
-/// # Examples
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Mercury in the solar system using spherical coordinates. In this case,
+/// we calculate where Mercury was in January 1st, 2000.
 ///
 /// ```
 /// use vsop87::vsop87b;
 ///
-/// let (l, b, r) = vsop87b::mercury(2451545.0);
+/// let coordinates = vsop87b::mercury(2451545.0);
 ///
-/// assert!(l > 4.4293481042 && l < 4.4293481044);
-/// assert!(b > -0.0527573412 && b < -0.0527573410);
-/// assert!(r > 0.4664711 && r < 0.4664719);
+/// assert!(coordinates.longitude() > 4.4293481042 && coordinates.longitude() < 4.4293481044);
+/// assert!(coordinates.latitude() > -0.0527573412 && coordinates.latitude() < -0.0527573410);
+/// assert!(coordinates.distance() > 0.4664711 && coordinates.distance() < 0.4664719);
 /// ```
-pub fn mercury(jde: f64) -> (f64, f64, f64) {
+pub fn mercury(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
     let l0 = calculate_var(t, &mercury::L0);
@@ -66,33 +81,37 @@ pub fn mercury(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
+    SphericalCoordinates {
+        lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        lat: b,
+        dist: r,
+    }
 }
 
-/// Calculates VSOP87B solution for Venus
+/// Calculates VSOP87B solution for Venus.
 ///
 /// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
-/// the equinox J2000.0) for the planet Venus. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
-/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
-/// center and the ecliptic plane as reference ```b = 0```:
+/// the equinox J2000.0) for the planet Venus. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87B solution ina `SphericalCoordinates` struct. Those values
+/// are the spherical coordinates of the planet, with the Sun in the center and the ecliptic plane
+/// as reference `latitude = 0`.
 ///
-/// - Ecliptic longitude (*L*), in radians
-/// - Ecliptic latitude (*B*), in radians
-/// - Radial distance (*R*), in *AU*
+/// # Example
 ///
-/// # Examples
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Venus in the solar system using spherical coordinates. In this case, we
+/// calculate where Venus was in December 31st, 1899.
 ///
 /// ```
 /// use vsop87::vsop87b;
 ///
-/// let (l, b, r) = vsop87b::venus(2415020.0);
+/// let coordinates = vsop87b::venus(2415020.0);
 ///
-/// assert!(l > 5.9993518123 && l < 5.9993518125);
-/// assert!(b > -0.0591709805 && b < -0.0591709803);
-/// assert!(r > 0.7274715 && r < 0.7274723);
+/// assert!(coordinates.longitude() > 5.9993518123 && coordinates.longitude() < 5.9993518125);
+/// assert!(coordinates.latitude() > -0.0591709805 && coordinates.latitude() < -0.0591709803);
+/// assert!(coordinates.distance() > 0.7274715 && coordinates.distance() < 0.7274723);
 /// ```
-pub fn venus(jde: f64) -> (f64, f64, f64) {
+pub fn venus(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
     let l0 = calculate_var(t, &venus::L0);
@@ -120,33 +139,37 @@ pub fn venus(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
+    SphericalCoordinates {
+        lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        lat: b,
+        dist: r,
+    }
 }
 
-/// Calculates VSOP87B solution for Earth
+/// Calculates VSOP87B solution for Earth.
 ///
 /// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
-/// the equinox J2000.0) for the planet Earth. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
-/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
-/// center and the ecliptic plane as reference ```b = 0```:
+/// the equinox J2000.0) for the planet Earth. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87B solution ina `SphericalCoordinates` struct. Those values
+/// are the spherical coordinates of the planet, with the Sun in the center and the ecliptic plane
+/// as reference `latitude = 0`.
 ///
-/// - Ecliptic longitude (*L*), in radians
-/// - Ecliptic latitude (*B*), in radians
-/// - Radial distance (*R*), in *AU*
+/// # Example
 ///
-/// # Examples
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Earth in the solar system using spherical coordinates. In this case, we
+/// calculate where the Earth was in December 30th, 1799.
 ///
 /// ```
 /// use vsop87::vsop87b;
 ///
-/// let (l, b, r) = vsop87b::earth(2378495.0);
+/// let coordinates = vsop87b::earth(2378495.0);
 ///
-/// assert!(l > 1.7750058557 && l < 1.7750058559);
-/// assert!(b > 0.0004381094 && b < 0.0004381096);
-/// assert!(r > 0.9832270 && r < 0.9832278);
+/// assert!(coordinates.longitude() > 1.7750058557 && coordinates.longitude() < 1.7750058559);
+/// assert!(coordinates.latitude() > 0.0004381094 && coordinates.latitude() < 0.0004381096);
+/// assert!(coordinates.distance() > 0.9832270 && coordinates.distance() < 0.9832278);
 /// ```
-pub fn earth(jde: f64) -> (f64, f64, f64) {
+pub fn earth(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
     let l0 = calculate_var(t, &earth::L0);
@@ -174,33 +197,37 @@ pub fn earth(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
+    SphericalCoordinates {
+        lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        lat: b,
+        dist: r,
+    }
 }
 
-/// Calculates VSOP87B solution for Mars
+/// Calculates VSOP87B solution for Mars.
 ///
 /// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
-/// the equinox J2000.0) for the planet Mars. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
-/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
-/// center and the ecliptic plane as reference ```b = 0```:
+/// the equinox J2000.0) for the planet Mars. The parameter needed is the Julian Day (*JD*) for the
+/// given date. It returns the VSOP87B solution ina `SphericalCoordinates` struct. Those values are
+/// the spherical coordinates of the planet, with the Sun in the center and the ecliptic plane as
+/// reference `latitude = 0`.
 ///
-/// - Ecliptic longitude (*L*), in radians
-/// - Ecliptic latitude (*B*), in radians
-/// - Radial distance (*R*), in *AU*
+/// # Example
 ///
-/// # Examples
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Mars in the solar system using spherical coordinates. In this case, we
+/// calculate where Mars was in December 29th, 1699.
 ///
 /// ```
 /// use vsop87::vsop87b;
 ///
-/// let (l, b, r) = vsop87b::mars(2341970.0);
+/// let coordinates = vsop87b::mars(2341970.0);
 ///
-/// assert!(l > 2.9897807829 && l < 2.9897807831);
-/// assert!(b > 0.0280781216 && b < 0.0280781218);
-/// assert!(r > 1.6584693 && r < 1.6584701);
+/// assert!(coordinates.longitude() > 2.9897807829 && coordinates.longitude() < 2.9897807831);
+/// assert!(coordinates.latitude() > 0.0280781216 && coordinates.latitude() < 0.0280781218);
+/// assert!(coordinates.distance() > 1.6584693 && coordinates.distance() < 1.6584701);
 /// ```
-pub fn mars(jde: f64) -> (f64, f64, f64) {
+pub fn mars(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
     let l0 = calculate_var(t, &mars::L0);
@@ -228,33 +255,37 @@ pub fn mars(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
+    SphericalCoordinates {
+        lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        lat: b,
+        dist: r,
+    }
 }
 
-/// Calculates VSOP87B solution for Jupiter
+/// Calculates VSOP87B solution for Jupiter.
 ///
 /// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
-/// the equinox J2000.0) for the planet Jupiter. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
-/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
-/// center and the ecliptic plane as reference ```b = 0```:
+/// the equinox J2000.0) for the planet Jupiter. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87B solution ina `SphericalCoordinates` struct. Those values
+/// are the spherical coordinates of the planet, with the Sun in the center and the ecliptic plane
+/// as reference `latitude = 0`.
 ///
-/// - Ecliptic longitude (*L*), in radians
-/// - Ecliptic latitude (*B*), in radians
-/// - Radial distance (*R*), in *AU*
+/// # Example
 ///
-/// # Examples
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Jupiter in the solar system using spherical coordinates. In this case,
+/// we calculate where Jupiter was in December 29th, 1599.
 ///
 /// ```
 /// use vsop87::vsop87b;
 ///
-/// let (l, b, r) = vsop87b::jupiter(2305445.0);
+/// let coordinates = vsop87b::jupiter(2305445.0);
 ///
-/// assert!(l > 2.4323346133 && l < 2.4323346135);
-/// assert!(b > 0.0145957281 && b < 0.0145957283);
-/// assert!(r > 5.3439451 && r < 5.3439459);
+/// assert!(coordinates.longitude() > 2.4323346133 && coordinates.longitude() < 2.4323346135);
+/// assert!(coordinates.latitude() > 0.0145957281 && coordinates.latitude() < 0.0145957283);
+/// assert!(coordinates.distance() > 5.3439451 && coordinates.distance() < 5.3439459);
 /// ```
-pub fn jupiter(jde: f64) -> (f64, f64, f64) {
+pub fn jupiter(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
     let l0 = calculate_var(t, &jupiter::L0);
@@ -282,33 +313,37 @@ pub fn jupiter(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
+    SphericalCoordinates {
+        lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        lat: b,
+        dist: r,
+    }
 }
 
-/// Calculates VSOP87B solution for Saturn
+/// Calculates VSOP87B solution for Saturn.
 ///
 /// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
-/// the equinox J2000.0) for the planet Saturn. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
-/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
-/// center and the ecliptic plane as reference ```b = 0```:
+/// the equinox J2000.0) for the planet Saturn. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87B solution ina `SphericalCoordinates` struct. Those values
+/// are the spherical coordinates of the planet, with the Sun in the center and the ecliptic plane
+/// as reference `latitude = 0`.
 ///
-/// - Ecliptic longitude (*L*), in radians
-/// - Ecliptic latitude (*B*), in radians
-/// - Radial distance (*R*), in *AU*
+/// # Example
 ///
-/// # Examples
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Saturn in the solar system using spherical coordinates. In this case, we
+/// calculate where Saturn was in December 19th, 1499.
 ///
 /// ```
 /// use vsop87::vsop87b;
 ///
-/// let (l, b, r) = vsop87b::saturn(2268920.0);
+/// let coordinates = vsop87b::saturn(2268920.0);
 ///
-/// assert!(l > 0.9812189104 && l < 0.9812189106);
-/// assert!(b > -0.0369435534 && b < -0.0369435532);
-/// assert!(r > 9.0669210 && r < 9.0669218);
+/// assert!(coordinates.longitude() > 0.9812189104 && coordinates.longitude() < 0.9812189106);
+/// assert!(coordinates.latitude() > -0.0369435534 && coordinates.latitude() < -0.0369435532);
+/// assert!(coordinates.distance() > 9.0669210 && coordinates.distance() < 9.0669218);
 /// ```
-pub fn saturn(jde: f64) -> (f64, f64, f64) {
+pub fn saturn(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
     let l0 = calculate_var(t, &saturn::L0);
@@ -336,33 +371,37 @@ pub fn saturn(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
 
-    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
+    SphericalCoordinates {
+        lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        lat: b,
+        dist: r,
+    }
 }
 
-/// Calculates VSOP87B solution for Uranus
+/// Calculates VSOP87B solution for Uranus.
 ///
 /// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
-/// the equinox J2000.0) for the planet Uranus. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
-/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
-/// center and the ecliptic plane as reference ```b = 0```:
+/// the equinox J2000.0) for the planet Uranus. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87B solution ina `SphericalCoordinates` struct. Those values
+/// are the spherical coordinates of the planet, with the Sun in the center and the ecliptic plane
+/// as reference `latitude = 0`.
 ///
-/// - Ecliptic longitude (*L*), in radians
-/// - Ecliptic latitude (*B*), in radians
-/// - Radial distance (*R*), in *AU*
+/// # Example
 ///
-/// # Examples
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Uranus in the solar system using spherical coordinates. In this case, we
+/// calculate where Uranus was in December 19th, 1399.
 ///
 /// ```
 /// use vsop87::vsop87b;
 ///
-/// let (l, b, r) = vsop87b::uranus(2232395.0);
+/// let coordinates = vsop87b::uranus(2232395.0);
 ///
-/// assert!(l > 4.6715450661 && l < 4.6715450663);
-/// assert!(b > -0.0033027750 && b < -0.0033027748);
-/// assert!(r > 19.2694309 && r < 19.2694317);
+/// assert!(coordinates.longitude() > 4.6715450661 && coordinates.longitude() < 4.6715450663);
+/// assert!(coordinates.latitude() > -0.0033027750 && coordinates.latitude() < -0.0033027748);
+/// assert!(coordinates.distance() > 19.2694309 && coordinates.distance() < 19.2694317);
 /// ```
-pub fn uranus(jde: f64) -> (f64, f64, f64) {
+pub fn uranus(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
     let l0 = calculate_var(t, &uranus::L0);
@@ -385,33 +424,37 @@ pub fn uranus(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3);
 
-    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
+    SphericalCoordinates {
+        lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        lat: b,
+        dist: r,
+    }
 }
 
-/// Calculates VSOP87B solution for Neptune
+/// Calculates VSOP87B solution for Neptune.
 ///
 /// This function calculates the VSOP87B solution (heliocentric ecliptic spherical coordinates for
-/// the equinox J2000.0) for the planet Neptune. The parameter needed is the Julian Day Efemeris
-/// (*JDE*) for the given date. It returns, in order, a tuple with the values *l*, *b*, *r* of the
-/// VSOP87B solution. Those values are the spherical coordinates of the planet, with the Sun in the
-/// center and the ecliptic plane as reference ```b = 0```:
+/// the equinox J2000.0) for the planet Neptune. The parameter needed is the Julian Day (*JD*) for
+/// the given date. It returns the VSOP87B solution ina `SphericalCoordinates` struct. Those values
+/// are the spherical coordinates of the planet, with the Sun in the center and the ecliptic plane
+/// as reference `latitude = 0`.
 ///
-/// - Ecliptic longitude (*L*), in radians
-/// - Ecliptic latitude (*B*), in radians
-/// - Radial distance (*R*), in *AU*
+/// # Example
 ///
-/// # Examples
+/// Given a date in [*JD*](http://aa.usno.navy.mil/data/docs/JulianDate.php), we can get the
+/// position of the planet Neptuine in the solar system using spherical coordinates. In this case,
+/// we calculate where Neptune was in December 19th, 1299.
 ///
 /// ```
 /// use vsop87::vsop87b;
 ///
-/// let (l, b, r) = vsop87b::neptune(2195870.0);
+/// let coordinates = vsop87b::neptune(2195870.0);
 ///
-/// assert!(l > 3.7635416327 && l < 3.7635416329);
-/// assert!(b > 0.0306777429 && b < 0.0306777431);
-/// assert!(r > 30.3109111 && r < 30.3109119);
+/// assert!(coordinates.longitude() > 3.7635416327 && coordinates.longitude() < 3.7635416329);
+/// assert!(coordinates.latitude() > 0.0306777429 && coordinates.latitude() < 0.0306777431);
+/// assert!(coordinates.distance() > 30.3109111 && coordinates.distance() < 30.3109119);
 /// ```
-pub fn neptune(jde: f64) -> (f64, f64, f64) {
+pub fn neptune(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
     let l0 = calculate_var(t, &neptune::L0);
@@ -433,5 +476,9 @@ pub fn neptune(jde: f64) -> (f64, f64, f64) {
     let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3);
     let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3);
 
-    (if l > 0_f64 { l } else { 2_f64 * PI + l }, b, r)
+    SphericalCoordinates {
+        lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
+        lat: b,
+        dist: r,
+    }
 }
