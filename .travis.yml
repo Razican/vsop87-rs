@@ -34,13 +34,15 @@ script:
   - |
       if [[ "$TRAVIS_OS_NAME" == "linux" ]]; then
       travis-cargo build &&
-      travis-cargo test &&
-      travis-cargo bench;
+      travis-cargo test;
       fi
   - |
       if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
       cargo build &&
-      cargo test &&
+      cargo test;
+      fi
+  - |
+      if [[ "$TRAVIS_RUST_VERSION" == "nightly" ]]; then
       cargo bench;
       fi
 
