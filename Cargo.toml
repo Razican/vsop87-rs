@@ -16,6 +16,7 @@ software to create views of the sky, or by simulation software to know the
 position of the planets.
 """
 keywords = ["vsop87", "simulation", "astrophysics", "astronomy"]
+categories = ["science"]
 
 [dev-dependencies]
 rand = "0.3.15"
