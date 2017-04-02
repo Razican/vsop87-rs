@@ -18,5 +18,9 @@ position of the planets.
 keywords = ["vsop87", "simulation", "astrophysics", "astronomy"]
 categories = ["science"]
 
+[badges]
+travis-ci = { repository = "Razican/vsop87-rs", branch = "master" }
+appveyor = { repository = "Razican/vsop87-rs", branch = "master", service = "github" }
+
 [dev-dependencies]
 rand = "0.3.15"
