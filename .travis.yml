@@ -1,7 +1,7 @@
 language: rust
 cache: cargo
 dist: trusty
-sudo: false
+sudo: true
 os:
   - linux
   - osx
@@ -41,6 +41,7 @@ script:
   - cargo build
   - cargo package
   - cargo test
+  - cargo doc
   - |
       if [[ "$TRAVIS_RUST_VERSION" == "nightly" && $CLIPPY ]]; then
         cargo clippy
