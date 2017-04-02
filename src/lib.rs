@@ -234,7 +234,8 @@ fn calculate_t(jde: f64) -> f64 {
 
 #[inline]
 fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
-    var.iter().fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
+    var.iter()
+        .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
 }
 
 /// Elements used by the VSOP87 solution. Can be converted into keplerian elements.
