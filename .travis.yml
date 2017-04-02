@@ -70,6 +70,7 @@ after_success:
         sudo make install &&
         cd ../.. &&
         rm -rf kcov-master &&
+        rm -rf target/debug/*.d &&
         for file in target/debug/vsop87*; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
         for file in target/debug/lib-*; do mkdir -p "target/cov/$(basename $file)"; kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file"; done &&
         bash <(curl -s https://codecov.io/bash) &&
