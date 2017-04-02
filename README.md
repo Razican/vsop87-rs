@@ -1,7 +1,7 @@
 # VSOP87 Rust implementation #
 [![Build Status](https://travis-ci.org/Razican/vsop87-rs.svg?branch=master)](https://travis-ci.org/Razican/vsop87-rs)
 [![Build status](https://ci.appveyor.com/api/projects/status/g028p4t0ekvcypu3?svg=true)](https://ci.appveyor.com/project/Razican/vsop87-rs)
-[![Coverage Status](https://coveralls.io/repos/Razican/vsop87-rs/badge.svg?branch=master&service=github)](https://coveralls.io/github/Razican/vsop87-rs?branch=master)
+[![codecov](https://codecov.io/gh/Razican/vsop87-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/Razican/vsop87-rs)
 [![Crates.io](https://meritbadge.herokuapp.com/vsop87)](https://crates.io/crates/vsop87)
 
 This library implements the *VSOP87* solutions to calculate the positions of the planets in the
@@ -50,7 +50,7 @@ assert!(vsop87_elts.p > 0.04563512 && vsop87_elts.p < 0.04563588);
 ```
 
 Note that the `>` and `<` comparisons are there because floats should not be compared using
-`==`. Those numbers are retrieved from the test data of the *VSOP87* algorithm.
+`==`. Those numbers are retrieved from the original test data of the *VSOP87* algorithm.
 We can then convert them into keplerian elements, by using both `KeplerianElements::from()` or
 the `into()` function in the *VSOP87* elements. This also works the other way around:
 
@@ -69,7 +69,7 @@ assert!(elements.mean_anomaly() > 4.40259 && elements.mean_anomaly() < 4.40261);
 ```
 
 As you can see, these numbers perfectly match
-[those from NASA](http://solarsystem.nasa.gov/planets/mercury/facts).
+[those from NASA](https://solarsystem.nasa.gov/planets/mercury/facts).
 
 ## License ##
 

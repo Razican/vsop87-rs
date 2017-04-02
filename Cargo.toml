@@ -1,6 +1,6 @@
 [package]
 name = "vsop87"
-version = "2.0.1"
+version = "2.0.2"
 authors = ["Iban Eguia <razican@protonmail.ch>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -17,6 +17,10 @@ position of the planets.
 """
 keywords = ["vsop87", "simulation", "astrophysics", "astronomy"]
 categories = ["science"]
+
+[badges]
+travis-ci = { repository = "Razican/vsop87-rs", branch = "master" }
+appveyor = { repository = "Razican/vsop87-rs", branch = "master", service = "github" }
 
 [dev-dependencies]
 rand = "0.3.15"
