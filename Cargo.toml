@@ -1,6 +1,6 @@
 [package]
 name = "vsop87"
-version = "2.0.2"
+version = "2.0.3"
 authors = ["Iban Eguia <razican@protonmail.ch>"]
 license = "MIT/Apache-2.0"
 readme = "README.md"
@@ -21,6 +21,9 @@ categories = ["science"]
 [badges]
 travis-ci = { repository = "Razican/vsop87-rs", branch = "master" }
 appveyor = { repository = "Razican/vsop87-rs", branch = "master", service = "github" }
+codecov = { repository = "Razican/vsop87-rs", branch = "master", service = "github" }
+is-it-maintained-issue-resolution = { repository = "Razican/vsop87-rs" }
+is-it-maintained-open-issues = { repository = "Razican/vsop87-rs" }
 
 [dev-dependencies]
 rand = "0.3.15"
