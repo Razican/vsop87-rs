@@ -234,8 +234,9 @@ fn calculate_t(jde: f64) -> f64 {
 
 #[inline]
 fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
-    var.iter()
-        .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
+    var.iter().fold(0_f64, |term, &(a, b, c)| {
+        term + a * (b + c * t).cos()
+    })
 }
 
 /// Elements used by the VSOP87 solution. Can be converted into keplerian elements.
@@ -527,7 +528,7 @@ pub fn earth_moon(jde: f64) -> VSOP87Elements {
 
     let a = a0 + a1 * t + a2 * t * t;
     let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-            (2_f64 * PI);
+        (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4) + q5 * t.powi(5);
@@ -617,7 +618,7 @@ pub fn mars(jde: f64) -> VSOP87Elements {
 
     let a = a0 + a1 * t + a2 * t * t;
     let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-            (2_f64 * PI);
+        (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4) + q5 * t.powi(5);
@@ -706,7 +707,7 @@ pub fn jupiter(jde: f64) -> VSOP87Elements {
 
     let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
     let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-            (2_f64 * PI);
+        (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);
@@ -799,7 +800,7 @@ pub fn saturn(jde: f64) -> VSOP87Elements {
 
     let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
     let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-            (2_f64 * PI);
+        (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4);
@@ -888,7 +889,7 @@ pub fn uranus(jde: f64) -> VSOP87Elements {
 
     let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
     let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-            (2_f64 * PI);
+        (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);
@@ -979,7 +980,7 @@ pub fn neptune(jde: f64) -> VSOP87Elements {
 
     let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
     let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-            (2_f64 * PI);
+        (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);

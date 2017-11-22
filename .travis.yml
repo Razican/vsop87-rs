@@ -22,6 +22,7 @@ rust:
   - nightly
   - beta
   - stable
+  - 1.21.0
   - 1.0.0
 
 # Load clippy and rustfmt
