@@ -86,7 +86,6 @@ pub fn sun(jde: f64) -> RectangularCoordinates {
     RectangularCoordinates { x: x, y: y, z: z }
 }
 
-
 /// Calculates VSOP87E solution for Mercury.
 ///
 /// This function calculates the VSOP87E solution (barycentric ecliptic rectangular coordinates for

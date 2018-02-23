@@ -1,11 +1,11 @@
 #![feature(test)]
 
-extern crate vsop87;
-extern crate test;
 extern crate rand;
+extern crate test;
+extern crate vsop87;
 
 use test::Bencher;
-use rand::{Rng, IsaacRng};
+use rand::{IsaacRng, Rng};
 
 #[bench]
 fn vsop87_mercury(b: &mut Bencher) {

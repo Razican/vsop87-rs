@@ -76,13 +76,17 @@
 //! As you can see, these numbers perfectly match
 //! [those from NASA](http://solarsystem.nasa.gov/planets/mercury/facts).
 
-#![forbid(missing_docs, warnings)]
-#![deny(deprecated, improper_ctypes, non_shorthand_field_patterns, overflowing_literals,
-    plugin_as_library, private_no_mangle_fns, private_no_mangle_statics, stable_features,
-    unconditional_recursion, unknown_lints, unused, unused_allocation, unused_attributes,
-    unused_comparisons, unused_features, unused_parens, while_true)]
-#![warn(trivial_casts, trivial_numeric_casts, unused, unused_extern_crates, unused_import_braces,
-    unused_qualifications, unused_results, variant_size_differences)]
+#![forbid(missing_docs, warnings, anonymous_parameters, unsafe_code, unused_extern_crates,
+          unused_import_braces, missing_copy_implementations, trivial_casts,
+          variant_size_differences, missing_debug_implementations, trivial_numeric_casts)]
+// Debug trait derivation will show an error if forbidden.
+#![deny(unused_qualifications)]
+#![cfg_attr(feature = "cargo-clippy", deny(clippy))]
+// FIXME: Maybe we should start writing proper variable names.
+#![cfg_attr(feature = "cargo-clippy", allow(many_single_char_names))]
+#![cfg_attr(feature = "cargo-clippy", warn(clippy_pedantic))]
+// All the "allow by default" lints
+#![warn(box_pointers, unused_results)]
 
 pub mod vsop87a;
 pub mod vsop87b;
@@ -229,14 +233,13 @@ impl SphericalCoordinates {
 
 #[inline]
 fn calculate_t(jde: f64) -> f64 {
-    (jde - 2451545_f64) / 365250_f64
+    (jde - 2_451_545_f64) / 365_250_f64
 }
 
 #[inline]
 fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
-    var.iter().fold(0_f64, |term, &(a, b, c)| {
-        term + a * (b + c * t).cos()
-    })
+    var.iter()
+        .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
 }
 
 /// Elements used by the VSOP87 solution. Can be converted into keplerian elements.
@@ -355,12 +358,12 @@ pub fn mercury(jde: f64) -> VSOP87Elements {
     let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3) + p4 * t.powi(4);
 
     VSOP87Elements {
-        a: a,
+        a,
         l: if l > 0_f64 { l } else { 2_f64 * PI + l },
-        k: k,
-        h: h,
-        q: q,
-        p: p,
+        k,
+        h,
+        q,
+        p,
     }
 }
 
@@ -443,12 +446,12 @@ pub fn venus(jde: f64) -> VSOP87Elements {
     let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3) + p4 * t.powi(4);
 
     VSOP87Elements {
-        a: a,
+        a,
         l: if l > 0_f64 { l } else { 2_f64 * PI + l },
-        k: k,
-        h: h,
-        q: q,
-        p: p,
+        k,
+        h,
+        q,
+        p,
     }
 }
 
@@ -527,20 +530,20 @@ pub fn earth_moon(jde: f64) -> VSOP87Elements {
     let p4 = calculate_var(t, &earth_moon::P4);
 
     let a = a0 + a1 * t + a2 * t * t;
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-        (2_f64 * PI);
+    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
+        % (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4) + q5 * t.powi(5);
     let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3) + p4 * t.powi(4);
 
     VSOP87Elements {
-        a: a,
+        a,
         l: if l > 0_f64 { l } else { 2_f64 * PI + l },
-        k: k,
-        h: h,
-        q: q,
-        p: p,
+        k,
+        h,
+        q,
+        p,
     }
 }
 
@@ -617,20 +620,20 @@ pub fn mars(jde: f64) -> VSOP87Elements {
     let p3 = calculate_var(t, &mars::P3);
 
     let a = a0 + a1 * t + a2 * t * t;
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-        (2_f64 * PI);
+    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
+        % (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4) + q5 * t.powi(5);
     let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3);
 
     VSOP87Elements {
-        a: a,
+        a,
         l: if l > 0_f64 { l } else { 2_f64 * PI + l },
-        k: k,
-        h: h,
-        q: q,
-        p: p,
+        k,
+        h,
+        q,
+        p,
     }
 }
 
@@ -706,20 +709,20 @@ pub fn jupiter(jde: f64) -> VSOP87Elements {
     let p2 = calculate_var(t, &jupiter::P2);
 
     let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-        (2_f64 * PI);
+    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
+        % (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);
     let p = p0 + p1 * t + p2 * t * t;
 
     VSOP87Elements {
-        a: a,
+        a,
         l: if l > 0_f64 { l } else { 2_f64 * PI + l },
-        k: k,
-        h: h,
-        q: q,
-        p: p,
+        k,
+        h,
+        q,
+        p,
     }
 }
 
@@ -799,20 +802,20 @@ pub fn saturn(jde: f64) -> VSOP87Elements {
     let p3 = calculate_var(t, &saturn::P3);
 
     let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-        (2_f64 * PI);
+    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
+        % (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4);
     let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3);
 
     VSOP87Elements {
-        a: a,
+        a,
         l: if l > 0_f64 { l } else { 2_f64 * PI + l },
-        k: k,
-        h: h,
-        q: q,
-        p: p,
+        k,
+        h,
+        q,
+        p,
     }
 }
 
@@ -888,20 +891,20 @@ pub fn uranus(jde: f64) -> VSOP87Elements {
     let p2 = calculate_var(t, &uranus::P2);
 
     let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-        (2_f64 * PI);
+    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
+        % (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);
     let p = p0 + p1 * t + p2 * t * t;
 
     VSOP87Elements {
-        a: a,
+        a,
         l: if l > 0_f64 { l } else { 2_f64 * PI + l },
-        k: k,
-        h: h,
-        q: q,
-        p: p,
+        k,
+        h,
+        q,
+        p,
     }
 }
 
@@ -979,19 +982,19 @@ pub fn neptune(jde: f64) -> VSOP87Elements {
     let p2 = calculate_var(t, &neptune::P2);
 
     let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5)) %
-        (2_f64 * PI);
+    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
+        % (2_f64 * PI);
     let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
     let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
     let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);
     let p = p0 + p1 * t + p2 * t * t;
 
     VSOP87Elements {
-        a: a,
+        a,
         l: if l > 0_f64 { l } else { 2_f64 * PI + l },
-        k: k,
-        h: h,
-        q: q,
-        p: p,
+        k,
+        h,
+        q,
+        p,
     }
 }
