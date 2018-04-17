@@ -25,5 +25,9 @@ codecov = { repository = "Razican/vsop87-rs", branch = "master", service = "gith
 is-it-maintained-issue-resolution = { repository = "Razican/vsop87-rs" }
 is-it-maintained-open-issues = { repository = "Razican/vsop87-rs" }
 
+[features]
+default = []
+unstable = []
+
 [dev-dependencies]
 rand = "0.4.2"

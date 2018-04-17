@@ -76,17 +76,18 @@
 //! As you can see, these numbers perfectly match
 //! [those from NASA](http://solarsystem.nasa.gov/planets/mercury/facts).
 
-#![forbid(missing_docs, warnings, anonymous_parameters, unsafe_code, unused_extern_crates,
+#![forbid(missing_docs, warnings, anonymous_parameters, unused_extern_crates,
           unused_import_braces, missing_copy_implementations, trivial_casts,
           variant_size_differences, missing_debug_implementations, trivial_numeric_casts)]
 // Debug trait derivation will show an error if forbidden.
-#![deny(unused_qualifications)]
+#![deny(unused_qualifications, unsafe_code)]
 #![cfg_attr(feature = "cargo-clippy", deny(clippy))]
 // FIXME: Maybe we should start writing proper variable names.
 #![cfg_attr(feature = "cargo-clippy", allow(many_single_char_names))]
 #![cfg_attr(feature = "cargo-clippy", warn(clippy_pedantic))]
 // All the "allow by default" lints
 #![warn(box_pointers, unused_results)]
+#![cfg_attr(feature = "unstable", feature(stdsimd, target_feature, cfg_target_feature))]
 
 pub mod vsop87a;
 pub mod vsop87b;
@@ -231,15 +232,59 @@ impl SphericalCoordinates {
     }
 }
 
+/// Calculates the `t` value.
 #[inline]
 fn calculate_t(jde: f64) -> f64 {
     (jde - 2_451_545_f64) / 365_250_f64
 }
 
+/// Calculates the given variable.
 #[inline]
+#[cfg(not(feature = "unstable"))]
 fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
+    calculate_var_default(t, var)
+}
+
+/// Calculates the given variable.
+#[inline]
+#[cfg(feature = "unstable")]
+fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
+    #[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+    #[allow(unsafe_code)]
+    {
+        if is_x86_feature_detected!("avx") {
+            unsafe { calculate_var_avx(t, var) }
+        } else {
+            calculate_var_default(t, var)
+        }
+    }
+
+    #[cfg(not(any(target_arch = "x86", target_arch = "x86_64")))]
+    {
+        calculate_var_default(t, var)
+    }
+}
+
+/// Default method to calculate the variable.
+#[inline]
+fn calculate_var_default(t: f64, var: &[(f64, f64, f64)]) -> f64 {
     var.iter()
         .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
+}
+
+/// Calculate the given variable using AVX-2.
+#[cfg(all(feature = "unstable", any(target_arch = "x86", target_arch = "x86_64")))]
+#[cfg_attr(feature = "unstable", target_feature(enable = "avx"))]
+#[allow(unsafe_code)]
+unsafe fn calculate_var_avx(t: f64, var: &[(f64, f64, f64)]) -> f64 {
+    // #[cfg(target_arch = "x86")]
+    // use std::arch::x86::_mm256_add_epi64;
+    // #[cfg(target_arch = "x86_64")]
+    // use std::arch::x86_64::_mm256_add_epi64;
+    //
+    // _mm256_add_epi64();
+
+    calculate_var_default()
 }
 
 /// Elements used by the VSOP87 solution. Can be converted into keplerian elements.
