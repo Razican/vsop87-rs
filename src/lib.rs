@@ -76,17 +76,25 @@
 //! As you can see, these numbers perfectly match
 //! [those from NASA](http://solarsystem.nasa.gov/planets/mercury/facts).
 
-#![forbid(missing_docs, warnings, anonymous_parameters, unsafe_code, unused_extern_crates,
-          unused_import_braces, missing_copy_implementations, trivial_casts,
-          variant_size_differences, missing_debug_implementations, trivial_numeric_casts)]
-// Debug trait derivation will show an error if forbidden.
-#![deny(unused_qualifications)]
-#![cfg_attr(feature = "cargo-clippy", deny(clippy))]
-// FIXME: Maybe we should start writing proper variable names.
-#![cfg_attr(feature = "cargo-clippy", allow(many_single_char_names))]
-#![cfg_attr(feature = "cargo-clippy", warn(clippy_pedantic))]
-// All the "allow by default" lints
+#![forbid(
+    missing_docs, warnings, anonymous_parameters, unused_extern_crates, unused_import_braces,
+    missing_copy_implementations, trivial_casts, variant_size_differences,
+    missing_debug_implementations, trivial_numeric_casts
+)]
+#![deny(unsafe_code, unused_qualifications)]
 #![warn(box_pointers, unused_results)]
+// Clippy
+#![cfg_attr(feature = "cargo-clippy", deny(clippy))]
+#![cfg_attr(feature = "cargo-clippy", warn(clippy_pedantic))]
+// FIXME: Maybe we should start writing proper variable names.
+#![cfg_attr(
+    feature = "cargo-clippy", allow(many_single_char_names, unreadable_literal, excessive_precision)
+)]
+#![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
+// Features
+#![feature(stdsimd)]
+#![cfg_attr(feature = "no_std", no_std)]
+#![cfg_attr(feature = "no_std", feature(core_float, core_intrinsics))]
 
 pub mod vsop87a;
 pub mod vsop87b;
@@ -94,16 +102,26 @@ pub mod vsop87c;
 pub mod vsop87d;
 pub mod vsop87e;
 
-mod mercury;
-mod venus;
 mod earth_moon;
-mod mars;
 mod jupiter;
+mod mars;
+mod mercury;
+mod neptune;
 mod saturn;
 mod uranus;
-mod neptune;
+mod venus;
 
+#[cfg(feature = "no_std")]
+use core::f64::consts::PI;
+#[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
+
+#[cfg(feature = "no_std")]
+use core::num::Float;
+#[cfg(feature = "no_std")]
+mod functions;
+#[cfg(feature = "no_std")]
+use functions::Trigonometry;
 
 /// Structure representing the keplerian elements of an orbit.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -166,19 +184,20 @@ impl KeplerianElements {
     }
 }
 
+#[cfg(not(feature = "no_std"))]
 impl From<VSOP87Elements> for KeplerianElements {
-    fn from(elts: VSOP87Elements) -> KeplerianElements {
+    fn from(elts: VSOP87Elements) -> Self {
         let ecc = (elts.h * elts.h + elts.k * elts.k).sqrt();
         let i = (1_f64 - 2_f64 * (elts.p * elts.p + elts.q * elts.q)).acos();
         let lan = (elts.p / elts.q).atan();
         let lper = (elts.h / ecc).asin();
 
-        KeplerianElements {
-            ecc: ecc,
+        Self {
+            ecc,
             sma: elts.a,
             incl: i,
-            lan: lan,
-            lper: lper,
+            lan,
+            lper,
             l0: elts.l,
         }
     }
@@ -231,15 +250,118 @@ impl SphericalCoordinates {
     }
 }
 
+/// Calculates the time variable for VSOP87.
 #[inline]
 fn calculate_t(jde: f64) -> f64 {
     (jde - 2_451_545_f64) / 365_250_f64
 }
 
+/// Calculates the given variable.
 #[inline]
+#[allow(unsafe_code)]
 fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
-    var.iter()
-        .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
+    if is_x86_feature_detected!("avx") {
+        // Safe because we already checked that we have AVX instruction set.
+        unsafe { calculate_var_avx(t, var) }
+    } else {
+        var.iter()
+            .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
+    }
+}
+
+/// Calculates the given variable using the AVX instruction set.
+#[target_feature(enable = "avx")]
+#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+#[allow(unsafe_code)]
+unsafe fn calculate_var_avx(t: f64, var: &[(f64, f64, f64)]) -> f64 {
+    #[cfg(feature = "no_std")]
+    use core::{f64,
+               simd::{f64x4, FromBits}};
+    #[cfg(not(feature = "no_std"))]
+    use std::{f64,
+              simd::{f64x4, FromBits}};
+
+    #[cfg(all(feature = "no_std", target_arch = "x86_64"))]
+    use core::arch::x86_64::*;
+    #[cfg(all(not(feature = "no_std"), target_arch = "x86_64"))]
+    use std::arch::x86_64::*;
+
+    #[cfg(all(feature = "no_std", target_arch = "x86"))]
+    use core::arch::x86::*;
+    #[cfg(all(not(feature = "no_std"), target_arch = "x86"))]
+    use std::arch::x86::*;
+
+    /// Vectorizes the calculation of 4 terms at the same time.
+    fn vector_term(
+        (a1, b1, c1): (f64, f64, f64),
+        (a2, b2, c2): (f64, f64, f64),
+        (a3, b3, c3): (f64, f64, f64),
+        (a4, b4, c4): (f64, f64, f64),
+        t: f64,
+    ) -> f64x4 {
+        let a = f64x4::new(a1, a2, a3, a4);
+        let b = f64x4::new(b1, b2, b3, b4);
+        let c = f64x4::new(c1, c2, c3, c4);
+        let t = f64x4::splat(t);
+
+        // Safe because both values are created properly and checked.
+        let ct = unsafe { _mm256_mul_pd(__m256d::from_bits(c), __m256d::from_bits(t)) };
+        // Safe because both values are created properly and checked.
+        let bct = unsafe { _mm256_add_pd(__m256d::from_bits(b), ct) };
+
+        let bct_std = f64x4::from_bits(bct);
+        // All safe because indexes are constant and < 4
+        let bct1 = unsafe { bct_std.extract_unchecked(0) }.cos();
+        let bct2 = unsafe { bct_std.extract_unchecked(1) }.cos();
+        let bct3 = unsafe { bct_std.extract_unchecked(2) }.cos();
+        let bct4 = unsafe { bct_std.extract_unchecked(3) }.cos();
+
+        let bct = f64x4::new(bct1, bct2, bct3, bct4);
+
+        // Safe because both values are created properly and checked.
+        let term = unsafe { _mm256_mul_pd(__m256d::from_bits(a), __m256d::from_bits(bct)) };
+        f64x4::from_bits(term)
+    }
+
+    var.chunks(4)
+        .map(|vec| {
+            match vec {
+                &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4)] => {
+                    let term =
+                        vector_term((a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4), t);
+
+                    // All safe because indexes are constant and < 4
+                    let term1 = term.extract_unchecked(0);
+                    let term2 = term.extract_unchecked(1);
+                    let term3 = term.extract_unchecked(2);
+                    let term4 = term.extract_unchecked(3);
+
+                    term1 + term2 + term3 + term4
+                }
+                &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3)] => {
+                    let term = vector_term(
+                        (a1, b1, c1),
+                        (a2, b2, c2),
+                        (a3, b3, c3),
+                        (f64::NAN, f64::NAN, f64::NAN),
+                        t,
+                    );
+
+                    // All safe because indexes are constant and < 4
+                    let term1 = term.extract_unchecked(0);
+                    let term2 = term.extract_unchecked(1);
+                    let term3 = term.extract_unchecked(2);
+
+                    term1 + term2 + term3
+                }
+                &[(a1, b1, c1), (a2, b2, c2)] => {
+                    a1 * (b1 + c1 * t).cos() + a2 * (b2 + c2 * t).cos()
+                }
+                &[(a, b, c)] => a * (b + c * t).cos(),
+                _ => unreachable!(),
+            }
+        })
+        .sum::<f64>()
 }
 
 /// Elements used by the VSOP87 solution. Can be converted into keplerian elements.
@@ -267,13 +389,16 @@ pub struct VSOP87Elements {
 
 impl From<KeplerianElements> for VSOP87Elements {
     fn from(elts: KeplerianElements) -> VSOP87Elements {
+        let (lper_sin, lper_cos) = elts.lper.sin_cos();
+        let (lan_sin, lan_cos) = elts.lan.sin_cos();
+        let incl_sin = (elts.incl / 2.0).sin();
         VSOP87Elements {
             a: elts.sma,
             l: elts.l0,
-            k: elts.ecc * elts.lper.cos(),
-            h: elts.ecc * elts.lper.sin(),
-            q: (elts.incl / 2.0).sin() * elts.lan.cos(),
-            p: (elts.incl / 2.0).sin() * elts.lan.sin(),
+            k: elts.ecc * lper_cos,
+            h: elts.ecc * lper_sin,
+            q: incl_sin * lan_cos,
+            p: incl_sin * lan_sin,
         }
     }
 }

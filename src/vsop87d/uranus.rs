@@ -1,3 +1,6 @@
+#[cfg(feature = "no_std")]
+use core::f64::consts::PI;
+#[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
 
 pub const L0: [(f64, f64, f64); 947] = [

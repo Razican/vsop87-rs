@@ -37,7 +37,9 @@ install:
 
 build_script:
   - cargo build
+  - cargo build --features no_std
   - cargo package
 
 test_script:
   - cargo test
+  - cargo test --features no_std

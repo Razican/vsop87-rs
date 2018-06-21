@@ -19,17 +19,19 @@
 //! assert!(coordinates.y > -0.1502242200 && coordinates.y < -0.1502242198);
 //! assert!(coordinates.z > 0.023618 && coordinates.z < 0.023622);
 
-mod mercury;
-mod venus;
 mod earth;
 mod earth_moon;
-mod mars;
 mod jupiter;
+mod mars;
+mod mercury;
+mod neptune;
 mod saturn;
 mod uranus;
-mod neptune;
+mod venus;
 
 use super::{calculate_t, calculate_var, RectangularCoordinates};
+#[cfg(feature = "no_std")]
+use core::num::Float;
 
 /// Calculates VSOP87A solution for Mercury.
 ///
@@ -81,7 +83,7 @@ pub fn mercury(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87A solution for Venus.
@@ -134,7 +136,7 @@ pub fn venus(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87A solution for Earth.
@@ -187,7 +189,7 @@ pub fn earth(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87A solution for Earth - Moon barycenter.
@@ -240,7 +242,7 @@ pub fn earth_moon(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87A solution for Mars.
@@ -293,7 +295,7 @@ pub fn mars(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87A solution for Jupiter.
@@ -346,7 +348,7 @@ pub fn jupiter(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87A solution for Saturn.
@@ -399,7 +401,7 @@ pub fn saturn(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4) + y5 * t.powi(5);
     let z = z0 + z1 * t + z2 * t * t + z3 * t.powi(3) + z4 * t.powi(4);
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87A solution for Uranus.
@@ -448,7 +450,7 @@ pub fn uranus(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4);
     let z = z0 + z1 * t + z2 * t * t;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87A solution for Neptune
@@ -497,5 +499,5 @@ pub fn neptune(jde: f64) -> RectangularCoordinates {
     let y = y0 + y1 * t + y2 * t * t + y3 * t.powi(3) + y4 * t.powi(4);
     let z = z0 + z1 * t + z2 * t * t;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }

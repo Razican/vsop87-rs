@@ -1,8 +1,10 @@
 extern crate vsop87;
 
+#[cfg(not(feature = "no_std"))]
 use vsop87::*;
 
 #[test]
+#[cfg(not(feature = "no_std"))]
 fn it_kepler() {
     let vsop87_elts = vsop87::mercury(2451545.0);
 
@@ -24,6 +26,7 @@ fn it_kepler() {
 }
 
 #[test]
+#[cfg(not(feature = "no_std"))]
 fn it_convert() {
     let vsop87_elts = vsop87::mercury(2451545.0);
 

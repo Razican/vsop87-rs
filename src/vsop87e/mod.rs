@@ -21,17 +21,20 @@
 //! assert!(coordinates.y > -0.0027881716 && coordinates.y < -0.0027881714);
 //! assert!(coordinates.z > 0.0002041 && coordinates.z < 0.0002081);
 
-mod sun;
-mod mercury;
-mod venus;
 mod earth;
-mod mars;
 mod jupiter;
-mod saturn;
-mod uranus;
+mod mars;
+mod mercury;
 mod neptune;
+mod saturn;
+mod sun;
+mod uranus;
+mod venus;
 
 use super::{calculate_t, calculate_var, RectangularCoordinates};
+
+#[cfg(feature = "no_std")]
+use core::num::Float;
 
 /// Calculates VSOP87E solution for the Sun.
 ///

@@ -4,8 +4,8 @@ extern crate rand;
 extern crate test;
 extern crate vsop87;
 
-use test::Bencher;
 use rand::{IsaacRng, Rng};
+use test::Bencher;
 use vsop87::vsop87a;
 
 #[bench]

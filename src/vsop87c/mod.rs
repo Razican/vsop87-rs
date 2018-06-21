@@ -20,16 +20,19 @@
 //! assert!(coordinates.y > -0.2203045664 && coordinates.y < -0.2203045662);
 //! assert!(coordinates.z > -0.04298775 && coordinates.z < -0.04298715);
 
-mod mercury;
-mod venus;
 mod earth;
-mod mars;
 mod jupiter;
+mod mars;
+mod mercury;
+mod neptune;
 mod saturn;
 mod uranus;
-mod neptune;
+mod venus;
 
 use super::{calculate_t, calculate_var, RectangularCoordinates};
+
+#[cfg(feature = "no_std")]
+use core::num::Float;
 
 /// Calculates VSOP87C solution for Mercury.
 ///

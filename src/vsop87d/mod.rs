@@ -19,17 +19,24 @@
 //! assert!(coordinates.distance() > 5.44915664 && coordinates.distance() < 5.44915740);
 //! ```
 
-mod mercury;
-mod venus;
 mod earth;
-mod mars;
 mod jupiter;
+mod mars;
+mod mercury;
+mod neptune;
 mod saturn;
 mod uranus;
-mod neptune;
+mod venus;
 
 use super::{calculate_t, calculate_var, SphericalCoordinates};
+
+#[cfg(feature = "no_std")]
+use core::f64::consts::PI;
+#[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
+
+#[cfg(feature = "no_std")]
+use core::num::Float;
 
 /// Calculates VSOP87D solution for Mercury.
 ///
