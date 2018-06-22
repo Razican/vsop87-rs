@@ -3,8 +3,6 @@
 #[macro_use]
 extern crate criterion;
 extern crate rand;
-extern crate test;
-extern crate vsop87;
 extern crate vsop87;
 
 use criterion::Criterion;

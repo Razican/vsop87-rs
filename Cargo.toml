@@ -52,3 +52,7 @@ harness = false
 [[bench]]
 name = "vsop87d"
 harness = false
+
+[[bench]]
+name = "vsop87e"
+harness = false
