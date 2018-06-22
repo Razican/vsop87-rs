@@ -30,4 +30,25 @@ default = []
 no_std = []
 
 [dev-dependencies]
-rand = "0.5.1"
+rand = "0.5.2"
+criterion = "0.2.3"
+
+[[bench]]
+name = "vsop87"
+harness = false
+
+[[bench]]
+name = "vsop87a"
+harness = false
+
+[[bench]]
+name = "vsop87b"
+harness = false
+
+[[bench]]
+name = "vsop87c"
+harness = false
+
+[[bench]]
+name = "vsop87d"
+harness = false
