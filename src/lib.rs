@@ -81,9 +81,8 @@
     missing_copy_implementations, trivial_casts, variant_size_differences,
     missing_debug_implementations, trivial_numeric_casts
 )]
-#![deny(unsafe_code, unused_qualifications)]
-#![warn(box_pointers, unused_results)]
-// Clippy
+// Debug trait derivation will show an error if forbidden.
+#![deny(unused_qualifications, unsafe_code)]
 #![cfg_attr(feature = "cargo-clippy", deny(clippy))]
 #![cfg_attr(feature = "cargo-clippy", warn(clippy_pedantic))]
 // FIXME: Maybe we should start writing proper variable names.
@@ -92,9 +91,10 @@
 )]
 #![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
 // Features
-#![feature(stdsimd)]
 #![cfg_attr(feature = "no_std", no_std)]
 #![cfg_attr(feature = "no_std", feature(core_float, core_intrinsics))]
+// All the "allow by default" lints
+#![warn(box_pointers, unused_results)]
 
 pub mod vsop87a;
 pub mod vsop87b;
@@ -275,11 +275,9 @@ fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
 #[allow(unsafe_code)]
 unsafe fn calculate_var_avx(t: f64, var: &[(f64, f64, f64)]) -> f64 {
     #[cfg(feature = "no_std")]
-    use core::{f64,
-               simd::{f64x4, FromBits}};
+    use core::{f64, mem};
     #[cfg(not(feature = "no_std"))]
-    use std::{f64,
-              simd::{f64x4, FromBits}};
+    use std::{f64, mem};
 
     #[cfg(all(feature = "no_std", target_arch = "x86_64"))]
     use core::arch::x86_64::*;
@@ -292,74 +290,65 @@ unsafe fn calculate_var_avx(t: f64, var: &[(f64, f64, f64)]) -> f64 {
     use std::arch::x86::*;
 
     /// Vectorizes the calculation of 4 terms at the same time.
-    fn vector_term(
+    unsafe fn vector_term(
         (a1, b1, c1): (f64, f64, f64),
         (a2, b2, c2): (f64, f64, f64),
         (a3, b3, c3): (f64, f64, f64),
         (a4, b4, c4): (f64, f64, f64),
         t: f64,
-    ) -> f64x4 {
-        let a = f64x4::new(a1, a2, a3, a4);
-        let b = f64x4::new(b1, b2, b3, b4);
-        let c = f64x4::new(c1, c2, c3, c4);
-        let t = f64x4::splat(t);
+    ) -> (f64, f64, f64, f64) {
+        let a = _mm256_set_pd(a1, a2, a3, a4);
+        let b = _mm256_set_pd(b1, b2, b3, b4);
+        let c = _mm256_set_pd(c1, c2, c3, c4);
+        let t = _mm256_set1_pd(t);
 
         // Safe because both values are created properly and checked.
-        let ct = unsafe { _mm256_mul_pd(__m256d::from_bits(c), __m256d::from_bits(t)) };
+        let ct = _mm256_mul_pd(c, t);
         // Safe because both values are created properly and checked.
-        let bct = unsafe { _mm256_add_pd(__m256d::from_bits(b), ct) };
+        let bct = _mm256_add_pd(b, ct);
 
-        let bct_std = f64x4::from_bits(bct);
-        // All safe because indexes are constant and < 4
-        let bct1 = unsafe { bct_std.extract_unchecked(0) }.cos();
-        let bct2 = unsafe { bct_std.extract_unchecked(1) }.cos();
-        let bct3 = unsafe { bct_std.extract_unchecked(2) }.cos();
-        let bct4 = unsafe { bct_std.extract_unchecked(3) }.cos();
+        // Safe because bct_unpacked is 4 f64 long.
+        let bct_unpacked: (f64, f64, f64, f64) = mem::transmute(bct);
 
-        let bct = f64x4::new(bct1, bct2, bct3, bct4);
+        // Safe because bct_unpacked is 4 f64 long, and x84/x86_64 is little endian.
+        let bct = _mm256_set_pd(
+            bct_unpacked.3.cos(),
+            bct_unpacked.2.cos(),
+            bct_unpacked.1.cos(),
+            bct_unpacked.0.cos(),
+        );
 
         // Safe because both values are created properly and checked.
-        let term = unsafe { _mm256_mul_pd(__m256d::from_bits(a), __m256d::from_bits(bct)) };
-        f64x4::from_bits(term)
+        let term = _mm256_mul_pd(a, bct);
+        let term_unpacked: (f64, f64, f64, f64) = mem::transmute(term);
+
+        term_unpacked
     }
 
     var.chunks(4)
-        .map(|vec| {
-            match vec {
-                &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4)] => {
-                    let term =
-                        vector_term((a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4), t);
+        .map(|vec| match vec {
+            &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4)] => {
+                // The result is little endian in x86/x86_64.
+                let (term4, term3, term2, term1) =
+                    vector_term((a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4), t);
 
-                    // All safe because indexes are constant and < 4
-                    let term1 = term.extract_unchecked(0);
-                    let term2 = term.extract_unchecked(1);
-                    let term3 = term.extract_unchecked(2);
-                    let term4 = term.extract_unchecked(3);
-
-                    term1 + term2 + term3 + term4
-                }
-                &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3)] => {
-                    let term = vector_term(
-                        (a1, b1, c1),
-                        (a2, b2, c2),
-                        (a3, b3, c3),
-                        (f64::NAN, f64::NAN, f64::NAN),
-                        t,
-                    );
-
-                    // All safe because indexes are constant and < 4
-                    let term1 = term.extract_unchecked(0);
-                    let term2 = term.extract_unchecked(1);
-                    let term3 = term.extract_unchecked(2);
-
-                    term1 + term2 + term3
-                }
-                &[(a1, b1, c1), (a2, b2, c2)] => {
-                    a1 * (b1 + c1 * t).cos() + a2 * (b2 + c2 * t).cos()
-                }
-                &[(a, b, c)] => a * (b + c * t).cos(),
-                _ => unreachable!(),
+                term1 + term2 + term3 + term4
             }
+            &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3)] => {
+                // The result is little endian in x86/x86_64.
+                let (_term4, term3, term2, term1) = vector_term(
+                    (a1, b1, c1),
+                    (a2, b2, c2),
+                    (a3, b3, c3),
+                    (f64::NAN, f64::NAN, f64::NAN),
+                    t,
+                );
+
+                term1 + term2 + term3
+            }
+            &[(a1, b1, c1), (a2, b2, c2)] => a1 * (b1 + c1 * t).cos() + a2 * (b2 + c2 * t).cos(),
+            &[(a, b, c)] => a * (b + c * t).cos(),
+            _ => unreachable!(),
         })
         .sum::<f64>()
 }
