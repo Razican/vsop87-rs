@@ -64,30 +64,35 @@ use core::num::Float;
 pub fn mercury(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
-    let l0 = calculate_var(t, &mercury::L0);
-    let l1 = calculate_var(t, &mercury::L1);
-    let l2 = calculate_var(t, &mercury::L2);
-    let l3 = calculate_var(t, &mercury::L3);
-    let l4 = calculate_var(t, &mercury::L4);
-    let l5 = calculate_var(t, &mercury::L5);
+    let l0 = calculate_var(t, &mercury::L0[0], &mercury::L0[1], &mercury::L0[2]);
+    let l1 = calculate_var(t, &mercury::L1[0], &mercury::L1[1], &mercury::L1[2]);
+    let l2 = calculate_var(t, &mercury::L2[0], &mercury::L2[1], &mercury::L2[2]);
+    let l3 = calculate_var(t, &mercury::L3[0], &mercury::L3[1], &mercury::L3[2]);
+    let l4 = calculate_var(t, &mercury::L4[0], &mercury::L4[1], &mercury::L4[2]);
+    let l5 = calculate_var(t, &mercury::L5[0], &mercury::L5[1], &mercury::L5[2]);
 
-    let b0 = calculate_var(t, &mercury::B0);
-    let b1 = calculate_var(t, &mercury::B1);
-    let b2 = calculate_var(t, &mercury::B2);
-    let b3 = calculate_var(t, &mercury::B3);
-    let b4 = calculate_var(t, &mercury::B4);
-    let b5 = calculate_var(t, &mercury::B5);
+    let b0 = calculate_var(t, &mercury::B0[0], &mercury::B0[1], &mercury::B0[2]);
+    let b1 = calculate_var(t, &mercury::B1[0], &mercury::B1[1], &mercury::B1[2]);
+    let b2 = calculate_var(t, &mercury::B2[0], &mercury::B2[1], &mercury::B2[2]);
+    let b3 = calculate_var(t, &mercury::B3[0], &mercury::B3[1], &mercury::B3[2]);
+    let b4 = calculate_var(t, &mercury::B4[0], &mercury::B4[1], &mercury::B4[2]);
+    let b5 = calculate_var(t, &mercury::B5[0], &mercury::B5[1], &mercury::B5[2]);
 
-    let r0 = calculate_var(t, &mercury::R0);
-    let r1 = calculate_var(t, &mercury::R1);
-    let r2 = calculate_var(t, &mercury::R2);
-    let r3 = calculate_var(t, &mercury::R3);
-    let r4 = calculate_var(t, &mercury::R4);
+    let r0 = calculate_var(t, &mercury::R0[0], &mercury::R0[1], &mercury::R0[2]);
+    let r1 = calculate_var(t, &mercury::R1[0], &mercury::R1[1], &mercury::R1[2]);
+    let r2 = calculate_var(t, &mercury::R2[0], &mercury::R2[1], &mercury::R2[2]);
+    let r3 = calculate_var(t, &mercury::R3[0], &mercury::R3[1], &mercury::R3[2]);
+    let r4 = calculate_var(t, &mercury::R4[0], &mercury::R4[1], &mercury::R4[2]);
 
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
-    let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
+    let r = r0 + r1 * t + r2 * t2 + r3 * t3 + r4 * t4;
 
     SphericalCoordinates {
         lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
@@ -122,30 +127,35 @@ pub fn mercury(jde: f64) -> SphericalCoordinates {
 pub fn venus(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
-    let l0 = calculate_var(t, &venus::L0);
-    let l1 = calculate_var(t, &venus::L1);
-    let l2 = calculate_var(t, &venus::L2);
-    let l3 = calculate_var(t, &venus::L3);
-    let l4 = calculate_var(t, &venus::L4);
-    let l5 = calculate_var(t, &venus::L5);
+    let l0 = calculate_var(t, &venus::L0[0], &venus::L0[1], &venus::L0[2]);
+    let l1 = calculate_var(t, &venus::L1[0], &venus::L1[1], &venus::L1[2]);
+    let l2 = calculate_var(t, &venus::L2[0], &venus::L2[1], &venus::L2[2]);
+    let l3 = calculate_var(t, &venus::L3[0], &venus::L3[1], &venus::L3[2]);
+    let l4 = calculate_var(t, &venus::L4[0], &venus::L4[1], &venus::L4[2]);
+    let l5 = calculate_var(t, &venus::L5[0], &venus::L5[1], &venus::L5[2]);
 
-    let b0 = calculate_var(t, &venus::B0);
-    let b1 = calculate_var(t, &venus::B1);
-    let b2 = calculate_var(t, &venus::B2);
-    let b3 = calculate_var(t, &venus::B3);
-    let b4 = calculate_var(t, &venus::B4);
-    let b5 = calculate_var(t, &venus::B5);
+    let b0 = calculate_var(t, &venus::B0[0], &venus::B0[1], &venus::B0[2]);
+    let b1 = calculate_var(t, &venus::B1[0], &venus::B1[1], &venus::B1[2]);
+    let b2 = calculate_var(t, &venus::B2[0], &venus::B2[1], &venus::B2[2]);
+    let b3 = calculate_var(t, &venus::B3[0], &venus::B3[1], &venus::B3[2]);
+    let b4 = calculate_var(t, &venus::B4[0], &venus::B4[1], &venus::B4[2]);
+    let b5 = calculate_var(t, &venus::B5[0], &venus::B5[1], &venus::B5[2]);
 
-    let r0 = calculate_var(t, &venus::R0);
-    let r1 = calculate_var(t, &venus::R1);
-    let r2 = calculate_var(t, &venus::R2);
-    let r3 = calculate_var(t, &venus::R3);
-    let r4 = calculate_var(t, &venus::R4);
+    let r0 = calculate_var(t, &venus::R0[0], &venus::R0[1], &venus::R0[2]);
+    let r1 = calculate_var(t, &venus::R1[0], &venus::R1[1], &venus::R1[2]);
+    let r2 = calculate_var(t, &venus::R2[0], &venus::R2[1], &venus::R2[2]);
+    let r3 = calculate_var(t, &venus::R3[0], &venus::R3[1], &venus::R3[2]);
+    let r4 = calculate_var(t, &venus::R4[0], &venus::R4[1], &venus::R4[2]);
 
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
-    let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
+    let r = r0 + r1 * t + r2 * t2 + r3 * t3 + r4 * t4;
 
     SphericalCoordinates {
         lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
@@ -180,29 +190,34 @@ pub fn venus(jde: f64) -> SphericalCoordinates {
 pub fn earth(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
-    let l0 = calculate_var(t, &earth::L0);
-    let l1 = calculate_var(t, &earth::L1);
-    let l2 = calculate_var(t, &earth::L2);
-    let l3 = calculate_var(t, &earth::L3);
-    let l4 = calculate_var(t, &earth::L4);
-    let l5 = calculate_var(t, &earth::L5);
+    let l0 = calculate_var(t, &earth::L0[0], &earth::L0[1], &earth::L0[2]);
+    let l1 = calculate_var(t, &earth::L1[0], &earth::L1[1], &earth::L1[2]);
+    let l2 = calculate_var(t, &earth::L2[0], &earth::L2[1], &earth::L2[2]);
+    let l3 = calculate_var(t, &earth::L3[0], &earth::L3[1], &earth::L3[2]);
+    let l4 = calculate_var(t, &earth::L4[0], &earth::L4[1], &earth::L4[2]);
+    let l5 = calculate_var(t, &earth::L5[0], &earth::L5[1], &earth::L5[2]);
 
-    let b0 = calculate_var(t, &earth::B0);
-    let b1 = calculate_var(t, &earth::B1);
-    let b2 = calculate_var(t, &earth::B2);
-    let b3 = calculate_var(t, &earth::B3);
-    let b4 = calculate_var(t, &earth::B4);
+    let b0 = calculate_var(t, &earth::B0[0], &earth::B0[1], &earth::B0[2]);
+    let b1 = calculate_var(t, &earth::B1[0], &earth::B1[1], &earth::B1[2]);
+    let b2 = calculate_var(t, &earth::B2[0], &earth::B2[1], &earth::B2[2]);
+    let b3 = calculate_var(t, &earth::B3[0], &earth::B3[1], &earth::B3[2]);
+    let b4 = calculate_var(t, &earth::B4[0], &earth::B4[1], &earth::B4[2]);
 
-    let r0 = calculate_var(t, &earth::R0);
-    let r1 = calculate_var(t, &earth::R1);
-    let r2 = calculate_var(t, &earth::R2);
-    let r3 = calculate_var(t, &earth::R3);
-    let r4 = calculate_var(t, &earth::R4);
+    let r0 = calculate_var(t, &earth::R0[0], &earth::R0[1], &earth::R0[2]);
+    let r1 = calculate_var(t, &earth::R1[0], &earth::R1[1], &earth::R1[2]);
+    let r2 = calculate_var(t, &earth::R2[0], &earth::R2[1], &earth::R2[2]);
+    let r3 = calculate_var(t, &earth::R3[0], &earth::R3[1], &earth::R3[2]);
+    let r4 = calculate_var(t, &earth::R4[0], &earth::R4[1], &earth::R4[2]);
 
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4);
-    let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4;
+    let r = r0 + r1 * t + r2 * t2 + r3 * t3 + r4 * t4;
 
     SphericalCoordinates {
         lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
@@ -237,30 +252,35 @@ pub fn earth(jde: f64) -> SphericalCoordinates {
 pub fn mars(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
-    let l0 = calculate_var(t, &mars::L0);
-    let l1 = calculate_var(t, &mars::L1);
-    let l2 = calculate_var(t, &mars::L2);
-    let l3 = calculate_var(t, &mars::L3);
-    let l4 = calculate_var(t, &mars::L4);
-    let l5 = calculate_var(t, &mars::L5);
+    let l0 = calculate_var(t, &mars::L0[0], &mars::L0[1], &mars::L0[2]);
+    let l1 = calculate_var(t, &mars::L1[0], &mars::L1[1], &mars::L1[2]);
+    let l2 = calculate_var(t, &mars::L2[0], &mars::L2[1], &mars::L2[2]);
+    let l3 = calculate_var(t, &mars::L3[0], &mars::L3[1], &mars::L3[2]);
+    let l4 = calculate_var(t, &mars::L4[0], &mars::L4[1], &mars::L4[2]);
+    let l5 = calculate_var(t, &mars::L5[0], &mars::L5[1], &mars::L5[2]);
 
-    let b0 = calculate_var(t, &mars::B0);
-    let b1 = calculate_var(t, &mars::B1);
-    let b2 = calculate_var(t, &mars::B2);
-    let b3 = calculate_var(t, &mars::B3);
-    let b4 = calculate_var(t, &mars::B4);
-    let b5 = calculate_var(t, &mars::B5);
+    let b0 = calculate_var(t, &mars::B0[0], &mars::B0[1], &mars::B0[2]);
+    let b1 = calculate_var(t, &mars::B1[0], &mars::B1[1], &mars::B1[2]);
+    let b2 = calculate_var(t, &mars::B2[0], &mars::B2[1], &mars::B2[2]);
+    let b3 = calculate_var(t, &mars::B3[0], &mars::B3[1], &mars::B3[2]);
+    let b4 = calculate_var(t, &mars::B4[0], &mars::B4[1], &mars::B4[2]);
+    let b5 = calculate_var(t, &mars::B5[0], &mars::B5[1], &mars::B5[2]);
 
-    let r0 = calculate_var(t, &mars::R0);
-    let r1 = calculate_var(t, &mars::R1);
-    let r2 = calculate_var(t, &mars::R2);
-    let r3 = calculate_var(t, &mars::R3);
-    let r4 = calculate_var(t, &mars::R4);
+    let r0 = calculate_var(t, &mars::R0[0], &mars::R0[1], &mars::R0[2]);
+    let r1 = calculate_var(t, &mars::R1[0], &mars::R1[1], &mars::R1[2]);
+    let r2 = calculate_var(t, &mars::R2[0], &mars::R2[1], &mars::R2[2]);
+    let r3 = calculate_var(t, &mars::R3[0], &mars::R3[1], &mars::R3[2]);
+    let r4 = calculate_var(t, &mars::R4[0], &mars::R4[1], &mars::R4[2]);
 
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
-    let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
+    let r = r0 + r1 * t + r2 * t2 + r3 * t3 + r4 * t4;
 
     SphericalCoordinates {
         lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
@@ -295,30 +315,35 @@ pub fn mars(jde: f64) -> SphericalCoordinates {
 pub fn jupiter(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
-    let l0 = calculate_var(t, &jupiter::L0);
-    let l1 = calculate_var(t, &jupiter::L1);
-    let l2 = calculate_var(t, &jupiter::L2);
-    let l3 = calculate_var(t, &jupiter::L3);
-    let l4 = calculate_var(t, &jupiter::L4);
-    let l5 = calculate_var(t, &jupiter::L5);
+    let l0 = calculate_var(t, &jupiter::L0[0], &jupiter::L0[1], &jupiter::L0[2]);
+    let l1 = calculate_var(t, &jupiter::L1[0], &jupiter::L1[1], &jupiter::L1[2]);
+    let l2 = calculate_var(t, &jupiter::L2[0], &jupiter::L2[1], &jupiter::L2[2]);
+    let l3 = calculate_var(t, &jupiter::L3[0], &jupiter::L3[1], &jupiter::L3[2]);
+    let l4 = calculate_var(t, &jupiter::L4[0], &jupiter::L4[1], &jupiter::L4[2]);
+    let l5 = calculate_var(t, &jupiter::L5[0], &jupiter::L5[1], &jupiter::L5[2]);
 
-    let b0 = calculate_var(t, &jupiter::B0);
-    let b1 = calculate_var(t, &jupiter::B1);
-    let b2 = calculate_var(t, &jupiter::B2);
-    let b3 = calculate_var(t, &jupiter::B3);
-    let b4 = calculate_var(t, &jupiter::B4);
-    let b5 = calculate_var(t, &jupiter::B5);
+    let b0 = calculate_var(t, &jupiter::B0[0], &jupiter::B0[1], &jupiter::B0[2]);
+    let b1 = calculate_var(t, &jupiter::B1[0], &jupiter::B1[1], &jupiter::B1[2]);
+    let b2 = calculate_var(t, &jupiter::B2[0], &jupiter::B2[1], &jupiter::B2[2]);
+    let b3 = calculate_var(t, &jupiter::B3[0], &jupiter::B3[1], &jupiter::B3[2]);
+    let b4 = calculate_var(t, &jupiter::B4[0], &jupiter::B4[1], &jupiter::B4[2]);
+    let b5 = calculate_var(t, &jupiter::B5[0], &jupiter::B5[1], &jupiter::B5[2]);
 
-    let r0 = calculate_var(t, &jupiter::R0);
-    let r1 = calculate_var(t, &jupiter::R1);
-    let r2 = calculate_var(t, &jupiter::R2);
-    let r3 = calculate_var(t, &jupiter::R3);
-    let r4 = calculate_var(t, &jupiter::R4);
+    let r0 = calculate_var(t, &jupiter::R0[0], &jupiter::R0[1], &jupiter::R0[2]);
+    let r1 = calculate_var(t, &jupiter::R1[0], &jupiter::R1[1], &jupiter::R1[2]);
+    let r2 = calculate_var(t, &jupiter::R2[0], &jupiter::R2[1], &jupiter::R2[2]);
+    let r3 = calculate_var(t, &jupiter::R3[0], &jupiter::R3[1], &jupiter::R3[2]);
+    let r4 = calculate_var(t, &jupiter::R4[0], &jupiter::R4[1], &jupiter::R4[2]);
 
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
-    let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
+    let r = r0 + r1 * t + r2 * t2 + r3 * t3 + r4 * t4;
 
     SphericalCoordinates {
         lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
@@ -353,30 +378,35 @@ pub fn jupiter(jde: f64) -> SphericalCoordinates {
 pub fn saturn(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
-    let l0 = calculate_var(t, &saturn::L0);
-    let l1 = calculate_var(t, &saturn::L1);
-    let l2 = calculate_var(t, &saturn::L2);
-    let l3 = calculate_var(t, &saturn::L3);
-    let l4 = calculate_var(t, &saturn::L4);
-    let l5 = calculate_var(t, &saturn::L5);
+    let l0 = calculate_var(t, &saturn::L0[0], &saturn::L0[1], &saturn::L0[2]);
+    let l1 = calculate_var(t, &saturn::L1[0], &saturn::L1[1], &saturn::L1[2]);
+    let l2 = calculate_var(t, &saturn::L2[0], &saturn::L2[1], &saturn::L2[2]);
+    let l3 = calculate_var(t, &saturn::L3[0], &saturn::L3[1], &saturn::L3[2]);
+    let l4 = calculate_var(t, &saturn::L4[0], &saturn::L4[1], &saturn::L4[2]);
+    let l5 = calculate_var(t, &saturn::L5[0], &saturn::L5[1], &saturn::L5[2]);
 
-    let b0 = calculate_var(t, &saturn::B0);
-    let b1 = calculate_var(t, &saturn::B1);
-    let b2 = calculate_var(t, &saturn::B2);
-    let b3 = calculate_var(t, &saturn::B3);
-    let b4 = calculate_var(t, &saturn::B4);
-    let b5 = calculate_var(t, &saturn::B5);
+    let b0 = calculate_var(t, &saturn::B0[0], &saturn::B0[1], &saturn::B0[2]);
+    let b1 = calculate_var(t, &saturn::B1[0], &saturn::B1[1], &saturn::B1[2]);
+    let b2 = calculate_var(t, &saturn::B2[0], &saturn::B2[1], &saturn::B2[2]);
+    let b3 = calculate_var(t, &saturn::B3[0], &saturn::B3[1], &saturn::B3[2]);
+    let b4 = calculate_var(t, &saturn::B4[0], &saturn::B4[1], &saturn::B4[2]);
+    let b5 = calculate_var(t, &saturn::B5[0], &saturn::B5[1], &saturn::B5[2]);
 
-    let r0 = calculate_var(t, &saturn::R0);
-    let r1 = calculate_var(t, &saturn::R1);
-    let r2 = calculate_var(t, &saturn::R2);
-    let r3 = calculate_var(t, &saturn::R3);
-    let r4 = calculate_var(t, &saturn::R4);
+    let r0 = calculate_var(t, &saturn::R0[0], &saturn::R0[1], &saturn::R0[2]);
+    let r1 = calculate_var(t, &saturn::R1[0], &saturn::R1[1], &saturn::R1[2]);
+    let r2 = calculate_var(t, &saturn::R2[0], &saturn::R2[1], &saturn::R2[2]);
+    let r3 = calculate_var(t, &saturn::R3[0], &saturn::R3[1], &saturn::R3[2]);
+    let r4 = calculate_var(t, &saturn::R4[0], &saturn::R4[1], &saturn::R4[2]);
 
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
-    let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3) + r4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
+    let r = r0 + r1 * t + r2 * t2 + r3 * t3 + r4 * t4;
 
     SphericalCoordinates {
         lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
@@ -411,28 +441,33 @@ pub fn saturn(jde: f64) -> SphericalCoordinates {
 pub fn uranus(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
-    let l0 = calculate_var(t, &uranus::L0);
-    let l1 = calculate_var(t, &uranus::L1);
-    let l2 = calculate_var(t, &uranus::L2);
-    let l3 = calculate_var(t, &uranus::L3);
-    let l4 = calculate_var(t, &uranus::L4);
-    let l5 = calculate_var(t, &uranus::L5);
+    let l0 = calculate_var(t, &uranus::L0[0], &uranus::L0[1], &uranus::L0[2]);
+    let l1 = calculate_var(t, &uranus::L1[0], &uranus::L1[1], &uranus::L1[2]);
+    let l2 = calculate_var(t, &uranus::L2[0], &uranus::L2[1], &uranus::L2[2]);
+    let l3 = calculate_var(t, &uranus::L3[0], &uranus::L3[1], &uranus::L3[2]);
+    let l4 = calculate_var(t, &uranus::L4[0], &uranus::L4[1], &uranus::L4[2]);
+    let l5 = calculate_var(t, &uranus::L5[0], &uranus::L5[1], &uranus::L5[2]);
 
-    let b0 = calculate_var(t, &uranus::B0);
-    let b1 = calculate_var(t, &uranus::B1);
-    let b2 = calculate_var(t, &uranus::B2);
-    let b3 = calculate_var(t, &uranus::B3);
-    let b4 = calculate_var(t, &uranus::B4);
+    let b0 = calculate_var(t, &uranus::B0[0], &uranus::B0[1], &uranus::B0[2]);
+    let b1 = calculate_var(t, &uranus::B1[0], &uranus::B1[1], &uranus::B1[2]);
+    let b2 = calculate_var(t, &uranus::B2[0], &uranus::B2[1], &uranus::B2[2]);
+    let b3 = calculate_var(t, &uranus::B3[0], &uranus::B3[1], &uranus::B3[2]);
+    let b4 = calculate_var(t, &uranus::B4[0], &uranus::B4[1], &uranus::B4[2]);
 
-    let r0 = calculate_var(t, &uranus::R0);
-    let r1 = calculate_var(t, &uranus::R1);
-    let r2 = calculate_var(t, &uranus::R2);
-    let r3 = calculate_var(t, &uranus::R3);
+    let r0 = calculate_var(t, &uranus::R0[0], &uranus::R0[1], &uranus::R0[2]);
+    let r1 = calculate_var(t, &uranus::R1[0], &uranus::R1[1], &uranus::R1[2]);
+    let r2 = calculate_var(t, &uranus::R2[0], &uranus::R2[1], &uranus::R2[2]);
+    let r3 = calculate_var(t, &uranus::R3[0], &uranus::R3[1], &uranus::R3[2]);
 
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4);
-    let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4;
+    let r = r0 + r1 * t + r2 * t2 + r3 * t3;
 
     SphericalCoordinates {
         lon: if l > 0_f64 { l } else { 2_f64 * PI + l },
@@ -467,29 +502,34 @@ pub fn uranus(jde: f64) -> SphericalCoordinates {
 pub fn neptune(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
-    let l0 = calculate_var(t, &neptune::L0);
-    let l1 = calculate_var(t, &neptune::L1);
-    let l2 = calculate_var(t, &neptune::L2);
-    let l3 = calculate_var(t, &neptune::L3);
-    let l4 = calculate_var(t, &neptune::L4);
-    let l5 = calculate_var(t, &neptune::L5);
+    let l0 = calculate_var(t, &neptune::L0[0], &neptune::L0[1], &neptune::L0[2]);
+    let l1 = calculate_var(t, &neptune::L1[0], &neptune::L1[1], &neptune::L1[2]);
+    let l2 = calculate_var(t, &neptune::L2[0], &neptune::L2[1], &neptune::L2[2]);
+    let l3 = calculate_var(t, &neptune::L3[0], &neptune::L3[1], &neptune::L3[2]);
+    let l4 = calculate_var(t, &neptune::L4[0], &neptune::L4[1], &neptune::L4[2]);
+    let l5 = calculate_var(t, &neptune::L5[0], &neptune::L5[1], &neptune::L5[2]);
 
-    let b0 = calculate_var(t, &neptune::B0);
-    let b1 = calculate_var(t, &neptune::B1);
-    let b2 = calculate_var(t, &neptune::B2);
-    let b3 = calculate_var(t, &neptune::B3);
-    let b4 = calculate_var(t, &neptune::B4);
-    let b5 = calculate_var(t, &neptune::B5);
+    let b0 = calculate_var(t, &neptune::B0[0], &neptune::B0[1], &neptune::B0[2]);
+    let b1 = calculate_var(t, &neptune::B1[0], &neptune::B1[1], &neptune::B1[2]);
+    let b2 = calculate_var(t, &neptune::B2[0], &neptune::B2[1], &neptune::B2[2]);
+    let b3 = calculate_var(t, &neptune::B3[0], &neptune::B3[1], &neptune::B3[2]);
+    let b4 = calculate_var(t, &neptune::B4[0], &neptune::B4[1], &neptune::B4[2]);
+    let b5 = calculate_var(t, &neptune::B5[0], &neptune::B5[1], &neptune::B5[2]);
 
-    let r0 = calculate_var(t, &neptune::R0);
-    let r1 = calculate_var(t, &neptune::R1);
-    let r2 = calculate_var(t, &neptune::R2);
-    let r3 = calculate_var(t, &neptune::R3);
+    let r0 = calculate_var(t, &neptune::R0[0], &neptune::R0[1], &neptune::R0[2]);
+    let r1 = calculate_var(t, &neptune::R1[0], &neptune::R1[1], &neptune::R1[2]);
+    let r2 = calculate_var(t, &neptune::R2[0], &neptune::R2[1], &neptune::R2[2]);
+    let r3 = calculate_var(t, &neptune::R3[0], &neptune::R3[1], &neptune::R3[2]);
 
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let b = b0 + b1 * t + b2 * t * t + b3 * t.powi(3) + b4 * t.powi(4) + b5 * t.powi(5);
-    let r = r0 + r1 * t + r2 * t * t + r3 * t.powi(3);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
+    let r = r0 + r1 * t + r2 * t2 + r3 * t3;
 
     SphericalCoordinates {
         lon: if l > 0_f64 { l } else { 2_f64 * PI + l },

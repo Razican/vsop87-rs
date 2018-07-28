@@ -92,9 +92,14 @@
 #![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
 // Features
 #![cfg_attr(feature = "no_std", no_std)]
-#![cfg_attr(feature = "no_std", feature(core_float, core_intrinsics))]
 // All the "allow by default" lints
 #![warn(box_pointers, unused_results)]
+
+#[cfg(feature = "simd")]
+extern crate simdeez;
+
+#[cfg(feature = "no_std")]
+extern crate libm;
 
 pub mod vsop87a;
 pub mod vsop87b;
@@ -116,12 +121,8 @@ use core::f64::consts::PI;
 #[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
 
-#[cfg(feature = "no_std")]
-use core::num::Float;
-#[cfg(feature = "no_std")]
-mod functions;
-#[cfg(feature = "no_std")]
-use functions::Trigonometry;
+#[cfg(feature = "simd")]
+use simdeez::Simd;
 
 /// Structure representing the keplerian elements of an orbit.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -259,98 +260,139 @@ fn calculate_t(jde: f64) -> f64 {
 /// Calculates the given variable.
 #[inline]
 #[allow(unsafe_code)]
-fn calculate_var(t: f64, var: &[(f64, f64, f64)]) -> f64 {
-    if is_x86_feature_detected!("avx") {
-        // Safe because we already checked that we have AVX instruction set.
-        unsafe { calculate_var_avx(t, var) }
-    } else {
-        var.iter()
-            .fold(0_f64, |term, &(a, b, c)| term + a * (b + c * t).cos())
+fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
+    // Check that the arrays are the correct length when debugging.
+    debug_assert_eq!(
+        a.len(),
+        b.len(),
+        "`a` and `b` variable lists have different lengths: {} and {} respectively",
+        a.len(),
+        b.len()
+    );
+    debug_assert_eq!(
+        a.len(),
+        c.len(),
+        "`a` and `c` variable lists have different lengths: {} and {} respectively",
+        a.len(),
+        c.len()
+    );
+
+    #[cfg(feature = "simd")]
+    {
+        if is_x86_feature_detected!("avx2") {
+            // Safe because we already checked that we have AVX 2 instruction set.
+            unsafe { calculate_var_avx2(t, a, b, c) }
+        } else if is_x86_feature_detected!("sse4.1") {
+            // Safe because we already checked that we have SSE 4.1 instruction set.
+            unsafe { calculate_var_sse41(t, a, b, c) }
+        } else if is_x86_feature_detected!("sse2") {
+            // Safe because we already checked that we have SSE 2 instruction set.
+            unsafe { calculate_var_sse2(t, a, b, c) }
+        } else {
+            calculate_var_fallback(t, a, b, c)
+        }
+    }
+
+    #[cfg(not(feature = "simd"))]
+    {
+        calculate_var_fallback(t, a, b, c)
     }
 }
 
-/// Calculates the given variable using the AVX instruction set.
-#[target_feature(enable = "avx")]
-#[cfg(any(target_arch = "x86", target_arch = "x86_64"))]
+/// Fallback implementation of the variable calculation.
+///
+/// Used in systems without SIMD support.
+#[inline]
+fn calculate_var_fallback(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
+    a.iter()
+        .zip(b)
+        .zip(c)
+        .fold(0_f64, |term, ((a, b), c)| term + a * (b + c * t).cos())
+}
+
+/// Call `calculate_term_simd()` as an AVX2 function.
+#[cfg(feature = "simd")]
 #[allow(unsafe_code)]
-unsafe fn calculate_var_avx(t: f64, var: &[(f64, f64, f64)]) -> f64 {
-    #[cfg(feature = "no_std")]
-    use core::{f64, mem};
-    #[cfg(not(feature = "no_std"))]
-    use std::{f64, mem};
+#[inline]
+#[target_feature(enable = "avx2")]
+unsafe fn calculate_var_avx2(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
+    calculate_var_simd::<simdeez::avx2::Avx2>(t, a, b, c)
+}
 
-    #[cfg(all(feature = "no_std", target_arch = "x86_64"))]
-    use core::arch::x86_64::*;
-    #[cfg(all(not(feature = "no_std"), target_arch = "x86_64"))]
-    use std::arch::x86_64::*;
+/// Call `calculate_term_simd()` as an SSE 4.1 function.
+#[cfg(feature = "simd")]
+#[allow(unsafe_code)]
+#[inline]
+#[target_feature(enable = "sse4.1")]
+unsafe fn calculate_var_sse41(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
+    calculate_var_simd::<simdeez::sse41::Sse41>(t, a, b, c)
+}
 
-    #[cfg(all(feature = "no_std", target_arch = "x86"))]
-    use core::arch::x86::*;
-    #[cfg(all(not(feature = "no_std"), target_arch = "x86"))]
-    use std::arch::x86::*;
+/// Call `calculate_term_simd()` as an SSE 2 function.
+#[cfg(feature = "simd")]
+#[allow(unsafe_code)]
+#[inline]
+#[target_feature(enable = "sse2")]
+unsafe fn calculate_var_sse2(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
+    calculate_var_simd::<simdeez::sse2::Sse2>(t, a, b, c)
+}
 
-    /// Vectorizes the calculation of 4 terms at the same time.
-    unsafe fn vector_term(
-        (a1, b1, c1): (f64, f64, f64),
-        (a2, b2, c2): (f64, f64, f64),
-        (a3, b3, c3): (f64, f64, f64),
-        (a4, b4, c4): (f64, f64, f64),
-        t: f64,
-    ) -> (f64, f64, f64, f64) {
-        let a = _mm256_set_pd(a1, a2, a3, a4);
-        let b = _mm256_set_pd(b1, b2, b3, b4);
-        let c = _mm256_set_pd(c1, c2, c3, c4);
-        let t = _mm256_set1_pd(t);
+/// Calculates the term using SIMD.
+#[cfg(feature = "simd")]
+#[allow(unsafe_code)]
+#[inline]
+unsafe fn calculate_var_simd<S>(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64
+where
+    S: Simd,
+{
+    calculate_terms_simd::<S>(t, a, b, c).into_iter().sum()
+}
 
-        // Safe because both values are created properly and checked.
-        let ct = _mm256_mul_pd(c, t);
-        // Safe because both values are created properly and checked.
-        let bct = _mm256_add_pd(b, ct);
+/// Calculates the terms using SIMD.
+#[cfg(feature = "simd")]
+#[allow(unsafe_code)]
+#[inline]
+unsafe fn calculate_terms_simd<S>(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> Vec<f64>
+where
+    S: Simd,
+{
+    let extra = a.len() % S::VF64_WIDTH;
+    let length = a.len() - if extra == 0 { 0 } else { extra - 1 };
 
-        // Safe because bct_unpacked is 4 f64 long.
-        let bct_unpacked: (f64, f64, f64, f64) = mem::transmute(bct);
+    let mut terms: Vec<f64> = Vec::with_capacity(length);
+    terms.set_len(length); // For efficiency
 
-        // Safe because bct_unpacked is 4 f64 long, and x84/x86_64 is little endian.
-        let bct = _mm256_set_pd(
-            bct_unpacked.3.cos(),
-            bct_unpacked.2.cos(),
-            bct_unpacked.1.cos(),
-            bct_unpacked.0.cos(),
-        );
+    let mut a_iter = a.chunks(S::VF64_WIDTH);
+    let mut b_iter = b.chunks(S::VF64_WIDTH);
+    let mut c_iter = c.chunks(S::VF64_WIDTH);
 
-        // Safe because both values are created properly and checked.
-        let term = _mm256_mul_pd(a, bct);
-        let term_unpacked: (f64, f64, f64, f64) = mem::transmute(term);
+    let mut i = 0;
+    while let (Some(a), Some(b), Some(c)) = (a_iter.next(), b_iter.next(), c_iter.next()) {
+        if a.len() == S::VF64_WIDTH {
+            //load data from the vec into a SIMD value
+            let tv = S::set1_pd(t);
+            let av = S::loadu_pd(&a[0]);
+            let bv = S::loadu_pd(&b[0]);
+            let cv = S::loadu_pd(&c[0]);
 
-        term_unpacked
+            // Initial operation.
+            let mut bct = bv + cv * tv;
+
+            // Safe because bct_unpacked is 4 f64 long.
+            for h in 0..S::VF64_WIDTH {
+                bct[h] = bct[h].cos();
+            }
+            let term = av * bct;
+
+            S::storeu_pd(&mut terms[i], term);
+            i += S::VF64_WIDTH;
+        } else {
+            let mut last = terms.get_unchecked_mut(length - 1);
+            *last = calculate_var_fallback(t, a, b, c);
+        }
     }
 
-    var.chunks(4)
-        .map(|vec| match vec {
-            &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4)] => {
-                // The result is little endian in x86/x86_64.
-                let (term4, term3, term2, term1) =
-                    vector_term((a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4), t);
-
-                term1 + term2 + term3 + term4
-            }
-            &[(a1, b1, c1), (a2, b2, c2), (a3, b3, c3)] => {
-                // The result is little endian in x86/x86_64.
-                let (_term4, term3, term2, term1) = vector_term(
-                    (a1, b1, c1),
-                    (a2, b2, c2),
-                    (a3, b3, c3),
-                    (f64::NAN, f64::NAN, f64::NAN),
-                    t,
-                );
-
-                term1 + term2 + term3
-            }
-            &[(a1, b1, c1), (a2, b2, c2)] => a1 * (b1 + c1 * t).cos() + a2 * (b2 + c2 * t).cos(),
-            &[(a, b, c)] => a * (b + c * t).cos(),
-            _ => unreachable!(),
-        })
-        .sum::<f64>()
+    terms
 }
 
 /// Elements used by the VSOP87 solution. Can be converted into keplerian elements.
@@ -428,48 +470,54 @@ impl From<KeplerianElements> for VSOP87Elements {
 pub fn mercury(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &mercury::A0);
-    let a1 = calculate_var(t, &mercury::A1);
-    let a2 = calculate_var(t, &mercury::A2);
+    let a0 = calculate_var(t, &mercury::A0[0], &mercury::A0[1], &mercury::A0[2]);
+    let a1 = calculate_var(t, &mercury::A1[0], &mercury::A1[1], &mercury::A1[2]);
+    let a2 = calculate_var(t, &mercury::A2[0], &mercury::A2[1], &mercury::A2[2]);
 
-    let l0 = calculate_var(t, &mercury::L0);
-    let l1 = calculate_var(t, &mercury::L1);
-    let l2 = calculate_var(t, &mercury::L2);
-    let l3 = calculate_var(t, &mercury::L3);
+    let l0 = calculate_var(t, &mercury::L0[0], &mercury::L0[1], &mercury::L0[2]);
+    let l1 = calculate_var(t, &mercury::L1[0], &mercury::L1[1], &mercury::L1[2]);
+    let l2 = calculate_var(t, &mercury::L2[0], &mercury::L2[1], &mercury::L2[2]);
+    let l3 = calculate_var(t, &mercury::L3[0], &mercury::L3[1], &mercury::L3[2]);
 
-    let k0 = calculate_var(t, &mercury::K0);
-    let k1 = calculate_var(t, &mercury::K1);
-    let k2 = calculate_var(t, &mercury::K2);
-    let k3 = calculate_var(t, &mercury::K3);
-    let k4 = calculate_var(t, &mercury::K4);
-    let k5 = calculate_var(t, &mercury::K5);
+    let k0 = calculate_var(t, &mercury::K0[0], &mercury::K0[1], &mercury::K0[2]);
+    let k1 = calculate_var(t, &mercury::K1[0], &mercury::K1[1], &mercury::K1[2]);
+    let k2 = calculate_var(t, &mercury::K2[0], &mercury::K2[1], &mercury::K2[2]);
+    let k3 = calculate_var(t, &mercury::K3[0], &mercury::K3[1], &mercury::K3[2]);
+    let k4 = calculate_var(t, &mercury::K4[0], &mercury::K4[1], &mercury::K4[2]);
+    let k5 = calculate_var(t, &mercury::K5[0], &mercury::K5[1], &mercury::K5[2]);
 
-    let h0 = calculate_var(t, &mercury::H0);
-    let h1 = calculate_var(t, &mercury::H1);
-    let h2 = calculate_var(t, &mercury::H2);
-    let h3 = calculate_var(t, &mercury::H3);
-    let h4 = calculate_var(t, &mercury::H4);
-    let h5 = calculate_var(t, &mercury::H5);
+    let h0 = calculate_var(t, &mercury::H0[0], &mercury::H0[1], &mercury::H0[2]);
+    let h1 = calculate_var(t, &mercury::H1[0], &mercury::H1[1], &mercury::H1[2]);
+    let h2 = calculate_var(t, &mercury::H2[0], &mercury::H2[1], &mercury::H2[2]);
+    let h3 = calculate_var(t, &mercury::H3[0], &mercury::H3[1], &mercury::H3[2]);
+    let h4 = calculate_var(t, &mercury::H4[0], &mercury::H4[1], &mercury::H4[2]);
+    let h5 = calculate_var(t, &mercury::H5[0], &mercury::H5[1], &mercury::H5[2]);
 
-    let q0 = calculate_var(t, &mercury::Q0);
-    let q1 = calculate_var(t, &mercury::Q1);
-    let q2 = calculate_var(t, &mercury::Q2);
-    let q3 = calculate_var(t, &mercury::Q3);
-    let q4 = calculate_var(t, &mercury::Q4);
-    let q5 = calculate_var(t, &mercury::Q5);
+    let q0 = calculate_var(t, &mercury::Q0[0], &mercury::Q0[1], &mercury::Q0[2]);
+    let q1 = calculate_var(t, &mercury::Q1[0], &mercury::Q1[1], &mercury::Q1[2]);
+    let q2 = calculate_var(t, &mercury::Q2[0], &mercury::Q2[1], &mercury::Q2[2]);
+    let q3 = calculate_var(t, &mercury::Q3[0], &mercury::Q3[1], &mercury::Q3[2]);
+    let q4 = calculate_var(t, &mercury::Q4[0], &mercury::Q4[1], &mercury::Q4[2]);
+    let q5 = calculate_var(t, &mercury::Q5[0], &mercury::Q5[1], &mercury::Q5[2]);
 
-    let p0 = calculate_var(t, &mercury::P0);
-    let p1 = calculate_var(t, &mercury::P1);
-    let p2 = calculate_var(t, &mercury::P2);
-    let p3 = calculate_var(t, &mercury::P3);
-    let p4 = calculate_var(t, &mercury::P4);
+    let p0 = calculate_var(t, &mercury::P0[0], &mercury::P0[1], &mercury::P0[2]);
+    let p1 = calculate_var(t, &mercury::P1[0], &mercury::P1[1], &mercury::P1[2]);
+    let p2 = calculate_var(t, &mercury::P2[0], &mercury::P2[1], &mercury::P2[2]);
+    let p3 = calculate_var(t, &mercury::P3[0], &mercury::P3[1], &mercury::P3[2]);
+    let p4 = calculate_var(t, &mercury::P4[0], &mercury::P4[1], &mercury::P4[2]);
 
-    let a = a0 + a1 * t + a2 * t * t;
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3)) % (2_f64 * PI);
-    let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
-    let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
-    let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4) + q5 * t.powi(5);
-    let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3) + p4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let a = a0 + a1 * t + a2 * t2;
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3) % (2_f64 * PI);
+    let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4 + k5 * t5;
+    let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4 + h5 * t5;
+    let q = q0 + q1 * t + q2 * t2 + q3 * t3 + q4 * t4 + q5 * t5;
+    let p = p0 + p1 * t + p2 * t2 + p3 * t3 + p4 * t4;
 
     VSOP87Elements {
         a,
@@ -516,48 +564,54 @@ pub fn mercury(jde: f64) -> VSOP87Elements {
 pub fn venus(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &venus::A0);
-    let a1 = calculate_var(t, &venus::A1);
-    let a2 = calculate_var(t, &venus::A2);
+    let a0 = calculate_var(t, &venus::A0[0], &venus::A0[1], &venus::A0[2]);
+    let a1 = calculate_var(t, &venus::A1[0], &venus::A1[1], &venus::A1[2]);
+    let a2 = calculate_var(t, &venus::A2[0], &venus::A2[1], &venus::A2[2]);
 
-    let l0 = calculate_var(t, &venus::L0);
-    let l1 = calculate_var(t, &venus::L1);
-    let l2 = calculate_var(t, &venus::L2);
-    let l3 = calculate_var(t, &venus::L3);
+    let l0 = calculate_var(t, &venus::L0[0], &venus::L0[1], &venus::L0[2]);
+    let l1 = calculate_var(t, &venus::L1[0], &venus::L1[1], &venus::L1[2]);
+    let l2 = calculate_var(t, &venus::L2[0], &venus::L2[1], &venus::L2[2]);
+    let l3 = calculate_var(t, &venus::L3[0], &venus::L3[1], &venus::L3[2]);
 
-    let k0 = calculate_var(t, &venus::K0);
-    let k1 = calculate_var(t, &venus::K1);
-    let k2 = calculate_var(t, &venus::K2);
-    let k3 = calculate_var(t, &venus::K3);
-    let k4 = calculate_var(t, &venus::K4);
-    let k5 = calculate_var(t, &venus::K5);
+    let k0 = calculate_var(t, &venus::K0[0], &venus::K0[1], &venus::K0[2]);
+    let k1 = calculate_var(t, &venus::K1[0], &venus::K1[1], &venus::K1[2]);
+    let k2 = calculate_var(t, &venus::K2[0], &venus::K2[1], &venus::K2[2]);
+    let k3 = calculate_var(t, &venus::K3[0], &venus::K3[1], &venus::K3[2]);
+    let k4 = calculate_var(t, &venus::K4[0], &venus::K4[1], &venus::K4[2]);
+    let k5 = calculate_var(t, &venus::K5[0], &venus::K5[1], &venus::K5[2]);
 
-    let h0 = calculate_var(t, &venus::H0);
-    let h1 = calculate_var(t, &venus::H1);
-    let h2 = calculate_var(t, &venus::H2);
-    let h3 = calculate_var(t, &venus::H3);
-    let h4 = calculate_var(t, &venus::H4);
-    let h5 = calculate_var(t, &venus::H5);
+    let h0 = calculate_var(t, &venus::H0[0], &venus::H0[1], &venus::H0[2]);
+    let h1 = calculate_var(t, &venus::H1[0], &venus::H1[1], &venus::H1[2]);
+    let h2 = calculate_var(t, &venus::H2[0], &venus::H2[1], &venus::H2[2]);
+    let h3 = calculate_var(t, &venus::H3[0], &venus::H3[1], &venus::H3[2]);
+    let h4 = calculate_var(t, &venus::H4[0], &venus::H4[1], &venus::H4[2]);
+    let h5 = calculate_var(t, &venus::H5[0], &venus::H5[1], &venus::H5[2]);
 
-    let q0 = calculate_var(t, &venus::Q0);
-    let q1 = calculate_var(t, &venus::Q1);
-    let q2 = calculate_var(t, &venus::Q2);
-    let q3 = calculate_var(t, &venus::Q3);
-    let q4 = calculate_var(t, &venus::Q4);
-    let q5 = calculate_var(t, &venus::Q5);
+    let q0 = calculate_var(t, &venus::Q0[0], &venus::Q0[1], &venus::Q0[2]);
+    let q1 = calculate_var(t, &venus::Q1[0], &venus::Q1[1], &venus::Q1[2]);
+    let q2 = calculate_var(t, &venus::Q2[0], &venus::Q2[1], &venus::Q2[2]);
+    let q3 = calculate_var(t, &venus::Q3[0], &venus::Q3[1], &venus::Q3[2]);
+    let q4 = calculate_var(t, &venus::Q4[0], &venus::Q4[1], &venus::Q4[2]);
+    let q5 = calculate_var(t, &venus::Q5[0], &venus::Q5[1], &venus::Q5[2]);
 
-    let p0 = calculate_var(t, &venus::P0);
-    let p1 = calculate_var(t, &venus::P1);
-    let p2 = calculate_var(t, &venus::P2);
-    let p3 = calculate_var(t, &venus::P3);
-    let p4 = calculate_var(t, &venus::P4);
+    let p0 = calculate_var(t, &venus::P0[0], &venus::P0[1], &venus::P0[2]);
+    let p1 = calculate_var(t, &venus::P1[0], &venus::P1[1], &venus::P1[2]);
+    let p2 = calculate_var(t, &venus::P2[0], &venus::P2[1], &venus::P2[2]);
+    let p3 = calculate_var(t, &venus::P3[0], &venus::P3[1], &venus::P3[2]);
+    let p4 = calculate_var(t, &venus::P4[0], &venus::P4[1], &venus::P4[2]);
 
-    let a = a0 + a1 * t + a2 * t * t;
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3)) % (2_f64 * PI);
-    let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
-    let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
-    let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4) + q5 * t.powi(5);
-    let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3) + p4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let a = a0 + a1 * t + a2 * t2;
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3) % (2_f64 * PI);
+    let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4 + k5 * t5;
+    let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4 + h5 * t5;
+    let q = q0 + q1 * t + q2 * t2 + q3 * t3 + q4 * t4 + q5 * t5;
+    let p = p0 + p1 * t + p2 * t2 + p3 * t3 + p4 * t4;
 
     VSOP87Elements {
         a,
@@ -605,51 +659,216 @@ pub fn venus(jde: f64) -> VSOP87Elements {
 pub fn earth_moon(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &earth_moon::A0);
-    let a1 = calculate_var(t, &earth_moon::A1);
-    let a2 = calculate_var(t, &earth_moon::A2);
+    let a0 = calculate_var(
+        t,
+        &earth_moon::A0[0],
+        &earth_moon::A0[1],
+        &earth_moon::A0[2],
+    );
+    let a1 = calculate_var(
+        t,
+        &earth_moon::A1[0],
+        &earth_moon::A1[1],
+        &earth_moon::A1[2],
+    );
+    let a2 = calculate_var(
+        t,
+        &earth_moon::A2[0],
+        &earth_moon::A2[1],
+        &earth_moon::A2[2],
+    );
 
-    let l0 = calculate_var(t, &earth_moon::L0);
-    let l1 = calculate_var(t, &earth_moon::L1);
-    let l2 = calculate_var(t, &earth_moon::L2);
-    let l3 = calculate_var(t, &earth_moon::L3);
-    let l4 = calculate_var(t, &earth_moon::L4);
-    let l5 = calculate_var(t, &earth_moon::L5);
+    let l0 = calculate_var(
+        t,
+        &earth_moon::L0[0],
+        &earth_moon::L0[1],
+        &earth_moon::L0[2],
+    );
+    let l1 = calculate_var(
+        t,
+        &earth_moon::L1[0],
+        &earth_moon::L1[1],
+        &earth_moon::L1[2],
+    );
+    let l2 = calculate_var(
+        t,
+        &earth_moon::L2[0],
+        &earth_moon::L2[1],
+        &earth_moon::L2[2],
+    );
+    let l3 = calculate_var(
+        t,
+        &earth_moon::L3[0],
+        &earth_moon::L3[1],
+        &earth_moon::L3[2],
+    );
+    let l4 = calculate_var(
+        t,
+        &earth_moon::L4[0],
+        &earth_moon::L4[1],
+        &earth_moon::L4[2],
+    );
+    let l5 = calculate_var(
+        t,
+        &earth_moon::L5[0],
+        &earth_moon::L5[1],
+        &earth_moon::L5[2],
+    );
 
-    let k0 = calculate_var(t, &earth_moon::K0);
-    let k1 = calculate_var(t, &earth_moon::K1);
-    let k2 = calculate_var(t, &earth_moon::K2);
-    let k3 = calculate_var(t, &earth_moon::K3);
-    let k4 = calculate_var(t, &earth_moon::K4);
-    let k5 = calculate_var(t, &earth_moon::K5);
+    let k0 = calculate_var(
+        t,
+        &earth_moon::K0[0],
+        &earth_moon::K0[1],
+        &earth_moon::K0[2],
+    );
+    let k1 = calculate_var(
+        t,
+        &earth_moon::K1[0],
+        &earth_moon::K1[1],
+        &earth_moon::K1[2],
+    );
+    let k2 = calculate_var(
+        t,
+        &earth_moon::K2[0],
+        &earth_moon::K2[1],
+        &earth_moon::K2[2],
+    );
+    let k3 = calculate_var(
+        t,
+        &earth_moon::K3[0],
+        &earth_moon::K3[1],
+        &earth_moon::K3[2],
+    );
+    let k4 = calculate_var(
+        t,
+        &earth_moon::K4[0],
+        &earth_moon::K4[1],
+        &earth_moon::K4[2],
+    );
+    let k5 = calculate_var(
+        t,
+        &earth_moon::K5[0],
+        &earth_moon::K5[1],
+        &earth_moon::K5[2],
+    );
 
-    let h0 = calculate_var(t, &earth_moon::H0);
-    let h1 = calculate_var(t, &earth_moon::H1);
-    let h2 = calculate_var(t, &earth_moon::H2);
-    let h3 = calculate_var(t, &earth_moon::H3);
-    let h4 = calculate_var(t, &earth_moon::H4);
-    let h5 = calculate_var(t, &earth_moon::H5);
+    let h0 = calculate_var(
+        t,
+        &earth_moon::H0[0],
+        &earth_moon::H0[1],
+        &earth_moon::H0[2],
+    );
+    let h1 = calculate_var(
+        t,
+        &earth_moon::H1[0],
+        &earth_moon::H1[1],
+        &earth_moon::H1[2],
+    );
+    let h2 = calculate_var(
+        t,
+        &earth_moon::H2[0],
+        &earth_moon::H2[1],
+        &earth_moon::H2[2],
+    );
+    let h3 = calculate_var(
+        t,
+        &earth_moon::H3[0],
+        &earth_moon::H3[1],
+        &earth_moon::H3[2],
+    );
+    let h4 = calculate_var(
+        t,
+        &earth_moon::H4[0],
+        &earth_moon::H4[1],
+        &earth_moon::H4[2],
+    );
+    let h5 = calculate_var(
+        t,
+        &earth_moon::H5[0],
+        &earth_moon::H5[1],
+        &earth_moon::H5[2],
+    );
 
-    let q0 = calculate_var(t, &earth_moon::Q0);
-    let q1 = calculate_var(t, &earth_moon::Q1);
-    let q2 = calculate_var(t, &earth_moon::Q2);
-    let q3 = calculate_var(t, &earth_moon::Q3);
-    let q4 = calculate_var(t, &earth_moon::Q4);
-    let q5 = calculate_var(t, &earth_moon::Q5);
+    let q0 = calculate_var(
+        t,
+        &earth_moon::Q0[0],
+        &earth_moon::Q0[1],
+        &earth_moon::Q0[2],
+    );
+    let q1 = calculate_var(
+        t,
+        &earth_moon::Q1[0],
+        &earth_moon::Q1[1],
+        &earth_moon::Q1[2],
+    );
+    let q2 = calculate_var(
+        t,
+        &earth_moon::Q2[0],
+        &earth_moon::Q2[1],
+        &earth_moon::Q2[2],
+    );
+    let q3 = calculate_var(
+        t,
+        &earth_moon::Q3[0],
+        &earth_moon::Q3[1],
+        &earth_moon::Q3[2],
+    );
+    let q4 = calculate_var(
+        t,
+        &earth_moon::Q4[0],
+        &earth_moon::Q4[1],
+        &earth_moon::Q4[2],
+    );
+    let q5 = calculate_var(
+        t,
+        &earth_moon::Q5[0],
+        &earth_moon::Q5[1],
+        &earth_moon::Q5[2],
+    );
 
-    let p0 = calculate_var(t, &earth_moon::P0);
-    let p1 = calculate_var(t, &earth_moon::P1);
-    let p2 = calculate_var(t, &earth_moon::P2);
-    let p3 = calculate_var(t, &earth_moon::P3);
-    let p4 = calculate_var(t, &earth_moon::P4);
+    let p0 = calculate_var(
+        t,
+        &earth_moon::P0[0],
+        &earth_moon::P0[1],
+        &earth_moon::P0[2],
+    );
+    let p1 = calculate_var(
+        t,
+        &earth_moon::P1[0],
+        &earth_moon::P1[1],
+        &earth_moon::P1[2],
+    );
+    let p2 = calculate_var(
+        t,
+        &earth_moon::P2[0],
+        &earth_moon::P2[1],
+        &earth_moon::P2[2],
+    );
+    let p3 = calculate_var(
+        t,
+        &earth_moon::P3[0],
+        &earth_moon::P3[1],
+        &earth_moon::P3[2],
+    );
+    let p4 = calculate_var(
+        t,
+        &earth_moon::P4[0],
+        &earth_moon::P4[1],
+        &earth_moon::P4[2],
+    );
 
-    let a = a0 + a1 * t + a2 * t * t;
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
-    let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
-    let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4) + q5 * t.powi(5);
-    let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3) + p4 * t.powi(4);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let a = a0 + a1 * t + a2 * t2;
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4 + k5 * t5;
+    let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4 + h5 * t5;
+    let q = q0 + q1 * t + q2 * t2 + q3 * t3 + q4 * t4 + q5 * t5;
+    let p = p0 + p1 * t + p2 * t2 + p3 * t3 + p4 * t4;
 
     VSOP87Elements {
         a,
@@ -696,50 +915,55 @@ pub fn earth_moon(jde: f64) -> VSOP87Elements {
 pub fn mars(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &mars::A0);
-    let a1 = calculate_var(t, &mars::A1);
-    let a2 = calculate_var(t, &mars::A2);
+    let a0 = calculate_var(t, &mars::A0[0], &mars::A0[1], &mars::A0[2]);
+    let a1 = calculate_var(t, &mars::A1[0], &mars::A1[1], &mars::A1[2]);
+    let a2 = calculate_var(t, &mars::A2[0], &mars::A2[1], &mars::A2[2]);
 
-    let l0 = calculate_var(t, &mars::L0);
-    let l1 = calculate_var(t, &mars::L1);
-    let l2 = calculate_var(t, &mars::L2);
-    let l3 = calculate_var(t, &mars::L3);
-    let l4 = calculate_var(t, &mars::L4);
-    let l5 = calculate_var(t, &mars::L5);
+    let l0 = calculate_var(t, &mars::L0[0], &mars::L0[1], &mars::L0[2]);
+    let l1 = calculate_var(t, &mars::L1[0], &mars::L1[1], &mars::L1[2]);
+    let l2 = calculate_var(t, &mars::L2[0], &mars::L2[1], &mars::L2[2]);
+    let l3 = calculate_var(t, &mars::L3[0], &mars::L3[1], &mars::L3[2]);
+    let l4 = calculate_var(t, &mars::L4[0], &mars::L4[1], &mars::L4[2]);
+    let l5 = calculate_var(t, &mars::L5[0], &mars::L5[1], &mars::L5[2]);
 
-    let k0 = calculate_var(t, &mars::K0);
-    let k1 = calculate_var(t, &mars::K1);
-    let k2 = calculate_var(t, &mars::K2);
-    let k3 = calculate_var(t, &mars::K3);
-    let k4 = calculate_var(t, &mars::K4);
-    let k5 = calculate_var(t, &mars::K5);
+    let k0 = calculate_var(t, &mars::K0[0], &mars::K0[1], &mars::K0[2]);
+    let k1 = calculate_var(t, &mars::K1[0], &mars::K1[1], &mars::K1[2]);
+    let k2 = calculate_var(t, &mars::K2[0], &mars::K2[1], &mars::K2[2]);
+    let k3 = calculate_var(t, &mars::K3[0], &mars::K3[1], &mars::K3[2]);
+    let k4 = calculate_var(t, &mars::K4[0], &mars::K4[1], &mars::K4[2]);
+    let k5 = calculate_var(t, &mars::K5[0], &mars::K5[1], &mars::K5[2]);
 
-    let h0 = calculate_var(t, &mars::H0);
-    let h1 = calculate_var(t, &mars::H1);
-    let h2 = calculate_var(t, &mars::H2);
-    let h3 = calculate_var(t, &mars::H3);
-    let h4 = calculate_var(t, &mars::H4);
-    let h5 = calculate_var(t, &mars::H5);
+    let h0 = calculate_var(t, &mars::H0[0], &mars::H0[1], &mars::H0[2]);
+    let h1 = calculate_var(t, &mars::H1[0], &mars::H1[1], &mars::H1[2]);
+    let h2 = calculate_var(t, &mars::H2[0], &mars::H2[1], &mars::H2[2]);
+    let h3 = calculate_var(t, &mars::H3[0], &mars::H3[1], &mars::H3[2]);
+    let h4 = calculate_var(t, &mars::H4[0], &mars::H4[1], &mars::H4[2]);
+    let h5 = calculate_var(t, &mars::H5[0], &mars::H5[1], &mars::H5[2]);
 
-    let q0 = calculate_var(t, &mars::Q0);
-    let q1 = calculate_var(t, &mars::Q1);
-    let q2 = calculate_var(t, &mars::Q2);
-    let q3 = calculate_var(t, &mars::Q3);
-    let q4 = calculate_var(t, &mars::Q4);
-    let q5 = calculate_var(t, &mars::Q5);
+    let q0 = calculate_var(t, &mars::Q0[0], &mars::Q0[1], &mars::Q0[2]);
+    let q1 = calculate_var(t, &mars::Q1[0], &mars::Q1[1], &mars::Q1[2]);
+    let q2 = calculate_var(t, &mars::Q2[0], &mars::Q2[1], &mars::Q2[2]);
+    let q3 = calculate_var(t, &mars::Q3[0], &mars::Q3[1], &mars::Q3[2]);
+    let q4 = calculate_var(t, &mars::Q4[0], &mars::Q4[1], &mars::Q4[2]);
+    let q5 = calculate_var(t, &mars::Q5[0], &mars::Q5[1], &mars::Q5[2]);
 
-    let p0 = calculate_var(t, &mars::P0);
-    let p1 = calculate_var(t, &mars::P1);
-    let p2 = calculate_var(t, &mars::P2);
-    let p3 = calculate_var(t, &mars::P3);
+    let p0 = calculate_var(t, &mars::P0[0], &mars::P0[1], &mars::P0[2]);
+    let p1 = calculate_var(t, &mars::P1[0], &mars::P1[1], &mars::P1[2]);
+    let p2 = calculate_var(t, &mars::P2[0], &mars::P2[1], &mars::P2[2]);
+    let p3 = calculate_var(t, &mars::P3[0], &mars::P3[1], &mars::P3[2]);
 
-    let a = a0 + a1 * t + a2 * t * t;
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
-    let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
-    let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4) + q5 * t.powi(5);
-    let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let a = a0 + a1 * t + a2 * t2;
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4 + k5 * t5;
+    let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4 + h5 * t5;
+    let q = q0 + q1 * t + q2 * t2 + q3 * t3 + q4 * t4 + q5 * t5;
+    let p = p0 + p1 * t + p2 * t2 + p3 * t3;
 
     VSOP87Elements {
         a,
@@ -787,48 +1011,53 @@ pub fn mars(jde: f64) -> VSOP87Elements {
 pub fn jupiter(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &jupiter::A0);
-    let a1 = calculate_var(t, &jupiter::A1);
-    let a2 = calculate_var(t, &jupiter::A2);
-    let a3 = calculate_var(t, &jupiter::A3);
-    let a4 = calculate_var(t, &jupiter::A4);
-    let a5 = calculate_var(t, &jupiter::A5);
+    let a0 = calculate_var(t, &jupiter::A0[0], &jupiter::A0[1], &jupiter::A0[2]);
+    let a1 = calculate_var(t, &jupiter::A1[0], &jupiter::A1[1], &jupiter::A1[2]);
+    let a2 = calculate_var(t, &jupiter::A2[0], &jupiter::A2[1], &jupiter::A2[2]);
+    let a3 = calculate_var(t, &jupiter::A3[0], &jupiter::A3[1], &jupiter::A3[2]);
+    let a4 = calculate_var(t, &jupiter::A4[0], &jupiter::A4[1], &jupiter::A4[2]);
+    let a5 = calculate_var(t, &jupiter::A5[0], &jupiter::A5[1], &jupiter::A5[2]);
 
-    let l0 = calculate_var(t, &jupiter::L0);
-    let l1 = calculate_var(t, &jupiter::L1);
-    let l2 = calculate_var(t, &jupiter::L2);
-    let l3 = calculate_var(t, &jupiter::L3);
-    let l4 = calculate_var(t, &jupiter::L4);
-    let l5 = calculate_var(t, &jupiter::L5);
+    let l0 = calculate_var(t, &jupiter::L0[0], &jupiter::L0[1], &jupiter::L0[2]);
+    let l1 = calculate_var(t, &jupiter::L1[0], &jupiter::L1[1], &jupiter::L1[2]);
+    let l2 = calculate_var(t, &jupiter::L2[0], &jupiter::L2[1], &jupiter::L2[2]);
+    let l3 = calculate_var(t, &jupiter::L3[0], &jupiter::L3[1], &jupiter::L3[2]);
+    let l4 = calculate_var(t, &jupiter::L4[0], &jupiter::L4[1], &jupiter::L4[2]);
+    let l5 = calculate_var(t, &jupiter::L5[0], &jupiter::L5[1], &jupiter::L5[2]);
 
-    let k0 = calculate_var(t, &jupiter::K0);
-    let k1 = calculate_var(t, &jupiter::K1);
-    let k2 = calculate_var(t, &jupiter::K2);
-    let k3 = calculate_var(t, &jupiter::K3);
-    let k4 = calculate_var(t, &jupiter::K4);
+    let k0 = calculate_var(t, &jupiter::K0[0], &jupiter::K0[1], &jupiter::K0[2]);
+    let k1 = calculate_var(t, &jupiter::K1[0], &jupiter::K1[1], &jupiter::K1[2]);
+    let k2 = calculate_var(t, &jupiter::K2[0], &jupiter::K2[1], &jupiter::K2[2]);
+    let k3 = calculate_var(t, &jupiter::K3[0], &jupiter::K3[1], &jupiter::K3[2]);
+    let k4 = calculate_var(t, &jupiter::K4[0], &jupiter::K4[1], &jupiter::K4[2]);
 
-    let h0 = calculate_var(t, &jupiter::H0);
-    let h1 = calculate_var(t, &jupiter::H1);
-    let h2 = calculate_var(t, &jupiter::H2);
-    let h3 = calculate_var(t, &jupiter::H3);
-    let h4 = calculate_var(t, &jupiter::H4);
+    let h0 = calculate_var(t, &jupiter::H0[0], &jupiter::H0[1], &jupiter::H0[2]);
+    let h1 = calculate_var(t, &jupiter::H1[0], &jupiter::H1[1], &jupiter::H1[2]);
+    let h2 = calculate_var(t, &jupiter::H2[0], &jupiter::H2[1], &jupiter::H2[2]);
+    let h3 = calculate_var(t, &jupiter::H3[0], &jupiter::H3[1], &jupiter::H3[2]);
+    let h4 = calculate_var(t, &jupiter::H4[0], &jupiter::H4[1], &jupiter::H4[2]);
 
-    let q0 = calculate_var(t, &jupiter::Q0);
-    let q1 = calculate_var(t, &jupiter::Q1);
-    let q2 = calculate_var(t, &jupiter::Q2);
-    let q3 = calculate_var(t, &jupiter::Q3);
+    let q0 = calculate_var(t, &jupiter::Q0[0], &jupiter::Q0[1], &jupiter::Q0[2]);
+    let q1 = calculate_var(t, &jupiter::Q1[0], &jupiter::Q1[1], &jupiter::Q1[2]);
+    let q2 = calculate_var(t, &jupiter::Q2[0], &jupiter::Q2[1], &jupiter::Q2[2]);
+    let q3 = calculate_var(t, &jupiter::Q3[0], &jupiter::Q3[1], &jupiter::Q3[2]);
 
-    let p0 = calculate_var(t, &jupiter::P0);
-    let p1 = calculate_var(t, &jupiter::P1);
-    let p2 = calculate_var(t, &jupiter::P2);
+    let p0 = calculate_var(t, &jupiter::P0[0], &jupiter::P0[1], &jupiter::P0[2]);
+    let p1 = calculate_var(t, &jupiter::P1[0], &jupiter::P1[1], &jupiter::P1[2]);
+    let p2 = calculate_var(t, &jupiter::P2[0], &jupiter::P2[1], &jupiter::P2[2]);
 
-    let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4);
-    let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4);
-    let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);
-    let p = p0 + p1 * t + p2 * t * t;
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let a = a0 + a1 * t + a2 * t2 + a3 * t3 + a4 * t4 + a5 * t5;
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4;
+    let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4;
+    let q = q0 + q1 * t + q2 * t2 + q3 * t3;
+    let p = p0 + p1 * t + p2 * t2;
 
     VSOP87Elements {
         a,
@@ -876,52 +1105,57 @@ pub fn jupiter(jde: f64) -> VSOP87Elements {
 pub fn saturn(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &saturn::A0);
-    let a1 = calculate_var(t, &saturn::A1);
-    let a2 = calculate_var(t, &saturn::A2);
-    let a3 = calculate_var(t, &saturn::A3);
-    let a4 = calculate_var(t, &saturn::A4);
-    let a5 = calculate_var(t, &saturn::A5);
+    let a0 = calculate_var(t, &saturn::A0[0], &saturn::A0[1], &saturn::A0[2]);
+    let a1 = calculate_var(t, &saturn::A1[0], &saturn::A1[1], &saturn::A1[2]);
+    let a2 = calculate_var(t, &saturn::A2[0], &saturn::A2[1], &saturn::A2[2]);
+    let a3 = calculate_var(t, &saturn::A3[0], &saturn::A3[1], &saturn::A3[2]);
+    let a4 = calculate_var(t, &saturn::A4[0], &saturn::A4[1], &saturn::A4[2]);
+    let a5 = calculate_var(t, &saturn::A5[0], &saturn::A5[1], &saturn::A5[2]);
 
-    let l0 = calculate_var(t, &saturn::L0);
-    let l1 = calculate_var(t, &saturn::L1);
-    let l2 = calculate_var(t, &saturn::L2);
-    let l3 = calculate_var(t, &saturn::L3);
-    let l4 = calculate_var(t, &saturn::L4);
-    let l5 = calculate_var(t, &saturn::L5);
+    let l0 = calculate_var(t, &saturn::L0[0], &saturn::L0[1], &saturn::L0[2]);
+    let l1 = calculate_var(t, &saturn::L1[0], &saturn::L1[1], &saturn::L1[2]);
+    let l2 = calculate_var(t, &saturn::L2[0], &saturn::L2[1], &saturn::L2[2]);
+    let l3 = calculate_var(t, &saturn::L3[0], &saturn::L3[1], &saturn::L3[2]);
+    let l4 = calculate_var(t, &saturn::L4[0], &saturn::L4[1], &saturn::L4[2]);
+    let l5 = calculate_var(t, &saturn::L5[0], &saturn::L5[1], &saturn::L5[2]);
 
-    let k0 = calculate_var(t, &saturn::K0);
-    let k1 = calculate_var(t, &saturn::K1);
-    let k2 = calculate_var(t, &saturn::K2);
-    let k3 = calculate_var(t, &saturn::K3);
-    let k4 = calculate_var(t, &saturn::K4);
-    let k5 = calculate_var(t, &saturn::K5);
+    let k0 = calculate_var(t, &saturn::K0[0], &saturn::K0[1], &saturn::K0[2]);
+    let k1 = calculate_var(t, &saturn::K1[0], &saturn::K1[1], &saturn::K1[2]);
+    let k2 = calculate_var(t, &saturn::K2[0], &saturn::K2[1], &saturn::K2[2]);
+    let k3 = calculate_var(t, &saturn::K3[0], &saturn::K3[1], &saturn::K3[2]);
+    let k4 = calculate_var(t, &saturn::K4[0], &saturn::K4[1], &saturn::K4[2]);
+    let k5 = calculate_var(t, &saturn::K5[0], &saturn::K5[1], &saturn::K5[2]);
 
-    let h0 = calculate_var(t, &saturn::H0);
-    let h1 = calculate_var(t, &saturn::H1);
-    let h2 = calculate_var(t, &saturn::H2);
-    let h3 = calculate_var(t, &saturn::H3);
-    let h4 = calculate_var(t, &saturn::H4);
-    let h5 = calculate_var(t, &saturn::H5);
+    let h0 = calculate_var(t, &saturn::H0[0], &saturn::H0[1], &saturn::H0[2]);
+    let h1 = calculate_var(t, &saturn::H1[0], &saturn::H1[1], &saturn::H1[2]);
+    let h2 = calculate_var(t, &saturn::H2[0], &saturn::H2[1], &saturn::H2[2]);
+    let h3 = calculate_var(t, &saturn::H3[0], &saturn::H3[1], &saturn::H3[2]);
+    let h4 = calculate_var(t, &saturn::H4[0], &saturn::H4[1], &saturn::H4[2]);
+    let h5 = calculate_var(t, &saturn::H5[0], &saturn::H5[1], &saturn::H5[2]);
 
-    let q0 = calculate_var(t, &saturn::Q0);
-    let q1 = calculate_var(t, &saturn::Q1);
-    let q2 = calculate_var(t, &saturn::Q2);
-    let q3 = calculate_var(t, &saturn::Q3);
-    let q4 = calculate_var(t, &saturn::Q4);
+    let q0 = calculate_var(t, &saturn::Q0[0], &saturn::Q0[1], &saturn::Q0[2]);
+    let q1 = calculate_var(t, &saturn::Q1[0], &saturn::Q1[1], &saturn::Q1[2]);
+    let q2 = calculate_var(t, &saturn::Q2[0], &saturn::Q2[1], &saturn::Q2[2]);
+    let q3 = calculate_var(t, &saturn::Q3[0], &saturn::Q3[1], &saturn::Q3[2]);
+    let q4 = calculate_var(t, &saturn::Q4[0], &saturn::Q4[1], &saturn::Q4[2]);
 
-    let p0 = calculate_var(t, &saturn::P0);
-    let p1 = calculate_var(t, &saturn::P1);
-    let p2 = calculate_var(t, &saturn::P2);
-    let p3 = calculate_var(t, &saturn::P3);
+    let p0 = calculate_var(t, &saturn::P0[0], &saturn::P0[1], &saturn::P0[2]);
+    let p1 = calculate_var(t, &saturn::P1[0], &saturn::P1[1], &saturn::P1[2]);
+    let p2 = calculate_var(t, &saturn::P2[0], &saturn::P2[1], &saturn::P2[2]);
+    let p3 = calculate_var(t, &saturn::P3[0], &saturn::P3[1], &saturn::P3[2]);
 
-    let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
-    let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
-    let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3) + q4 * t.powi(4);
-    let p = p0 + p1 * t + p2 * t * t + p3 * t.powi(3);
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let a = a0 + a1 * t + a2 * t2 + a3 * t3 + a4 * t4 + a5 * t5;
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4 + k5 * t5;
+    let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4 + h5 * t5;
+    let q = q0 + q1 * t + q2 * t2 + q3 * t3 + q4 * t4;
+    let p = p0 + p1 * t + p2 * t2 + p3 * t3;
 
     VSOP87Elements {
         a,
@@ -969,48 +1203,53 @@ pub fn saturn(jde: f64) -> VSOP87Elements {
 pub fn uranus(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &uranus::A0);
-    let a1 = calculate_var(t, &uranus::A1);
-    let a2 = calculate_var(t, &uranus::A2);
-    let a3 = calculate_var(t, &uranus::A3);
-    let a4 = calculate_var(t, &uranus::A4);
-    let a5 = calculate_var(t, &uranus::A5);
+    let a0 = calculate_var(t, &uranus::A0[0], &uranus::A0[1], &uranus::A0[2]);
+    let a1 = calculate_var(t, &uranus::A1[0], &uranus::A1[1], &uranus::A1[2]);
+    let a2 = calculate_var(t, &uranus::A2[0], &uranus::A2[1], &uranus::A2[2]);
+    let a3 = calculate_var(t, &uranus::A3[0], &uranus::A3[1], &uranus::A3[2]);
+    let a4 = calculate_var(t, &uranus::A4[0], &uranus::A4[1], &uranus::A4[2]);
+    let a5 = calculate_var(t, &uranus::A5[0], &uranus::A5[1], &uranus::A5[2]);
 
-    let l0 = calculate_var(t, &uranus::L0);
-    let l1 = calculate_var(t, &uranus::L1);
-    let l2 = calculate_var(t, &uranus::L2);
-    let l3 = calculate_var(t, &uranus::L3);
-    let l4 = calculate_var(t, &uranus::L4);
-    let l5 = calculate_var(t, &uranus::L5);
+    let l0 = calculate_var(t, &uranus::L0[0], &uranus::L0[1], &uranus::L0[2]);
+    let l1 = calculate_var(t, &uranus::L1[0], &uranus::L1[1], &uranus::L1[2]);
+    let l2 = calculate_var(t, &uranus::L2[0], &uranus::L2[1], &uranus::L2[2]);
+    let l3 = calculate_var(t, &uranus::L3[0], &uranus::L3[1], &uranus::L3[2]);
+    let l4 = calculate_var(t, &uranus::L4[0], &uranus::L4[1], &uranus::L4[2]);
+    let l5 = calculate_var(t, &uranus::L5[0], &uranus::L5[1], &uranus::L5[2]);
 
-    let k0 = calculate_var(t, &uranus::K0);
-    let k1 = calculate_var(t, &uranus::K1);
-    let k2 = calculate_var(t, &uranus::K2);
-    let k3 = calculate_var(t, &uranus::K3);
-    let k4 = calculate_var(t, &uranus::K4);
+    let k0 = calculate_var(t, &uranus::K0[0], &uranus::K0[1], &uranus::K0[2]);
+    let k1 = calculate_var(t, &uranus::K1[0], &uranus::K1[1], &uranus::K1[2]);
+    let k2 = calculate_var(t, &uranus::K2[0], &uranus::K2[1], &uranus::K2[2]);
+    let k3 = calculate_var(t, &uranus::K3[0], &uranus::K3[1], &uranus::K3[2]);
+    let k4 = calculate_var(t, &uranus::K4[0], &uranus::K4[1], &uranus::K4[2]);
 
-    let h0 = calculate_var(t, &uranus::H0);
-    let h1 = calculate_var(t, &uranus::H1);
-    let h2 = calculate_var(t, &uranus::H2);
-    let h3 = calculate_var(t, &uranus::H3);
-    let h4 = calculate_var(t, &uranus::H4);
+    let h0 = calculate_var(t, &uranus::H0[0], &uranus::H0[1], &uranus::H0[2]);
+    let h1 = calculate_var(t, &uranus::H1[0], &uranus::H1[1], &uranus::H1[2]);
+    let h2 = calculate_var(t, &uranus::H2[0], &uranus::H2[1], &uranus::H2[2]);
+    let h3 = calculate_var(t, &uranus::H3[0], &uranus::H3[1], &uranus::H3[2]);
+    let h4 = calculate_var(t, &uranus::H4[0], &uranus::H4[1], &uranus::H4[2]);
 
-    let q0 = calculate_var(t, &uranus::Q0);
-    let q1 = calculate_var(t, &uranus::Q1);
-    let q2 = calculate_var(t, &uranus::Q2);
-    let q3 = calculate_var(t, &uranus::Q3);
+    let q0 = calculate_var(t, &uranus::Q0[0], &uranus::Q0[1], &uranus::Q0[2]);
+    let q1 = calculate_var(t, &uranus::Q1[0], &uranus::Q1[1], &uranus::Q1[2]);
+    let q2 = calculate_var(t, &uranus::Q2[0], &uranus::Q2[1], &uranus::Q2[2]);
+    let q3 = calculate_var(t, &uranus::Q3[0], &uranus::Q3[1], &uranus::Q3[2]);
 
-    let p0 = calculate_var(t, &uranus::P0);
-    let p1 = calculate_var(t, &uranus::P1);
-    let p2 = calculate_var(t, &uranus::P2);
+    let p0 = calculate_var(t, &uranus::P0[0], &uranus::P0[1], &uranus::P0[2]);
+    let p1 = calculate_var(t, &uranus::P1[0], &uranus::P1[1], &uranus::P1[2]);
+    let p2 = calculate_var(t, &uranus::P2[0], &uranus::P2[1], &uranus::P2[2]);
 
-    let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4);
-    let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4);
-    let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);
-    let p = p0 + p1 * t + p2 * t * t;
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let a = a0 + a1 * t + a2 * t2 + a3 * t3 + a4 * t4 + a5 * t5;
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4;
+    let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4;
+    let q = q0 + q1 * t + q2 * t2 + q3 * t3;
+    let p = p0 + p1 * t + p2 * t2;
 
     VSOP87Elements {
         a,
@@ -1058,50 +1297,55 @@ pub fn uranus(jde: f64) -> VSOP87Elements {
 pub fn neptune(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
-    let a0 = calculate_var(t, &neptune::A0);
-    let a1 = calculate_var(t, &neptune::A1);
-    let a2 = calculate_var(t, &neptune::A2);
-    let a3 = calculate_var(t, &neptune::A3);
-    let a4 = calculate_var(t, &neptune::A4);
-    let a5 = calculate_var(t, &neptune::A5);
+    let a0 = calculate_var(t, &neptune::A0[0], &neptune::A0[1], &neptune::A0[2]);
+    let a1 = calculate_var(t, &neptune::A1[0], &neptune::A1[1], &neptune::A1[2]);
+    let a2 = calculate_var(t, &neptune::A2[0], &neptune::A2[1], &neptune::A2[2]);
+    let a3 = calculate_var(t, &neptune::A3[0], &neptune::A3[1], &neptune::A3[2]);
+    let a4 = calculate_var(t, &neptune::A4[0], &neptune::A4[1], &neptune::A4[2]);
+    let a5 = calculate_var(t, &neptune::A5[0], &neptune::A5[1], &neptune::A5[2]);
 
-    let l0 = calculate_var(t, &neptune::L0);
-    let l1 = calculate_var(t, &neptune::L1);
-    let l2 = calculate_var(t, &neptune::L2);
-    let l3 = calculate_var(t, &neptune::L3);
-    let l4 = calculate_var(t, &neptune::L4);
-    let l5 = calculate_var(t, &neptune::L5);
+    let l0 = calculate_var(t, &neptune::L0[0], &neptune::L0[1], &neptune::L0[2]);
+    let l1 = calculate_var(t, &neptune::L1[0], &neptune::L1[1], &neptune::L1[2]);
+    let l2 = calculate_var(t, &neptune::L2[0], &neptune::L2[1], &neptune::L2[2]);
+    let l3 = calculate_var(t, &neptune::L3[0], &neptune::L3[1], &neptune::L3[2]);
+    let l4 = calculate_var(t, &neptune::L4[0], &neptune::L4[1], &neptune::L4[2]);
+    let l5 = calculate_var(t, &neptune::L5[0], &neptune::L5[1], &neptune::L5[2]);
 
-    let k0 = calculate_var(t, &neptune::K0);
-    let k1 = calculate_var(t, &neptune::K1);
-    let k2 = calculate_var(t, &neptune::K2);
-    let k3 = calculate_var(t, &neptune::K3);
-    let k4 = calculate_var(t, &neptune::K4);
-    let k5 = calculate_var(t, &neptune::K5);
+    let k0 = calculate_var(t, &neptune::K0[0], &neptune::K0[1], &neptune::K0[2]);
+    let k1 = calculate_var(t, &neptune::K1[0], &neptune::K1[1], &neptune::K1[2]);
+    let k2 = calculate_var(t, &neptune::K2[0], &neptune::K2[1], &neptune::K2[2]);
+    let k3 = calculate_var(t, &neptune::K3[0], &neptune::K3[1], &neptune::K3[2]);
+    let k4 = calculate_var(t, &neptune::K4[0], &neptune::K4[1], &neptune::K4[2]);
+    let k5 = calculate_var(t, &neptune::K5[0], &neptune::K5[1], &neptune::K5[2]);
 
-    let h0 = calculate_var(t, &neptune::H0);
-    let h1 = calculate_var(t, &neptune::H1);
-    let h2 = calculate_var(t, &neptune::H2);
-    let h3 = calculate_var(t, &neptune::H3);
-    let h4 = calculate_var(t, &neptune::H4);
-    let h5 = calculate_var(t, &neptune::H5);
+    let h0 = calculate_var(t, &neptune::H0[0], &neptune::H0[1], &neptune::H0[2]);
+    let h1 = calculate_var(t, &neptune::H1[0], &neptune::H1[1], &neptune::H1[2]);
+    let h2 = calculate_var(t, &neptune::H2[0], &neptune::H2[1], &neptune::H2[2]);
+    let h3 = calculate_var(t, &neptune::H3[0], &neptune::H3[1], &neptune::H3[2]);
+    let h4 = calculate_var(t, &neptune::H4[0], &neptune::H4[1], &neptune::H4[2]);
+    let h5 = calculate_var(t, &neptune::H5[0], &neptune::H5[1], &neptune::H5[2]);
 
-    let q0 = calculate_var(t, &neptune::Q0);
-    let q1 = calculate_var(t, &neptune::Q1);
-    let q2 = calculate_var(t, &neptune::Q2);
-    let q3 = calculate_var(t, &neptune::Q3);
+    let q0 = calculate_var(t, &neptune::Q0[0], &neptune::Q0[1], &neptune::Q0[2]);
+    let q1 = calculate_var(t, &neptune::Q1[0], &neptune::Q1[1], &neptune::Q1[2]);
+    let q2 = calculate_var(t, &neptune::Q2[0], &neptune::Q2[1], &neptune::Q2[2]);
+    let q3 = calculate_var(t, &neptune::Q3[0], &neptune::Q3[1], &neptune::Q3[2]);
 
-    let p0 = calculate_var(t, &neptune::P0);
-    let p1 = calculate_var(t, &neptune::P1);
-    let p2 = calculate_var(t, &neptune::P2);
+    let p0 = calculate_var(t, &neptune::P0[0], &neptune::P0[1], &neptune::P0[2]);
+    let p1 = calculate_var(t, &neptune::P1[0], &neptune::P1[1], &neptune::P1[2]);
+    let p2 = calculate_var(t, &neptune::P2[0], &neptune::P2[1], &neptune::P2[2]);
 
-    let a = a0 + a1 * t + a2 * t * t + a3 * t.powi(3) + a4 * t.powi(4) + a5 * t.powi(5);
-    let l = (l0 + l1 * t + l2 * t * t + l3 * t.powi(3) + l4 * t.powi(4) + l5 * t.powi(5))
-        % (2_f64 * PI);
-    let k = k0 + k1 * t + k2 * t * t + k3 * t.powi(3) + k4 * t.powi(4) + k5 * t.powi(5);
-    let h = h0 + h1 * t + h2 * t * t + h3 * t.powi(3) + h4 * t.powi(4) + h5 * t.powi(5);
-    let q = q0 + q1 * t + q2 * t * t + q3 * t.powi(3);
-    let p = p0 + p1 * t + p2 * t * t;
+    // We calculate the `t` potencies beforehand for easy re-use.
+    let t2 = t * t;
+    let t3 = t.powi(3);
+    let t4 = t2 * t2;
+    let t5 = t.powi(5);
+
+    let a = a0 + a1 * t + a2 * t2 + a3 * t3 + a4 * t4 + a5 * t5;
+    let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
+    let k = k0 + k1 * t + k2 * t2 + k3 * t3 + k4 * t4 + k5 * t5;
+    let h = h0 + h1 * t + h2 * t2 + h3 * t3 + h4 * t4 + h5 * t5;
+    let q = q0 + q1 * t + q2 * t2 + q3 * t3;
+    let p = p0 + p1 * t + p2 * t2;
 
     VSOP87Elements {
         a,
