@@ -30,8 +30,6 @@ mod uranus;
 mod venus;
 
 use super::{calculate_t, calculate_var, RectangularCoordinates};
-#[cfg(feature = "no_std")]
-use core::num::Float;
 
 /// Calculates VSOP87A solution for Mercury.
 ///
@@ -81,9 +79,9 @@ pub fn mercury(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
@@ -140,9 +138,9 @@ pub fn venus(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
@@ -199,9 +197,9 @@ pub fn earth(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
@@ -343,9 +341,9 @@ pub fn earth_moon(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
@@ -402,9 +400,9 @@ pub fn mars(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
@@ -461,9 +459,9 @@ pub fn jupiter(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
@@ -520,9 +518,9 @@ pub fn saturn(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
@@ -575,7 +573,7 @@ pub fn uranus(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4;
@@ -629,7 +627,7 @@ pub fn neptune(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4;

@@ -35,9 +35,6 @@ use core::f64::consts::PI;
 #[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
 
-#[cfg(feature = "no_std")]
-use core::num::Float;
-
 /// Calculates VSOP87D solution for Mercury.
 ///
 /// This function calculates the VSOP87D solution (heliocentric ecliptic spherical coordinates for
@@ -86,9 +83,9 @@ pub fn mercury(jde: f64) -> SphericalCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
     let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
@@ -149,9 +146,9 @@ pub fn venus(jde: f64) -> SphericalCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
     let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
@@ -211,9 +208,9 @@ pub fn earth(jde: f64) -> SphericalCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
     let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4;
@@ -274,9 +271,9 @@ pub fn mars(jde: f64) -> SphericalCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
     let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
@@ -337,9 +334,9 @@ pub fn jupiter(jde: f64) -> SphericalCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
     let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
@@ -400,9 +397,9 @@ pub fn saturn(jde: f64) -> SphericalCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
     let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;
@@ -461,9 +458,9 @@ pub fn uranus(jde: f64) -> SphericalCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
     let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4;
@@ -523,9 +520,9 @@ pub fn neptune(jde: f64) -> SphericalCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
     let b = b0 + b1 * t + b2 * t2 + b3 * t3 + b4 * t4 + b5 * t5;

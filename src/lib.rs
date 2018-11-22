@@ -1,9 +1,5 @@
 //! This library implements the *VSOP87* solutions to calculate the positions of the planets in the
-//! solar system. To use it you must include the following in your crate:
-//!
-//! ```
-//! extern crate vsop87;
-//! ```
+//! solar system.
 //!
 //! The main module calculates heliocentric ecliptic orbital elements for the equinox J2000.0 for
 //! the planets in the solar system, the basic *VSOP87* solution. There is one module per other
@@ -77,29 +73,31 @@
 //! [those from NASA](http://solarsystem.nasa.gov/planets/mercury/facts).
 
 #![forbid(
-    missing_docs, warnings, anonymous_parameters, unused_extern_crates, unused_import_braces,
-    missing_copy_implementations, trivial_casts, variant_size_differences,
-    missing_debug_implementations, trivial_numeric_casts
+    missing_docs,
+    warnings,
+    anonymous_parameters,
+    unused_extern_crates,
+    unused_import_braces,
+    missing_copy_implementations,
+    trivial_casts,
+    variant_size_differences,
+    missing_debug_implementations,
+    trivial_numeric_casts
 )]
 // Debug trait derivation will show an error if forbidden.
 #![deny(unused_qualifications, unsafe_code)]
-#![cfg_attr(feature = "cargo-clippy", deny(clippy))]
-#![cfg_attr(feature = "cargo-clippy", warn(clippy_pedantic))]
-// FIXME: Maybe we should start writing proper variable names.
-#![cfg_attr(
-    feature = "cargo-clippy", allow(many_single_char_names, unreadable_literal, excessive_precision)
+#![deny(clippy::all)]
+#![warn(clippy::pedantic)]
+#![allow(
+    clippy::many_single_char_names,
+    clippy::unreadable_literal,
+    clippy::excessive_precision
 )]
 #![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
 // Features
 #![cfg_attr(feature = "no_std", no_std)]
 // All the "allow by default" lints
 #![warn(box_pointers, unused_results)]
-
-#[cfg(feature = "simd")]
-extern crate simdeez;
-
-#[cfg(feature = "no_std")]
-extern crate libm;
 
 pub mod vsop87a;
 pub mod vsop87b;
@@ -118,11 +116,11 @@ mod venus;
 
 #[cfg(feature = "no_std")]
 use core::f64::consts::PI;
+#[cfg(feature = "no_std")]
+use libm::F64Ext;
+
 #[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
-
-#[cfg(feature = "simd")]
-use simdeez::Simd;
 
 /// Structure representing the keplerian elements of an orbit.
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -140,7 +138,7 @@ impl KeplerianElements {
     ///
     /// A number smaller to one would be a closed ellipse, while 0 would be a circle orbit. Values
     /// higher than one would be hyperbolic orbits, that are not closed, while a 1 would be a
-    /// parabolical orbit. Negative values cannot exist.
+    /// parabolic orbit. Negative values cannot exist.
     pub fn eccentricity(&self) -> f64 {
         self.ecc
     }
@@ -185,7 +183,6 @@ impl KeplerianElements {
     }
 }
 
-#[cfg(not(feature = "no_std"))]
 impl From<VSOP87Elements> for KeplerianElements {
     fn from(elts: VSOP87Elements) -> Self {
         let ecc = (elts.h * elts.h + elts.k * elts.k).sqrt();
@@ -259,41 +256,19 @@ fn calculate_t(jde: f64) -> f64 {
 
 /// Calculates the given variable.
 #[inline]
-#[allow(unsafe_code)]
 fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
-    // Check that the arrays are the correct length when debugging.
-    debug_assert_eq!(
-        a.len(),
-        b.len(),
-        "`a` and `b` variable lists have different lengths: {} and {} respectively",
-        a.len(),
-        b.len()
-    );
-    debug_assert_eq!(
-        a.len(),
-        c.len(),
-        "`a` and `c` variable lists have different lengths: {} and {} respectively",
-        a.len(),
-        c.len()
-    );
-
-    #[cfg(feature = "simd")]
+    #[cfg(not(feature = "no_std"))]
+    #[allow(unsafe_code)]
     {
-        if is_x86_feature_detected!("avx2") {
-            // Safe because we already checked that we have AVX 2 instruction set.
-            unsafe { calculate_var_avx2(t, a, b, c) }
-        } else if is_x86_feature_detected!("sse4.1") {
-            // Safe because we already checked that we have SSE 4.1 instruction set.
-            unsafe { calculate_var_sse41(t, a, b, c) }
-        } else if is_x86_feature_detected!("sse2") {
-            // Safe because we already checked that we have SSE 2 instruction set.
-            unsafe { calculate_var_sse2(t, a, b, c) }
+        if is_x86_feature_detected!("avx") {
+            // Safe because we already checked that we have AVX instruction set.
+            unsafe { calculate_var_avx(t, a, b, c) }
         } else {
             calculate_var_fallback(t, a, b, c)
         }
     }
 
-    #[cfg(not(feature = "simd"))]
+    #[cfg(feature = "no_std")]
     {
         calculate_var_fallback(t, a, b, c)
     }
@@ -310,89 +285,95 @@ fn calculate_var_fallback(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
         .fold(0_f64, |term, ((a, b), c)| term + a * (b + c * t).cos())
 }
 
-/// Call `calculate_term_simd()` as an AVX2 function.
-#[cfg(feature = "simd")]
+/// Calculates the given variable using the AVX instruction set.
+#[target_feature(enable = "avx")]
+#[cfg(all(
+    any(target_arch = "x86", target_arch = "x86_64"),
+    not(feature = "no_std")
+))]
 #[allow(unsafe_code)]
-#[inline]
-#[target_feature(enable = "avx2")]
-unsafe fn calculate_var_avx2(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
-    calculate_var_simd::<simdeez::avx2::Avx2>(t, a, b, c)
-}
+unsafe fn calculate_var_avx(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
+    #[cfg(feature = "no_std")]
+    use core::{f64, mem};
+    #[cfg(not(feature = "no_std"))]
+    use std::{f64, mem};
 
-/// Call `calculate_term_simd()` as an SSE 4.1 function.
-#[cfg(feature = "simd")]
-#[allow(unsafe_code)]
-#[inline]
-#[target_feature(enable = "sse4.1")]
-unsafe fn calculate_var_sse41(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
-    calculate_var_simd::<simdeez::sse41::Sse41>(t, a, b, c)
-}
+    #[cfg(all(feature = "no_std", target_arch = "x86_64"))]
+    use core::arch::x86_64::*;
+    #[cfg(all(not(feature = "no_std"), target_arch = "x86_64"))]
+    use std::arch::x86_64::*;
 
-/// Call `calculate_term_simd()` as an SSE 2 function.
-#[cfg(feature = "simd")]
-#[allow(unsafe_code)]
-#[inline]
-#[target_feature(enable = "sse2")]
-unsafe fn calculate_var_sse2(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
-    calculate_var_simd::<simdeez::sse2::Sse2>(t, a, b, c)
-}
+    #[cfg(all(feature = "no_std", target_arch = "x86"))]
+    use core::arch::x86::*;
+    #[cfg(all(not(feature = "no_std"), target_arch = "x86"))]
+    use std::arch::x86::*;
 
-/// Calculates the term using SIMD.
-#[cfg(feature = "simd")]
-#[allow(unsafe_code)]
-#[inline]
-unsafe fn calculate_var_simd<S>(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64
-where
-    S: Simd,
-{
-    calculate_terms_simd::<S>(t, a, b, c).into_iter().sum()
-}
+    /// Vectorizes the calculation of 4 terms at the same time.
+    unsafe fn vector_term(
+        (a1, b1, c1): (f64, f64, f64),
+        (a2, b2, c2): (f64, f64, f64),
+        (a3, b3, c3): (f64, f64, f64),
+        (a4, b4, c4): (f64, f64, f64),
+        t: f64,
+    ) -> (f64, f64, f64, f64) {
+        let a = _mm256_set_pd(a1, a2, a3, a4);
+        let b = _mm256_set_pd(b1, b2, b3, b4);
+        let c = _mm256_set_pd(c1, c2, c3, c4);
+        let t = _mm256_set1_pd(t);
 
-/// Calculates the terms using SIMD.
-#[cfg(feature = "simd")]
-#[allow(unsafe_code)]
-#[inline]
-unsafe fn calculate_terms_simd<S>(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> Vec<f64>
-where
-    S: Simd,
-{
-    let extra = a.len() % S::VF64_WIDTH;
-    let length = a.len() - if extra == 0 { 0 } else { extra - 1 };
+        // Safe because both values are created properly and checked.
+        let ct = _mm256_mul_pd(c, t);
+        // Safe because both values are created properly and checked.
+        let bct = _mm256_add_pd(b, ct);
 
-    let mut terms: Vec<f64> = Vec::with_capacity(length);
-    terms.set_len(length); // For efficiency
+        // Safe because bct_unpacked is 4 f64 long.
+        let bct_unpacked: (f64, f64, f64, f64) = mem::transmute(bct);
 
-    let mut a_iter = a.chunks(S::VF64_WIDTH);
-    let mut b_iter = b.chunks(S::VF64_WIDTH);
-    let mut c_iter = c.chunks(S::VF64_WIDTH);
+        // Safe because bct_unpacked is 4 f64 long, and x84/x86_64 is little endian.
+        let bct = _mm256_set_pd(
+            bct_unpacked.3.cos(),
+            bct_unpacked.2.cos(),
+            bct_unpacked.1.cos(),
+            bct_unpacked.0.cos(),
+        );
 
-    let mut i = 0;
-    while let (Some(a), Some(b), Some(c)) = (a_iter.next(), b_iter.next(), c_iter.next()) {
-        if a.len() == S::VF64_WIDTH {
-            //load data from the vec into a SIMD value
-            let tv = S::set1_pd(t);
-            let av = S::loadu_pd(&a[0]);
-            let bv = S::loadu_pd(&b[0]);
-            let cv = S::loadu_pd(&c[0]);
+        // Safe because both values are created properly and checked.
+        let term = _mm256_mul_pd(a, bct);
+        let term_unpacked: (f64, f64, f64, f64) = mem::transmute(term);
 
-            // Initial operation.
-            let mut bct = bv + cv * tv;
-
-            // Safe because bct_unpacked is 4 f64 long.
-            for h in 0..S::VF64_WIDTH {
-                bct[h] = bct[h].cos();
-            }
-            let term = av * bct;
-
-            S::storeu_pd(&mut terms[i], term);
-            i += S::VF64_WIDTH;
-        } else {
-            let mut last = terms.get_unchecked_mut(length - 1);
-            *last = calculate_var_fallback(t, a, b, c);
-        }
+        term_unpacked
     }
 
-    terms
+    a.chunks(4)
+        .zip(b.chunks(4))
+        .zip(c.chunks(4))
+        .map(|vars| match vars {
+            ((&[a1, a2, a3, a4], &[b1, b2, b3, b4]), &[c1, c2, c3, c4]) => {
+                // The result is little endian in x86/x86_64.
+                let (term4, term3, term2, term1) =
+                    vector_term((a1, b1, c1), (a2, b2, c2), (a3, b3, c3), (a4, b4, c4), t);
+
+                term1 + term2 + term3 + term4
+            }
+            ((&[a1, a2, a3], &[b1, b2, b3]), &[c1, c2, c3]) => {
+                // The result is little endian in x86/x86_64.
+                let (_term4, term3, term2, term1) = vector_term(
+                    (a1, b1, c1),
+                    (a2, b2, c2),
+                    (a3, b3, c3),
+                    (f64::NAN, f64::NAN, f64::NAN),
+                    t,
+                );
+
+                term1 + term2 + term3
+            }
+            ((&[a1, a2], &[b1, b2]), &[c1, c2]) => {
+                a1 * (b1 + c1 * t).cos() + a2 * (b2 + c2 * t).cos()
+            }
+            ((&[a], &[b]), &[c]) => a * (b + c * t).cos(),
+            _ => unreachable!(),
+        })
+        .sum::<f64>()
 }
 
 /// Elements used by the VSOP87 solution. Can be converted into keplerian elements.
@@ -419,11 +400,11 @@ pub struct VSOP87Elements {
 }
 
 impl From<KeplerianElements> for VSOP87Elements {
-    fn from(elts: KeplerianElements) -> VSOP87Elements {
+    fn from(elts: KeplerianElements) -> Self {
         let (lper_sin, lper_cos) = elts.lper.sin_cos();
         let (lan_sin, lan_cos) = elts.lan.sin_cos();
         let incl_sin = (elts.incl / 2.0).sin();
-        VSOP87Elements {
+        Self {
             a: elts.sma,
             l: elts.l0,
             k: elts.ecc * lper_cos,
@@ -508,9 +489,9 @@ pub fn mercury(jde: f64) -> VSOP87Elements {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2;
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3) % (2_f64 * PI);
@@ -602,9 +583,9 @@ pub fn venus(jde: f64) -> VSOP87Elements {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2;
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3) % (2_f64 * PI);
@@ -859,9 +840,9 @@ pub fn earth_moon(jde: f64) -> VSOP87Elements {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2;
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
@@ -954,9 +935,9 @@ pub fn mars(jde: f64) -> VSOP87Elements {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2;
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
@@ -1048,9 +1029,9 @@ pub fn jupiter(jde: f64) -> VSOP87Elements {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2 + a3 * t3 + a4 * t4 + a5 * t5;
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
@@ -1146,9 +1127,9 @@ pub fn saturn(jde: f64) -> VSOP87Elements {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2 + a3 * t3 + a4 * t4 + a5 * t5;
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
@@ -1240,9 +1221,9 @@ pub fn uranus(jde: f64) -> VSOP87Elements {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2 + a3 * t3 + a4 * t4 + a5 * t5;
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);
@@ -1336,9 +1317,9 @@ pub fn neptune(jde: f64) -> VSOP87Elements {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let a = a0 + a1 * t + a2 * t2 + a3 * t3 + a4 * t4 + a5 * t5;
     let l = (l0 + l1 * t + l2 * t2 + l3 * t3 + l4 * t4 + l5 * t5) % (2_f64 * PI);

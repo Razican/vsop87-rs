@@ -1,8 +1,9 @@
 [package]
 name = "vsop87"
 version = "2.0.3"
-authors = ["Iban Eguia <razican@protonmail.ch>"]
 license = "MIT/Apache-2.0"
+authors = ["Iban Eguia <razican@protonmail.ch>"]
+edition = "2018"
 readme = "README.md"
 repository = "https://github.com/Razican/vsop87-rs"
 documentation = "https://docs.rs/vsop87/"
@@ -26,17 +27,16 @@ is-it-maintained-issue-resolution = { repository = "Razican/vsop87-rs" }
 is-it-maintained-open-issues = { repository = "Razican/vsop87-rs" }
 
 [features]
-default = []
+default = ["simd"]
 no_std = ["libm"]
-simd = ["simdeez"]
+simd = []
 
 [dependencies]
 libm = { version = "0.1.2", optional = true }
-simdeez = { version = "0.4.2", optional = true }
 
 [dev-dependencies]
-rand = "0.5.4"
-criterion = "0.2.4"
+rand = "0.6.0"
+criterion = "0.2.5"
 
 [[bench]]
 name = "vsop87"

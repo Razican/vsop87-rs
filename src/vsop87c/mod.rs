@@ -31,9 +31,6 @@ mod venus;
 
 use super::{calculate_t, calculate_var, RectangularCoordinates};
 
-#[cfg(feature = "no_std")]
-use core::num::Float;
-
 /// Calculates VSOP87C solution for Mercury.
 ///
 /// This function calculates the VSOP87C solution (heliocentric ecliptic rectangular coordinates
@@ -82,15 +79,15 @@ pub fn mercury(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
     let z = z0 + z1 * t + z2 * t2 + z3 * t3 + z4 * t4;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87C solution for Venus.
@@ -141,15 +138,15 @@ pub fn venus(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
     let z = z0 + z1 * t + z2 * t2 + z3 * t3 + z4 * t4;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87C solution for Earth.
@@ -199,15 +196,15 @@ pub fn earth(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
     let z = z0 + z1 * t + z2 * t2 + z3 * t3;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87C solution for Mars.
@@ -258,15 +255,15 @@ pub fn mars(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
     let z = z0 + z1 * t + z2 * t2 + z3 * t3 + z4 * t4;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87C solution for Jupiter.
@@ -317,15 +314,15 @@ pub fn jupiter(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
     let z = z0 + z1 * t + z2 * t2 + z3 * t3 + z4 * t4;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87C solution for Saturn.
@@ -376,15 +373,15 @@ pub fn saturn(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
     let z = z0 + z1 * t + z2 * t2 + z3 * t3 + z4 * t4;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87C solution for Uranus.
@@ -435,15 +432,15 @@ pub fn uranus(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
     let z = z0 + z1 * t + z2 * t2 + z3 * t3 + z4 * t4;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
 
 /// Calculates VSOP87C solution for Neptune.
@@ -494,13 +491,13 @@ pub fn neptune(jde: f64) -> RectangularCoordinates {
 
     // We calculate the `t` potencies beforehand for easy re-use.
     let t2 = t * t;
-    let t3 = t.powi(3);
+    let t3 = t2 * t;
     let t4 = t2 * t2;
-    let t5 = t.powi(5);
+    let t5 = t2 * t3;
 
     let x = x0 + x1 * t + x2 * t2 + x3 * t3 + x4 * t4 + x5 * t5;
     let y = y0 + y1 * t + y2 * t2 + y3 * t3 + y4 * t4 + y5 * t5;
     let z = z0 + z1 * t + z2 * t2 + z3 * t3 + z4 * t4;
 
-    RectangularCoordinates { x: x, y: y, z: z }
+    RectangularCoordinates { x, y, z }
 }
