@@ -31,8 +31,11 @@ default = ["simd"]
 no_std = ["libm"]
 simd = []
 
-[dependencies]
-libm = { version = "0.1.2", optional = true }
+[dependencies.libm]
+git = "https://github.com/Razican/libm.git"
+branch = "fix_overflow_panic"
+optional = true
+#libm = { version = "0.1.2", optional = true }
 
 [dev-dependencies]
 rand = "0.6.1"
