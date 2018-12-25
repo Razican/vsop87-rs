@@ -344,9 +344,32 @@ unsafe fn calculate_var_avx(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
         term_unpacked
     }
 
-    a.chunks(4)
-        .zip(b.chunks(4))
-        .zip(c.chunks(4))
+    let iter1 = a.chunks_exact(4);
+    let iter2 = b.chunks_exact(4);
+    let iter3 = c.chunks_exact(4);
+
+    let remainder = match (iter1.remainder(), iter2.remainder(), iter3.remainder()) {
+        (&[a1, a2, a3], &[b1, b2, b3], &[c1, c2, c3]) => {
+            // The result is little endian in x86/x86_64.
+            let (_term4, term3, term2, term1) = vector_term(
+                (a1, b1, c1),
+                (a2, b2, c2),
+                (a3, b3, c3),
+                (f64::NAN, f64::NAN, f64::NAN),
+                t,
+            );
+
+            term1 + term2 + term3
+        }
+        (&[a1, a2], &[b1, b2], &[c1, c2]) => a1 * (b1 + c1 * t).cos() + a2 * (b2 + c2 * t).cos(),
+        (&[a], &[b], &[c]) => a * (b + c * t).cos(),
+        (&[], &[], &[]) => 0_f64,
+        _ => unreachable!(),
+    };
+
+    let res = iter1
+        .zip(iter2)
+        .zip(iter3)
         .map(|vars| match vars {
             ((&[a1, a2, a3, a4], &[b1, b2, b3, b4]), &[c1, c2, c3, c4]) => {
                 // The result is little endian in x86/x86_64.
@@ -355,25 +378,11 @@ unsafe fn calculate_var_avx(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
 
                 term1 + term2 + term3 + term4
             }
-            ((&[a1, a2, a3], &[b1, b2, b3]), &[c1, c2, c3]) => {
-                // The result is little endian in x86/x86_64.
-                let (_term4, term3, term2, term1) = vector_term(
-                    (a1, b1, c1),
-                    (a2, b2, c2),
-                    (a3, b3, c3),
-                    (f64::NAN, f64::NAN, f64::NAN),
-                    t,
-                );
-
-                term1 + term2 + term3
-            }
-            ((&[a1, a2], &[b1, b2]), &[c1, c2]) => {
-                a1 * (b1 + c1 * t).cos() + a2 * (b2 + c2 * t).cos()
-            }
-            ((&[a], &[b]), &[c]) => a * (b + c * t).cos(),
             _ => unreachable!(),
         })
-        .sum::<f64>()
+        .sum::<f64>();
+
+    res + remainder
 }
 
 /// Elements used by the VSOP87 solution. Can be converted into keplerian elements.
