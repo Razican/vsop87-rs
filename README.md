@@ -1,11 +1,11 @@
-# VSOP87 Rust implementation #
-[![Build Status](https://travis-ci.org/Razican/vsop87-rs.svg?branch=master)](https://travis-ci.org/Razican/vsop87-rs)
-[![Build status](https://ci.appveyor.com/api/projects/status/g028p4t0ekvcypu3?svg=true)](https://ci.appveyor.com/project/Razican/vsop87-rs)
-[![codecov](https://codecov.io/gh/Razican/vsop87-rs/branch/master/graph/badge.svg)](https://codecov.io/gh/Razican/vsop87-rs)
-[![Crates.io](https://meritbadge.herokuapp.com/vsop87)](https://crates.io/crates/vsop87)
+# VSOP87 Rust implementation
+
+[![Build Status][build_svg][build_status]
+[![codecov][coverage_svg]][coverage_status]
+[![Crates.io][crate_svg]][crate_link]
 
 This library implements the *VSOP87* solutions to calculate the positions of the planets in the
-solar system. Full **documentation** can be found [here](https://docs.rs/vsop87/). To use it you
+solar system. Full **documentation** can be found [here][docs_link]. To use it you
 must include the following in your crate:
 
 ```rust
@@ -15,17 +15,15 @@ extern crate vsop87;
 The main module calculates heliocentric ecliptic orbital elements for the equinox J2000.0 for
 the planets in the solar system, the basic *VSOP87* solution. There is one module per other
 *VSOP87* implementation: *VSOP87A*, *VSOP87B*, *VSOP87C*, *VSOP87D* and *VSOP87E*. More
-information can be found [here](https://www.caglow.com/info/compute/vsop87) and
-[here](https://en.wikipedia.org/wiki/VSOP_(planets)).
+information can be found [here][vsop87_compute] and [here][vsop87_wiki].
 
 Each module has its own documentation, and here is the documentation on the base *VSOP87*
-solution. The *VSOP87* algorithm has great precission (under 1") for **4,000 years** before and
+solution. The *VSOP87* algorithm has great precision (under 1") for **4,000 years** before and
 after J2000 epoch for Mercury, Venus, Earth-Moon barycenter and Mars, for **2,000 years** in
 the case of Jupiter and Saturn and for **6,000 years** for Uranus and Neptune.
 
-The base *VSOP87* solution calculates the
-[orbital elements](https://en.wikipedia.org/wiki/Orbital_elements) of the planets arount the
-Sun. The returned elements are a special VSOP87 orbital elements, that can be converted into
+The base *VSOP87* solution calculates the [orbital elements][orb_elem_wiki] of the planets around
+the Sun. The returned elements are a special VSOP87 orbital elements, that can be converted into
 usual keplerian elements using the `Into` trait. These elements are ideal to get an idea on how
 the orbits are changing over time. It can also be used for other complex orbital computations.
 
@@ -33,7 +31,7 @@ the orbits are changing over time. It can also be used for other complex orbital
 
 As an example, here we calculate the orbital parameters for Mercury on the January 1st, 2000.
 The *VSOP87* algorithm requires dates to be entered as
-[Julian Day](https://en.wikipedia.org/wiki/Julian_day) (*JD*). In our case, that date is
+[Julian Day][julian_day_wiki] (*JD*). In our case, that date is
 `2451545.0`.
 
 We first calculate the VSOP87 elements:
@@ -68,11 +66,23 @@ assert!(elements.periapsis() > 1.35183 && elements.periapsis() < 1.35185);
 assert!(elements.mean_anomaly() > 4.40259 && elements.mean_anomaly() < 4.40261);
 ```
 
-As you can see, these numbers perfectly match
-[those from NASA](https://solarsystem.nasa.gov/planets/mercury/facts).
+As you can see, these numbers perfectly match [those from NASA][nasa_mercury_facts].
 
-## License ##
+## License
 
 This library is distributed under the terms of both the MIT license and the
 Apache License (Version 2.0), at your option. See LICENSE-APACHE, and LICENSE-MIT files for
 details.
+
+[build_svg]: https://travis-ci.org/Razican/vsop87-rs.svg?branch=master
+[build_status]: https://travis-ci.org/Razican/vsop87-rs
+[coverage_svg]: https://codecov.io/gh/Razican/vsop87-rs/branch/master/graph/badge.svg
+[coverage_status]: https://codecov.io/gh/Razican/vsop87-rs
+[crate_svg]: https://meritbadge.herokuapp.com/vsop87
+[crate_link]: https://crates.io/crates/vsop87
+[docs_link]: https://docs.rs/vsop87/
+[vsop87_compute]: https://www.caglow.com/info/compute/vsop87
+[vsop87_wiki]: https://en.wikipedia.org/wiki/VSOP_(planets)
+[julian_day_wiki]: https://en.wikipedia.org/wiki/Julian_day
+[orb_elem_wiki]: https://en.wikipedia.org/wiki/Orbital_elements
+[nasa_mercury_facts]: https://solarsystem.nasa.gov/planets/mercury/facts
