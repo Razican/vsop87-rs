@@ -37,8 +37,8 @@ optional = true
 #libm = { version = "0.1.2", optional = true }
 
 [dev-dependencies]
-rand = "0.6.1"
-criterion = "0.2.5"
+rand = "0.6.4"
+criterion = "0.2.8"
 
 [[bench]]
 name = "vsop87"
