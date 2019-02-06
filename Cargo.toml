@@ -21,7 +21,6 @@ categories = ["science"]
 
 [badges]
 travis-ci = { repository = "Razican/vsop87-rs", branch = "master" }
-appveyor = { repository = "Razican/vsop87-rs", branch = "master", service = "github" }
 codecov = { repository = "Razican/vsop87-rs", branch = "master", service = "github" }
 is-it-maintained-issue-resolution = { repository = "Razican/vsop87-rs" }
 is-it-maintained-open-issues = { repository = "Razican/vsop87-rs" }
