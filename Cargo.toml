@@ -38,7 +38,7 @@ optional = true
 
 [dev-dependencies]
 rand = "0.6.5"
-criterion = "0.2.9"
+criterion = "0.2.10"
 
 [[bench]]
 name = "vsop87"
