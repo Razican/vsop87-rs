@@ -231,6 +231,7 @@ pub fn earth(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > 0.9464953235 && coordinates.y < 0.9464953237);
 /// assert!(coordinates.z > 0.001703 && coordinates.z < 0.001707);
 /// ```
+#[allow(clippy::too_many_lines)]
 pub fn earth_moon(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 

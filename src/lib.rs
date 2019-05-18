@@ -646,6 +646,7 @@ pub fn venus(jde: f64) -> VSOP87Elements {
 /// let k_elements: KeplerianElements = vsop87_elts.into();
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
+#[allow(clippy::too_many_lines)]
 pub fn earth_moon(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
