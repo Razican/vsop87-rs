@@ -278,7 +278,10 @@ fn calculate_t(jde: f64) -> f64 {
 /// Calculates the given variable.
 #[inline]
 fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
-    #[cfg(not(feature = "no_std"))]
+    #[cfg(all(
+        any(target_arch = "x86", target_arch = "x86_64"),
+        not(feature = "no_std")
+    ))]
     #[allow(unsafe_code)]
     {
         if is_x86_feature_detected!("avx") {
@@ -289,7 +292,10 @@ fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
         }
     }
 
-    #[cfg(feature = "no_std")]
+    #[cfg(any(
+        not(any(target_arch = "x86", target_arch = "x86_64")),
+        feature = "no_std"
+    ))]
     {
         calculate_var_fallback(t, a, b, c)
     }
