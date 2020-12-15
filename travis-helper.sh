@@ -41,20 +41,8 @@ elif [ "$action" = "upload_code_coverage" ]; then
   if [[ "$TRAVIS_BUILD_STAGE_NAME" == "Test" &&
         "$TRAVIS_RUST_VERSION" == "stable" &&
         "$TRAVIS_OS_NAME" == "linux" ]]; then
-    wget https://github.com/SimonKagstrom/kcov/archive/master.tar.gz &&
-    tar xzf master.tar.gz &&
-    cd kcov-master &&
-    mkdir build &&
-    cd build &&
-    cmake .. &&
-    make &&
-    sudo make install &&
-    cd ../.. &&
-    rm -rf kcov-master &&
-    for file in target/debug/vsop87*[^\.d]; do
-      mkdir -p "target/cov/$(basename $file)";
-      kcov --exclude-pattern=/.cargo,/usr/lib --verify "target/cov/$(basename $file)" "$file";
-    done &&
+    cargo install -v cargo-tarpaulin &&
+    cargo tarpaulin --out Xml &&
     bash <(curl -s https://codecov.io/bash) &&
     echo "Uploaded code coverage"
   fi
