@@ -1,6 +1,6 @@
 language: rust
 cache: cargo
-dist: bionic
+dist: focal
 
 # Run builds in Linux, MacOS X and Windows
 os:
@@ -8,21 +8,13 @@ os:
 - osx
 - windows
 
+arch:
+- amd64
+- arm64
+
 # Run builds for all the supported trains
 rust:
 - 1.36.0
-- 1.37.0
-- 1.38.0
-- 1.39.0
-- 1.40.0
-- 1.41.1
-- 1.42.0
-- 1.43.1
-- 1.44.1
-- 1.45.2
-- 1.46.0
-- 1.47.0
-- 1.48.0
 - stable
 - beta
 - nightly
@@ -40,6 +32,8 @@ env:
 
 # Extra jobs to include
 jobs:
+  allow_failures:
+  - os: windows
   include:
   # Upload documentation
   - name: "Documentation upload"
@@ -70,10 +64,6 @@ jobs:
       on:
         repo: Razican/vsop87-rs
         tags: true
-
-matrix:
-  allow_failures:
-  - os: windows
 
 # Run the multiple tests.
 script:
