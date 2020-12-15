@@ -91,7 +91,8 @@
 #![allow(
     clippy::many_single_char_names,
     clippy::unreadable_literal,
-    clippy::excessive_precision
+    clippy::excessive_precision,
+    clippy::must_use_candidate
 )]
 #![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
 // Features
@@ -117,7 +118,7 @@ mod venus;
 #[cfg(feature = "no_std")]
 use core::f64::consts::PI;
 #[cfg(feature = "no_std")]
-use libm::F64Ext;
+use libm::{acos, asin, atan, cos, sin, sincos, sqrt};
 
 #[cfg(not(feature = "no_std"))]
 use std::f64::consts::PI;
@@ -185,18 +186,38 @@ impl KeplerianElements {
 
 impl From<VSOP87Elements> for KeplerianElements {
     fn from(elts: VSOP87Elements) -> Self {
-        let ecc = (elts.h * elts.h + elts.k * elts.k).sqrt();
-        let i = (1_f64 - 2_f64 * (elts.p * elts.p + elts.q * elts.q)).acos();
-        let lan = (elts.p / elts.q).atan();
-        let lper = (elts.h / ecc).asin();
+        #[cfg(feature = "no_std")]
+        {
+            let ecc = sqrt(elts.h * elts.h + elts.k * elts.k);
+            let i = acos(1_f64 - 2_f64 * (elts.p * elts.p + elts.q * elts.q));
+            let lan = atan(elts.p / elts.q);
+            let lper = asin(elts.h / ecc);
 
-        Self {
-            ecc,
-            sma: elts.a,
-            incl: i,
-            lan,
-            lper,
-            l0: elts.l,
+            Self {
+                ecc,
+                sma: elts.a,
+                incl: i,
+                lan,
+                lper,
+                l0: elts.l,
+            }
+        }
+
+        #[cfg(not(feature = "no_std"))]
+        {
+            let ecc = (elts.h * elts.h + elts.k * elts.k).sqrt();
+            let i = (1_f64 - 2_f64 * (elts.p * elts.p + elts.q * elts.q)).acos();
+            let lan = (elts.p / elts.q).atan();
+            let lper = (elts.h / ecc).asin();
+
+            Self {
+                ecc,
+                sma: elts.a,
+                incl: i,
+                lan,
+                lper,
+                l0: elts.l,
+            }
         }
     }
 }
@@ -279,10 +300,21 @@ fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
 /// Used in systems without SIMD support.
 #[inline]
 fn calculate_var_fallback(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
-    a.iter()
-        .zip(b)
-        .zip(c)
-        .fold(0_f64, |term, ((a, b), c)| term + a * (b + c * t).cos())
+    #[cfg(not(feature = "no_std"))]
+    {
+        a.iter()
+            .zip(b)
+            .zip(c)
+            .fold(0_f64, |term, ((a, b), c)| term + a * (b + c * t).cos())
+    }
+
+    #[cfg(feature = "no_std")]
+    {
+        a.iter()
+            .zip(b)
+            .zip(c)
+            .fold(0_f64, |term, ((a, b), c)| term + a * cos(b + c * t))
+    }
 }
 
 /// Calculates the given variable using the AVX instruction set.
@@ -299,9 +331,9 @@ unsafe fn calculate_var_avx(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
     use std::{f64, mem};
 
     #[cfg(all(feature = "no_std", target_arch = "x86_64"))]
-    use core::arch::x86_64::*;
+    use core::arch::x86_64::{_mm256_add_pd, _mm256_mul_pd, _mm256_set1_pd, _mm256_set_pd};
     #[cfg(all(not(feature = "no_std"), target_arch = "x86_64"))]
-    use std::arch::x86_64::*;
+    use std::arch::x86_64::{_mm256_add_pd, _mm256_mul_pd, _mm256_set1_pd, _mm256_set_pd};
 
     #[cfg(all(feature = "no_std", target_arch = "x86"))]
     use core::arch::x86::*;
@@ -410,16 +442,34 @@ pub struct VSOP87Elements {
 
 impl From<KeplerianElements> for VSOP87Elements {
     fn from(elts: KeplerianElements) -> Self {
-        let (lper_sin, lper_cos) = elts.lper.sin_cos();
-        let (lan_sin, lan_cos) = elts.lan.sin_cos();
-        let incl_sin = (elts.incl / 2.0).sin();
-        Self {
-            a: elts.sma,
-            l: elts.l0,
-            k: elts.ecc * lper_cos,
-            h: elts.ecc * lper_sin,
-            q: incl_sin * lan_cos,
-            p: incl_sin * lan_sin,
+        #[cfg(feature = "no_std")]
+        {
+            let (lper_sin, lper_cos) = sincos(elts.lper);
+            let (lan_sin, lan_cos) = sincos(elts.lan);
+            let incl_sin = sin(elts.incl / 2.0);
+            Self {
+                a: elts.sma,
+                l: elts.l0,
+                k: elts.ecc * lper_cos,
+                h: elts.ecc * lper_sin,
+                q: incl_sin * lan_cos,
+                p: incl_sin * lan_sin,
+            }
+        }
+
+        #[cfg(not(feature = "no_std"))]
+        {
+            let (lper_sin, lper_cos) = elts.lper.sin_cos();
+            let (lan_sin, lan_cos) = elts.lan.sin_cos();
+            let incl_sin = (elts.incl / 2.0).sin();
+            Self {
+                a: elts.sma,
+                l: elts.l0,
+                k: elts.ecc * lper_cos,
+                h: elts.ecc * lper_sin,
+                q: incl_sin * lan_cos,
+                p: incl_sin * lan_sin,
+            }
         }
     }
 }
