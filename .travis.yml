@@ -44,10 +44,11 @@ jobs:
     script: ./travis-helper.sh documentation
     deploy: &pages
       provider: pages
-      github-token: $GH_TOKEN
-      local-dir: target/doc/
-      skip_cleanup: true
-      keep-history: true
+      token: $GH_TOKEN
+      local_dir: target/doc/
+      cleanup: true
+      keep_history: true
+      strategy: git
       on:
         repo: Razican/vsop87-rs
         branch: develop

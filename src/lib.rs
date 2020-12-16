@@ -74,7 +74,6 @@
 
 #![forbid(
     missing_docs,
-    warnings,
     anonymous_parameters,
     unused_extern_crates,
     unused_import_braces,
@@ -278,7 +277,11 @@ fn calculate_t(jde: f64) -> f64 {
 /// Calculates the given variable.
 #[inline]
 fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
-    #[cfg(not(feature = "no_std"))]
+    #[cfg(all(
+        any(target_arch = "x86", target_arch = "x86_64"),
+        feature = "simd",
+        not(feature = "no_std")
+    ))]
     #[allow(unsafe_code)]
     {
         if is_x86_feature_detected!("avx") {
@@ -289,7 +292,11 @@ fn calculate_var(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
         }
     }
 
-    #[cfg(feature = "no_std")]
+    #[cfg(any(
+        all(not(target_arch = "x86"), not(target_arch = "x86_64")),
+        not(feature = "simd"),
+        feature = "no_std"
+    ))]
     {
         calculate_var_fallback(t, a, b, c)
     }
@@ -321,6 +328,7 @@ fn calculate_var_fallback(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
 #[target_feature(enable = "avx")]
 #[cfg(all(
     any(target_arch = "x86", target_arch = "x86_64"),
+    feature = "simd",
     not(feature = "no_std")
 ))]
 #[allow(unsafe_code)]
@@ -336,9 +344,9 @@ unsafe fn calculate_var_avx(t: f64, a: &[f64], b: &[f64], c: &[f64]) -> f64 {
     use std::arch::x86_64::{_mm256_add_pd, _mm256_mul_pd, _mm256_set1_pd, _mm256_set_pd};
 
     #[cfg(all(feature = "no_std", target_arch = "x86"))]
-    use core::arch::x86::*;
+    use core::arch::x86::{_mm256_add_pd, _mm256_mul_pd, _mm256_set1_pd, _mm256_set_pd};
     #[cfg(all(not(feature = "no_std"), target_arch = "x86"))]
-    use std::arch::x86::*;
+    use std::arch::x86::{_mm256_add_pd, _mm256_mul_pd, _mm256_set1_pd, _mm256_set_pd};
 
     /// Vectorizes the calculation of 4 terms at the same time.
     unsafe fn vector_term(
