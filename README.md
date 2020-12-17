@@ -1,6 +1,7 @@
 # VSOP87 Rust implementation
 
-[![Build Status][build_svg]][build_status]
+[![Github_Actions][github_svg]][github_status]
+[![Travis Status][travis_svg]][travis_status]
 [![codecov][coverage_svg]][coverage_status]
 [![Crates.io][crate_svg]][crate_link]
 
@@ -74,8 +75,10 @@ This library is distributed under the terms of both the MIT license and the
 Apache License (Version 2.0), at your option. See LICENSE-APACHE, and LICENSE-MIT files for
 details.
 
-[build_svg]: https://travis-ci.org/Razican/vsop87-rs.svg?branch=master
-[build_status]: https://travis-ci.org/Razican/vsop87-rs
+[github_svg]: https://github.com/Razican/vsop87-rs/workflows/Rust/badge.svg
+[github_status]: https://github.com/Razican/vsop87-rs/actions
+[travis_svg]: https://travis-ci.org/Razican/vsop87-rs.svg?branch=master
+[travis_status]: https://travis-ci.org/Razican/vsop87-rs
 [coverage_svg]: https://codecov.io/gh/Razican/vsop87-rs/branch/master/graph/badge.svg
 [coverage_status]: https://codecov.io/gh/Razican/vsop87-rs
 [crate_svg]: https://meritbadge.herokuapp.com/vsop87
