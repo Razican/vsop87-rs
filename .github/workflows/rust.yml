@@ -1,0 +1,144 @@
+name: Continuous integration
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  merge_group:
+    types: [checks_requested]
+
+env:
+  RUSTFLAGS: -Dwarnings
+
+jobs:
+  coverage:
+    name: Coverage
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+      - name: Install cargo-tarpaulin
+        uses: baptiste0928/cargo-install@v2.2.0
+        with:
+          crate: cargo-tarpaulin
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: tarpaulin
+      - name: Run tarpaulin
+        uses: actions-rs/cargo@v1
+        with:
+          command: tarpaulin
+          args: --ignore-tests --engine llvm --out xml
+      - name: Upload to codecov.io
+        uses: codecov/codecov-action@v3
+
+  tests:
+    name: Test
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      matrix:
+        os:
+          - macos-latest
+          - windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+      - uses: Swatinem/rust-cache@v2
+      - name: Test
+        run: cargo test
+      - name: Test no-std
+        run: cargo test --features="no_std"
+      - name: Test (no-features)
+        run: cargo test --no-default-features
+      - name: Test no-std (no-features)
+        run: cargo test --no-default-features --features="no_std"
+      - name: Test docs
+        run: cargo test --doc
+
+  msrv:
+    name: MSRV
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: "1.36.0"
+          override: true
+          profile: minimal
+      - name: Check without default features
+        run: cargo check --no-default-features --all-targets
+      - name: Check witho default features
+        run: cargo check --all-targets
+      - name: Check no-std without default features
+        run: cargo check --no-default-features --features="no_std" --all-targets
+      - name: Check no-std with default features
+        run: cargo check --features="no_std" --all-targets
+
+  fmt:
+    name: Formatting
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+          components: rustfmt
+      - name: Format (rustfmt)
+        run: cargo fmt --all --check
+
+  clippy:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+          components: clippy
+      - name: Clippy
+        run: cargo clippy --all-targets -- -D warnings
+      - name: Clippy (No features)
+        run: cargo clippy --no-default-features --all-targets -- -D warnings
+      - name: Clippy (no-std)
+        run: cargo clippy --features="no_std" --all-targets -- -D warnings
+      - name: Clippy (no-std, no features)
+        run: cargo clippy --no-default-features features="no_std" --all-targets -- -D warnings
+
+  docs:
+    name: Documentation
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RUSTDOCFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions-rs/toolchain@v1.0.7
+        with:
+          toolchain: stable
+          override: true
+          profile: minimal
+      - uses: Swatinem/rust-cache@v2
+        with:
+          key: docs
+      - name: Generate documentation
+        run: cargo doc -v --document-private-items --all-features
