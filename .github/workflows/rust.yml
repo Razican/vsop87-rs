@@ -122,7 +122,7 @@ jobs:
       - name: Clippy (no-std)
         run: cargo clippy --features="no_std" --all-targets -- -D warnings
       - name: Clippy (no-std, no features)
-        run: cargo clippy --no-default-features features="no_std" --all-targets -- -D warnings
+        run: cargo clippy --no-default-features --features="no_std" --all-targets -- -D warnings
 
   docs:
     name: Documentation
