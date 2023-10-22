@@ -1,9 +1,10 @@
 [package]
 name = "vsop87"
-version = "2.1.0"
+version = "3.0.0"
 license = "MIT/Apache-2.0"
 authors = ["Iban Eguia <razican@protonmail.ch>"]
-edition = "2018"
+edition = "2021"
+rust-version = "1.70"
 readme = "README.md"
 repository = "https://github.com/Razican/vsop87-rs"
 documentation = "https://docs.rs/vsop87/"
@@ -31,11 +32,11 @@ no_std = ["libm"]
 simd = []
 
 [dependencies]
-libm = { version = "0.2.1", optional = true }
+libm = { version = "0.2.8", optional = true }
 
 [dev-dependencies]
-rand = "0.7.3"
-criterion = "0.3.3"
+rand = "0.8.5"
+criterion = "0.5.1"
 
 [[bench]]
 name = "vsop87"

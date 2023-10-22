@@ -75,25 +75,87 @@
 #![forbid(
     missing_docs,
     anonymous_parameters,
-    unused_extern_crates,
-    unused_import_braces,
+    unused,
     missing_copy_implementations,
     trivial_casts,
     variant_size_differences,
     missing_debug_implementations,
-    trivial_numeric_casts
+    trivial_numeric_casts,
+    unused,
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    rust_2021_compatibility
 )]
-// Debug trait derivation will show an error if forbidden.
+#![cfg_attr(not(test), forbid(clippy::unwrap_used))]
 #![deny(unused_qualifications, unsafe_code)]
-#![deny(clippy::all)]
-#![warn(clippy::pedantic)]
+#![warn(
+    // rustc lint groups https://doc.rust-lang.org/rustc/lints/groups.html
+    warnings,
+    future_incompatible,
+    let_underscore,
+    nonstandard_style,
+
+    // rustc allowed-by-default lints https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
+    macro_use_extern_crate,
+    meta_variable_misuse,
+    missing_abi,
+    non_ascii_idents,
+    noop_method_call,
+    single_use_lifetimes,
+    unreachable_pub,
+    unsafe_op_in_unsafe_fn,
+    unused_crate_dependencies,
+    unused_lifetimes,
+    unused_qualifications,
+    unused_tuple_struct_fields,
+
+    // rustdoc lints https://doc.rust-lang.org/rustdoc/lints.html
+    rustdoc::broken_intra_doc_links,
+    rustdoc::private_intra_doc_links,
+    rustdoc::missing_crate_level_docs,
+    rustdoc::private_doc_tests,
+    rustdoc::invalid_codeblock_attributes,
+    rustdoc::invalid_rust_codeblocks,
+    rustdoc::bare_urls,
+
+    // clippy allowed by default
+    clippy::dbg_macro,
+
+    // clippy categories https://doc.rust-lang.org/clippy/
+    clippy::all,
+    clippy::correctness,
+    clippy::suspicious,
+    clippy::style,
+    clippy::complexity,
+    clippy::perf,
+    clippy::pedantic,
+)]
+#![allow(
+    // Currently throws a false positive regarding dependencies that are only used in benchmarks.
+    unused_crate_dependencies,
+    clippy::module_name_repetitions,
+    clippy::redundant_pub_crate,
+    clippy::too_many_lines,
+    clippy::cognitive_complexity,
+    clippy::missing_errors_doc,
+    clippy::let_unit_value,
+    clippy::option_if_let_else,
+
+    // It may be worth to look if we can fix the issues highlighted by these lints.
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_wrap,
+
+    // Add temporarily - Needs addressing
+    clippy::missing_panics_doc,
+)]
 #![allow(
     clippy::many_single_char_names,
     clippy::unreadable_literal,
-    clippy::excessive_precision,
-    clippy::must_use_candidate
+    clippy::excessive_precision
 )]
-#![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
+// #![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
 // Features
 #![cfg_attr(feature = "no_std", no_std)]
 // All the "allow by default" lints
@@ -139,6 +201,7 @@ impl KeplerianElements {
     /// A number smaller to one would be a closed ellipse, while 0 would be a circle orbit. Values
     /// higher than one would be hyperbolic orbits, that are not closed, while a 1 would be a
     /// parabolic orbit. Negative values cannot exist.
+    #[must_use]
     pub fn eccentricity(&self) -> f64 {
         self.ecc
     }
@@ -146,6 +209,7 @@ impl KeplerianElements {
     /// Gets the semimajor axis of an orbit (*a*), in *AU* (Astronomical units).
     ///
     /// This value represents the average distance from the orbiting body to the center of mass.
+    #[must_use]
     pub fn semimajor_axis(&self) -> f64 {
         self.sma
     }
@@ -154,6 +218,7 @@ impl KeplerianElements {
     ///
     /// This value represents the inclination of the plane where the object is orbiting with
     /// respect to the reference plane.
+    #[must_use]
     pub fn inclination(&self) -> f64 {
         self.incl
     }
@@ -162,6 +227,7 @@ impl KeplerianElements {
     ///
     /// This value represents the angle in the orbit ellipse of the point where the reference plane
     /// and the orbit plane cross when the orbiting body crosses the plane *ascending* in the orbit.
+    #[must_use]
     pub fn ascending_node(&self) -> f64 {
         self.lan
     }
@@ -170,6 +236,7 @@ impl KeplerianElements {
     ///
     /// This value represents the angle in the orbit ellipse of the nearest point of the orbit to
     /// the center of mass of the system.
+    #[must_use]
     pub fn periapsis(&self) -> f64 {
         self.lper
     }
@@ -178,12 +245,14 @@ impl KeplerianElements {
     ///
     /// This value represents the angle in the orbit ellipse of the orbiting body at the given
     /// moment.
+    #[must_use]
     pub fn mean_anomaly(&self) -> f64 {
         self.l0
     }
 }
 
 impl From<VSOP87Elements> for KeplerianElements {
+    #[inline]
     fn from(elts: VSOP87Elements) -> Self {
         #[cfg(feature = "no_std")]
         {
@@ -246,6 +315,7 @@ impl SphericalCoordinates {
     /// This value represents the angular distance of an object along the ecliptic plane from the
     /// primary direction. In the case of heliocentric coordinates, it represents the *l* parameter,
     /// in geocentric coordinates, represents the *λ* parameter.
+    #[must_use]
     pub fn longitude(&self) -> f64 {
         self.lon
     }
@@ -255,6 +325,7 @@ impl SphericalCoordinates {
     /// This value represents the angular distance of an object from the ecliptic towards the north
     /// ecliptic pole. In the case of heliocentric coordinates, it represents the *b* parameter, in
     /// geocentric coordinates, represents the *β* parameter.
+    #[must_use]
     pub fn latitude(&self) -> f64 {
         self.lat
     }
@@ -263,6 +334,7 @@ impl SphericalCoordinates {
     ///
     /// In the case of heliocentric coordinates, it represents the *r* parameter, in geocentric
     /// coordinates, represents the *Δ* parameter.
+    #[must_use]
     pub fn distance(&self) -> f64 {
         self.dist
     }
@@ -449,6 +521,7 @@ pub struct VSOP87Elements {
 }
 
 impl From<KeplerianElements> for VSOP87Elements {
+    #[inline]
     fn from(elts: KeplerianElements) -> Self {
         #[cfg(feature = "no_std")]
         {
@@ -515,6 +588,7 @@ impl From<KeplerianElements> for VSOP87Elements {
 /// let k_elements: KeplerianElements = vsop87_elts.into();
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
+#[must_use]
 pub fn mercury(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
@@ -609,6 +683,7 @@ pub fn mercury(jde: f64) -> VSOP87Elements {
 /// let k_elements: KeplerianElements = vsop87_elts.into();
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
+#[must_use]
 pub fn venus(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
@@ -705,6 +780,7 @@ pub fn venus(jde: f64) -> VSOP87Elements {
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
 #[allow(clippy::too_many_lines)]
+#[must_use]
 pub fn earth_moon(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
@@ -961,6 +1037,7 @@ pub fn earth_moon(jde: f64) -> VSOP87Elements {
 /// let k_elements: KeplerianElements = vsop87_elts.into();
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
+#[must_use]
 pub fn mars(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
@@ -1057,6 +1134,7 @@ pub fn mars(jde: f64) -> VSOP87Elements {
 /// let k_elements: KeplerianElements = vsop87_elts.into();
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
+#[must_use]
 pub fn jupiter(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
@@ -1151,6 +1229,7 @@ pub fn jupiter(jde: f64) -> VSOP87Elements {
 /// let k_elements: KeplerianElements = vsop87_elts.into();
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
+#[must_use]
 pub fn saturn(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
@@ -1249,6 +1328,7 @@ pub fn saturn(jde: f64) -> VSOP87Elements {
 /// let k_elements: KeplerianElements = vsop87_elts.into();
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
+#[must_use]
 pub fn uranus(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 
@@ -1343,6 +1423,7 @@ pub fn uranus(jde: f64) -> VSOP87Elements {
 /// let k_elements: KeplerianElements = vsop87_elts.into();
 /// let convert_back = VSOP87Elements::from(k_elements);
 /// ```
+#[must_use]
 pub fn neptune(jde: f64) -> VSOP87Elements {
     let t = calculate_t(jde);
 

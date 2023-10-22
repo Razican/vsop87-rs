@@ -1,4 +1,3 @@
-extern crate vsop87;
 use vsop87::*;
 
 #[test]
