@@ -1,8 +1,12 @@
 # VSOP87 Rust implementation
 
-[![Build Status][build_svg]][build_status]
-[![codecov][coverage_svg]][coverage_status]
-[![Crates.io][crate_svg]][crate_link]
+[![Build Status][build_badge]][build_link]
+[![codecov](https://codecov.io/gh/Razican/vsop87-rs/branch/main/graph/badge.svg)](https://codecov.io/gh/Razican/vsop87-rs)
+[![Crates.io](https://img.shields.io/crates/v/vsop87.svg)](https://crates.io/crates/vsop87)
+[![Docs.rs](https://docs.rs/vsop87/badge.svg)](https://docs.rs/vsop87)
+
+[build_badge]: https://github.com/Razican/vsop87-rs/actions/workflows/rust.yml/badge.svg?event=push&branch=main
+[build_link]: https://github.com/Razican/vsop87-rs/actions/workflows/rust.yml?query=event%3Apush+branch%3Amain
 
 This library implements the *VSOP87* solutions to calculate the positions of the planets in the
 solar system. Full **documentation** can be found [here][docs_link].
@@ -69,12 +73,6 @@ This library is distributed under the terms of both the MIT license and the
 Apache License (Version 2.0), at your option. See LICENSE-APACHE, and LICENSE-MIT files for
 details.
 
-[build_svg]: https://travis-ci.org/Razican/vsop87-rs.svg?branch=master
-[build_status]: https://travis-ci.org/Razican/vsop87-rs
-[coverage_svg]: https://codecov.io/gh/Razican/vsop87-rs/branch/master/graph/badge.svg
-[coverage_status]: https://codecov.io/gh/Razican/vsop87-rs
-[crate_svg]: https://meritbadge.herokuapp.com/vsop87
-[crate_link]: https://crates.io/crates/vsop87
 [docs_link]: https://docs.rs/vsop87/
 [vsop87_compute]: https://www.caglow.com/info/compute/vsop87
 [vsop87_wiki]: https://en.wikipedia.org/wiki/VSOP_(planets)
