@@ -56,6 +56,7 @@ use super::{calculate_t, calculate_var, RectangularCoordinates};
 /// assert!(coordinates.y > -0.0027881716 && coordinates.y < -0.0027881714);
 /// assert!(coordinates.z > 0.0002041 && coordinates.z < 0.0002081);
 /// ```
+#[must_use]
 pub fn sun(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
@@ -115,6 +116,7 @@ pub fn sun(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > -0.1438666202 && coordinates.y < -0.1438666200);
 /// assert!(coordinates.z > 0.0235142 && coordinates.z < 0.0235182);
 /// ```
+#[must_use]
 pub fn mercury(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
@@ -174,6 +176,7 @@ pub fn mercury(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > 0.3900421674 && coordinates.y < 0.3900421676);
 /// assert!(coordinates.z > 0.0397542 && coordinates.z < 0.0397582);
 /// ```
+#[must_use]
 pub fn venus(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
@@ -233,6 +236,7 @@ pub fn venus(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > 0.9651943804 && coordinates.y < 0.9651943806);
 /// assert!(coordinates.z > 0.0007705 && coordinates.z < 0.0007745);
 /// ```
+#[must_use]
 pub fn earth(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
@@ -292,6 +296,7 @@ pub fn earth(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > 1.4065798250 && coordinates.y < 1.4065798252);
 /// assert!(coordinates.z > 0.0502476 && coordinates.z < 0.0502516);
 /// ```
+#[must_use]
 pub fn mars(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
@@ -351,6 +356,7 @@ pub fn mars(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > -1.9854861384 && coordinates.y < -1.9854861382);
 /// assert!(coordinates.z > -0.0959289 && coordinates.z < -0.0959249);
 /// ```
+#[must_use]
 pub fn jupiter(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
@@ -410,6 +416,7 @@ pub fn jupiter(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > -10.0240954526 && coordinates.y < -10.0240954524);
 /// assert!(coordinates.z > 0.1345888 && coordinates.z < 0.1345928);
 /// ```
+#[must_use]
 pub fn saturn(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
@@ -469,6 +476,7 @@ pub fn saturn(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > -5.1666300881 && coordinates.y < -5.1666300879);
 /// assert!(coordinates.z > 0.2124594 && coordinates.z < 0.2124634);
 /// ```
+#[must_use]
 pub fn uranus(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 
@@ -523,6 +531,7 @@ pub fn uranus(jde: f64) -> RectangularCoordinates {
 /// assert!(coordinates.y > -2.0298541973 && coordinates.y < -2.0298541971);
 /// assert!(coordinates.z > -0.6440972 && coordinates.z < -0.6440932);
 /// ```
+#[must_use]
 pub fn neptune(jde: f64) -> RectangularCoordinates {
     let t = calculate_t(jde);
 

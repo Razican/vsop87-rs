@@ -56,6 +56,7 @@ use std::f64::consts::PI;
 /// assert!(coordinates.latitude() > -0.0527573412 && coordinates.latitude() < -0.0527573410);
 /// assert!(coordinates.distance() > 0.4664711 && coordinates.distance() < 0.4664719);
 /// ```
+#[must_use]
 pub fn mercury(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
@@ -119,6 +120,7 @@ pub fn mercury(jde: f64) -> SphericalCoordinates {
 /// assert!(coordinates.latitude() > -0.0591709805 && coordinates.latitude() < -0.0591709803);
 /// assert!(coordinates.distance() > 0.7274715 && coordinates.distance() < 0.7274723);
 /// ```
+#[must_use]
 pub fn venus(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
@@ -182,6 +184,7 @@ pub fn venus(jde: f64) -> SphericalCoordinates {
 /// assert!(coordinates.latitude() > 0.0004381094 && coordinates.latitude() < 0.0004381096);
 /// assert!(coordinates.distance() > 0.9832270 && coordinates.distance() < 0.9832278);
 /// ```
+#[must_use]
 pub fn earth(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
@@ -245,6 +248,7 @@ pub fn earth(jde: f64) -> SphericalCoordinates {
 /// assert!(coordinates.latitude() > 0.0280781216 && coordinates.latitude() < 0.0280781218);
 /// assert!(coordinates.distance() > 1.6584693 && coordinates.distance() < 1.6584701);
 /// ```
+#[must_use]
 pub fn mars(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
@@ -308,6 +312,7 @@ pub fn mars(jde: f64) -> SphericalCoordinates {
 /// assert!(coordinates.latitude() > 0.0145957281 && coordinates.latitude() < 0.0145957283);
 /// assert!(coordinates.distance() > 5.3439451 && coordinates.distance() < 5.3439459);
 /// ```
+#[must_use]
 pub fn jupiter(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
@@ -371,6 +376,7 @@ pub fn jupiter(jde: f64) -> SphericalCoordinates {
 /// assert!(coordinates.latitude() > -0.0369435534 && coordinates.latitude() < -0.0369435532);
 /// assert!(coordinates.distance() > 9.0669210 && coordinates.distance() < 9.0669218);
 /// ```
+#[must_use]
 pub fn saturn(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
@@ -434,6 +440,7 @@ pub fn saturn(jde: f64) -> SphericalCoordinates {
 /// assert!(coordinates.latitude() > -0.0033027750 && coordinates.latitude() < -0.0033027748);
 /// assert!(coordinates.distance() > 19.2694309 && coordinates.distance() < 19.2694317);
 /// ```
+#[must_use]
 pub fn uranus(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
@@ -492,6 +499,7 @@ pub fn uranus(jde: f64) -> SphericalCoordinates {
 /// assert!(coordinates.latitude() > 0.0306777429 && coordinates.latitude() < 0.0306777431);
 /// assert!(coordinates.distance() > 30.3109111 && coordinates.distance() < 30.3109119);
 /// ```
+#[must_use]
 pub fn neptune(jde: f64) -> SphericalCoordinates {
     let t = calculate_t(jde);
 
