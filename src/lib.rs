@@ -184,6 +184,7 @@ impl KeplerianElements {
 }
 
 impl From<VSOP87Elements> for KeplerianElements {
+    #[inline]
     fn from(elts: VSOP87Elements) -> Self {
         #[cfg(feature = "no_std")]
         {
@@ -449,6 +450,7 @@ pub struct VSOP87Elements {
 }
 
 impl From<KeplerianElements> for VSOP87Elements {
+    #[inline]
     fn from(elts: KeplerianElements) -> Self {
         #[cfg(feature = "no_std")]
         {
