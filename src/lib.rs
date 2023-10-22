@@ -75,24 +75,87 @@
 #![forbid(
     missing_docs,
     anonymous_parameters,
-    unused_extern_crates,
-    unused_import_braces,
+    unused,
     missing_copy_implementations,
     trivial_casts,
     variant_size_differences,
     missing_debug_implementations,
-    trivial_numeric_casts
+    trivial_numeric_casts,
+    unused,
+    rust_2018_compatibility,
+    rust_2018_idioms,
+    rust_2021_compatibility
 )]
-// Debug trait derivation will show an error if forbidden.
+#![cfg_attr(not(test), forbid(clippy::unwrap_used))]
 #![deny(unused_qualifications, unsafe_code)]
-#![deny(clippy::all)]
-#![warn(clippy::pedantic)]
+#![warn(
+    // rustc lint groups https://doc.rust-lang.org/rustc/lints/groups.html
+    warnings,
+    future_incompatible,
+    let_underscore,
+    nonstandard_style,
+
+    // rustc allowed-by-default lints https://doc.rust-lang.org/rustc/lints/listing/allowed-by-default.html
+    macro_use_extern_crate,
+    meta_variable_misuse,
+    missing_abi,
+    non_ascii_idents,
+    noop_method_call,
+    single_use_lifetimes,
+    unreachable_pub,
+    unsafe_op_in_unsafe_fn,
+    unused_crate_dependencies,
+    unused_lifetimes,
+    unused_qualifications,
+    unused_tuple_struct_fields,
+
+    // rustdoc lints https://doc.rust-lang.org/rustdoc/lints.html
+    rustdoc::broken_intra_doc_links,
+    rustdoc::private_intra_doc_links,
+    rustdoc::missing_crate_level_docs,
+    rustdoc::private_doc_tests,
+    rustdoc::invalid_codeblock_attributes,
+    rustdoc::invalid_rust_codeblocks,
+    rustdoc::bare_urls,
+
+    // clippy allowed by default
+    clippy::dbg_macro,
+
+    // clippy categories https://doc.rust-lang.org/clippy/
+    clippy::all,
+    clippy::correctness,
+    clippy::suspicious,
+    clippy::style,
+    clippy::complexity,
+    clippy::perf,
+    clippy::pedantic,
+)]
+#![allow(
+    // Currently throws a false positive regarding dependencies that are only used in benchmarks.
+    unused_crate_dependencies,
+    clippy::module_name_repetitions,
+    clippy::redundant_pub_crate,
+    clippy::too_many_lines,
+    clippy::cognitive_complexity,
+    clippy::missing_errors_doc,
+    clippy::let_unit_value,
+    clippy::option_if_let_else,
+
+    // It may be worth to look if we can fix the issues highlighted by these lints.
+    clippy::cast_possible_truncation,
+    clippy::cast_sign_loss,
+    clippy::cast_precision_loss,
+    clippy::cast_possible_wrap,
+
+    // Add temporarily - Needs addressing
+    clippy::missing_panics_doc,
+)]
 #![allow(
     clippy::many_single_char_names,
     clippy::unreadable_literal,
     clippy::excessive_precision
 )]
-#![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
+// #![cfg_attr(all(test, feature = "no_std"), allow(unused_imports))]
 // Features
 #![cfg_attr(feature = "no_std", no_std)]
 // All the "allow by default" lints

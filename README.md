@@ -5,12 +5,7 @@
 [![Crates.io][crate_svg]][crate_link]
 
 This library implements the *VSOP87* solutions to calculate the positions of the planets in the
-solar system. Full **documentation** can be found [here][docs_link]. To use it you
-must include the following in your crate:
-
-```rust
-extern crate vsop87;
-```
+solar system. Full **documentation** can be found [here][docs_link].
 
 The main module calculates heliocentric ecliptic orbital elements for the equinox J2000.0 for
 the planets in the solar system, the basic *VSOP87* solution. There is one module per other

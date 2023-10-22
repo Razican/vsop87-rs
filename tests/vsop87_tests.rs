@@ -1,5 +1,3 @@
-extern crate vsop87;
-
 #[test]
 fn it_mercury() {
     let vsop87_elts = vsop87::mercury(2451545.0);
